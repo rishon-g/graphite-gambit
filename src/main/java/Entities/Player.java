@@ -1,4 +1,5 @@
 package Entities;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Game.GameWorld;
 
@@ -66,6 +67,7 @@ public class Player extends Entity {
             
         // If health drops to 0 or below, handle game end logic
         }else if (this.health <= 0) {
+            //TODO: game end logic
         }
     }
 
@@ -79,5 +81,5 @@ public class Player extends Entity {
      * Renders the player on the screen. This method is called every frame after update().
      */
     @Override
-    public void render() {}
+    public void render(SpriteBatch batch) {}
 }

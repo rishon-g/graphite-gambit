@@ -3,12 +3,13 @@ package Entities;
 import Game.GameWorld;
 
 /**
- * The Enemy class represents an enemy entity in the game, extending from Entity.
+ * The Enemy class represents an enemy entity in the game, extending the Entity abstract class.
  * Enemies have an attack method that defines their behavior when attacking the player.
  * 
  * @author Lane Jacobson
  * @version 1.0
  * @since 2026-2-26
+ * @see Entity
  */
 public abstract class Enemy extends Entity {
     public Enemy(GameWorld world) {

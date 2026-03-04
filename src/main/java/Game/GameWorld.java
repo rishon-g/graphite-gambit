@@ -3,7 +3,10 @@ import Entities.Entity;
 import Entities.Player;
 
 import java.util.Vector;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class GameWorld {
     // list of all entities in the game world
@@ -48,9 +51,30 @@ public class GameWorld {
     /**
      * Renders all entities in the game world. This method is called every frame after update.
      */
-    public void render() {
+    public void render(SpriteBatch batch) {
         for (Entity entity : entities) {
-            entity.render();
+            entity.render(batch);
         }
+    }
+
+    /**
+     * Disposes of all resources used by the game world.
+     * Called when the game is closed to free up memory and resources.
+     */
+    public void dispose() {
+        for (Entity entity : entities) {
+            if (entity.sprite != null) {
+                entity.sprite.dispose();
+            }
+        }
+    }
+
+    /**
+     * updates the position of the camera to follow the player.
+     * called by the screen before rendering the spritebatch.
+     * @param camera the camera following the player.
+     */
+    public void updateCamera(OrthographicCamera camera){
+        camera.position.set(player.transform.x, player.transform.y, 0);
     }
 }
