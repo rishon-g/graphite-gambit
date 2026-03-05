@@ -63,9 +63,9 @@ public class GameWorld {
      */
     public void dispose() {
         for (Entity entity : entities) {
-            if (entity.sprite != null) {
-                entity.sprite.dispose();
-            }
+            //if (entity.sprite != null) {
+            //    entity.sprite.dispose();
+            //}
         }
     }
 

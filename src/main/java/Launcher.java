@@ -1,3 +1,4 @@
+import Game.GdxGame;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
@@ -8,6 +9,6 @@ public class Launcher {
         config.setWindowedMode(800, 600);
         config.useVsync(true);
 
-        new Lwjgl3Application(new Game(), config);
+        new Lwjgl3Application(new GdxGame(), config);
     }
 }
