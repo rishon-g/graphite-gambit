@@ -1,6 +1,8 @@
 package Game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,11 +16,13 @@ import com.badlogic.gdx.Game;
  * @version 1.0
  */
 public class GdxGame extends Game {
-    private Batch batch;
+    private SpriteBatch batch;
     private BitmapFont font;
+    private ScreenManager screenManager;
     @Override
     public void create() {
         batch = new SpriteBatch();
+        screenManager = new ScreenManager();
 
         // load default font
         var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto.ttf"));
@@ -28,23 +32,51 @@ public class GdxGame extends Game {
         font = generator.generateFont(fontParams);
         generator.dispose();
 
-        // set initial screen
+        // set the initial screen
         // if data exists, load level, otherwise load menu
-        setScreen(new MainMenuScreen(this));
+        screenManager.switchScreen(new MainMenuScreen(this));
+        screenManager.push(new PauseScreen(this));
     }
 
-    public void changeScreen(GameScreen screen) {
-        this.setScreen(screen);
+    @Override
+    public void render() {
+        screenManager.render(Gdx.graphics.getDeltaTime());
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        screenManager.resize(width, height);
+    }
+
+    /**
+     * Changes between screen objects
+     * @param screen the screen to change to (MainMenuScreen, GameScreen, etc)
+     */
+    public void changeScreen(Screen screen) {
+        screenManager.switchScreen(screen);
+    }
+
+    public void overlayScreen(Screen screen) {
+        screenManager.push(screen);
+    }
+
+    public void popScreen() {
+        screenManager.pop();
+    }
+
+    public int numScreens() {
+        return screenManager.getSize();
     }
 
     @Override
     public void dispose() {
         super.dispose();
+        screenManager.dispose();
         batch.dispose();
         font.dispose();
     }
 
-    public Batch getBatch() {
+    public SpriteBatch getBatch() {
         return batch;
     }
 

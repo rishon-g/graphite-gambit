@@ -2,13 +2,13 @@ package Game;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.Game;
 
 public class GameScreen implements Screen {
 
     // reference to the main game class, used for switching screens.
-    Game game;
+    GdxGame game;
 
     // the game world that contains all entities and tilemap data for this screen
     GameWorld world;
@@ -23,10 +23,10 @@ public class GameScreen implements Screen {
      * Constructor for the GameScreen class. Initializes all resources and the GameWorld.
      * @param game reference to the main game class.
      */
-    public GameScreen(Game game) {
+    public GameScreen(GdxGame game) {
         this.game = game;
         camera = new OrthographicCamera();
-        batch = new SpriteBatch();
+        batch = game.getBatch();
         this.world = new WorldLoader().loadWorld(1);
     }
 
@@ -81,7 +81,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         world.dispose();
-        batch.dispose();
     }
     
 }
