@@ -1,14 +1,24 @@
 package Game;
 
+import Game.Worlds.Asset.AssetService;
+import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 
     // reference to the main game class, used for switching screens.
     GdxGame game;
+
+    Viewport viewport;
+    AssetService assetService;
+
+    OrthogonalTiledMapRenderer mapRenderer;
 
     // the game world that contains all entities and tilemap data for this screen
     GameWorld world;
@@ -28,11 +38,16 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera();
         batch = game.getBatch();
         this.world = new WorldLoader().loadWorld(id);
+        viewport = game.getViewport();
+        assetService = game.getAssetService();
+        mapRenderer = new OrthogonalTiledMapRenderer(null,
+                GdxGame.UNIT_SCALE, this.batch);
     }
 
     @Override
     public void show() {
-        camera.setToOrtho(false, 1960, 1080);
+        this.assetService.load(MapAsset.LEVEL1);
+        this.mapRenderer.setMap(this.assetService.get(MapAsset.LEVEL1));
     }
 
     /**
@@ -42,9 +57,17 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
+        viewport.apply();
+        camera.update();
+
+        this.batch.setColor(Color.WHITE);
+        this.mapRenderer.setView(this.camera);
+        this.mapRenderer.render();
+
+
         world.update(delta);
 
-        camera.update();
+
         world.updateCamera(camera);
 
         batch.setProjectionMatrix(camera.combined);
@@ -56,7 +79,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -81,6 +104,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         world.dispose();
+        mapRenderer.dispose();
     }
     
 }

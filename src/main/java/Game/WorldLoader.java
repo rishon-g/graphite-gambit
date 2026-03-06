@@ -25,6 +25,7 @@ public class WorldLoader {
     public GameWorld loadWorld(int id){
         GameWorld world = new GameWorld();
 
+        /* temporarily stopped
         // parse level data from json file
         Json json = new Json();
         String path = "./Worlds/level" + id + ".json";
@@ -49,7 +50,15 @@ public class WorldLoader {
             //TODO: set entity sprite based on entity data
 
             world.entities.add(entity);
-        }
+
+
+
+        } */
+        Entity dummyPlayer = new Player(world);
+        dummyPlayer.transform.setPosition(0, 0);
+        world.entities.add(dummyPlayer);
+
+        System.out.println("DEBUG: JSON bypassed. Dummy player spawned at 0,0.");
 
         return world;
     }
