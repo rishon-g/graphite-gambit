@@ -19,10 +19,13 @@ public class GdxGame extends Game {
     private SpriteBatch batch;
     private BitmapFont font;
     private ScreenManager screenManager;
+    private PlayerData playerData;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
-        screenManager = new ScreenManager();
+        screenManager = ScreenManager.getInstance(this);
+        playerData = new PlayerData();
 
         // load default font
         var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto.ttf"));
@@ -34,38 +37,17 @@ public class GdxGame extends Game {
 
         // set the initial screen
         // if data exists, load level, otherwise load menu
-        screenManager.switchScreen(new MainMenuScreen(this));
-        screenManager.push(new PauseScreen(this));
+        screenManager.SetMenuScreen(playerData);
     }
 
     @Override
     public void render() {
-        screenManager.render(Gdx.graphics.getDeltaTime());
+        super.render();
     }
 
     @Override
     public void resize(int width, int height) {
-        screenManager.resize(width, height);
-    }
-
-    /**
-     * Changes between screen objects
-     * @param screen the screen to change to (MainMenuScreen, GameScreen, etc)
-     */
-    public void changeScreen(Screen screen) {
-        screenManager.switchScreen(screen);
-    }
-
-    public void overlayScreen(Screen screen) {
-        screenManager.push(screen);
-    }
-
-    public void popScreen() {
-        screenManager.pop();
-    }
-
-    public int numScreens() {
-        return screenManager.getSize();
+        super.resize(width, height);
     }
 
     @Override

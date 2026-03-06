@@ -2,6 +2,7 @@ package Game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -22,11 +23,15 @@ public class MainMenuScreen extends ScreenAdapter {
     private final BitmapFont font;
     private final Viewport viewport = new ScreenViewport();
     private final GlyphLayout layout = new GlyphLayout();
+    private final ScreenManager screenManager;
+    private final PlayerData playerData;
 
-    public MainMenuScreen(GdxGame game) {
+    public MainMenuScreen(GdxGame game, PlayerData data) {
         this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
+        this.screenManager = ScreenManager.getInstance(game);
+        this.playerData = data;
     }
 
     @Override
@@ -34,7 +39,7 @@ public class MainMenuScreen extends ScreenAdapter {
         // listen for space press
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             // go to game screen
-            game.changeScreen(new GameScreen(game));
+            screenManager.SetGameScreen(1);
         }
 
         ScreenUtils.clear(Color.BLACK);
@@ -42,7 +47,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        layout.setText(font, "Main Menu");
+        layout.setText(font, "Press space to start");
         // centered text
         font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, viewport.getWorldHeight() / 2);
         batch.end();

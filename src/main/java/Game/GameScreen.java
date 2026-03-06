@@ -23,11 +23,11 @@ public class GameScreen implements Screen {
      * Constructor for the GameScreen class. Initializes all resources and the GameWorld.
      * @param game reference to the main game class.
      */
-    public GameScreen(GdxGame game) {
+    public GameScreen(GdxGame game, int id) {
         this.game = game;
         camera = new OrthographicCamera();
         batch = game.getBatch();
-        this.world = new WorldLoader().loadWorld(1);
+        this.world = new WorldLoader().loadWorld(id);
     }
 
     @Override
