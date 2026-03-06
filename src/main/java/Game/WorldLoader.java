@@ -55,8 +55,10 @@ public class WorldLoader {
 
         } */
         Entity dummyPlayer = new Player(world);
-        dummyPlayer.transform.setPosition(0, 0);
+        dummyPlayer.transform.setPosition(15, 10);
         world.entities.add(dummyPlayer);
+
+        world.player = (Player) dummyPlayer;
 
         System.out.println("DEBUG: JSON bypassed. Dummy player spawned at 0,0.");
 

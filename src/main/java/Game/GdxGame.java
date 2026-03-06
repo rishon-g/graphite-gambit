@@ -22,9 +22,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  * @version 1.0
  */
 public class GdxGame extends Game {
-    public static final float WORLD_WIDTH = 16f;
-    public static final float WORLD_HEIGHT = 9f;
-    public static final float UNIT_SCALE = 1f / 32f;
+    public static final float WORLD_WIDTH = 48f;
+    public static final float WORLD_HEIGHT = 27f;
+    public static final float UNIT_SCALE = 1f / 128f;
 
 
     private SpriteBatch batch;

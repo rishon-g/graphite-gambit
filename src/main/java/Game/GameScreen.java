@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
@@ -35,7 +36,7 @@ public class GameScreen implements Screen {
      */
     public GameScreen(GdxGame game, int id) {
         this.game = game;
-        camera = new OrthographicCamera();
+        camera = game.getCamera();
         batch = game.getBatch();
         this.world = new WorldLoader().loadWorld(id);
         viewport = game.getViewport();
@@ -57,21 +58,29 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        viewport.apply();
-        camera.update();
+        // 1. FREEZE TIME AND PHYSICS
+        // Comment out the world update so gravity stops pulling your player down!
+        // world.update(delta);
 
+        // 2. DETACH THE CAMERA
+        // Comment out the camera tracker
+        // world.updateCamera(camera);
+
+        // 3. HARDCODE CAMERA TO THE CENTER OF THE MAP
+        camera.position.set(15f, 10f, 0f);
+        camera.update();
+        viewport.apply();
+
+        // 4. WIPE THE SCREEN
+        ScreenUtils.clear(Color.NAVY);
+
+        // 5. DRAW THE MAP
         this.batch.setColor(Color.WHITE);
         this.mapRenderer.setView(this.camera);
         this.mapRenderer.render();
 
-
-        world.update(delta);
-
-
-        world.updateCamera(camera);
-
+        // 6. DRAW ENTITIES
         batch.setProjectionMatrix(camera.combined);
-
         batch.begin();
         world.render(batch);
         batch.end();
