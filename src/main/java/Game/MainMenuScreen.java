@@ -26,12 +26,12 @@ public class MainMenuScreen extends ScreenAdapter {
     private final ScreenManager screenManager;
     private final PlayerData playerData;
 
-    public MainMenuScreen(GdxGame game, PlayerData data) {
+    public MainMenuScreen(GdxGame game) {
         this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
         this.screenManager = ScreenManager.getInstance(game);
-        this.playerData = data;
+        this.playerData = PlayerData.obtainPlayerData();
     }
 
     @Override

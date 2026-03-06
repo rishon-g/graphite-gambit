@@ -19,13 +19,11 @@ public class GdxGame extends Game {
     private SpriteBatch batch;
     private BitmapFont font;
     private ScreenManager screenManager;
-    private PlayerData playerData;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         screenManager = ScreenManager.getInstance(this);
-        playerData = new PlayerData();
 
         // load default font
         var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto.ttf"));
@@ -36,8 +34,7 @@ public class GdxGame extends Game {
         generator.dispose();
 
         // set the initial screen
-        // if data exists, load level, otherwise load menu
-        screenManager.SetMenuScreen(playerData);
+        screenManager.SetMenuScreen();
     }
 
     @Override
