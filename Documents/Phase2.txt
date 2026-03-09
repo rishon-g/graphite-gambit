@@ -1,0 +1,34 @@
+Approach to Implementation:
+
+    The initial approach to the creation of the game stemmed from the control flow and functionalities of LibGDX for java. to accomplish our game, we required two main modules:
+        1: a main game class that is initialized at runtime. In our implementation, this class is not responsible for logic, but for initializing and switching between screens.
+
+        2: the screens that are actually rendered. Screens implement the Screen interface provided by LibGDX, which continuously renders whichever screen is currently active. In our implementation, we created one screen for the main menu, and one for the game logic. these two screens also have reference to their parent such that they may switch the screens themselves.
+
+Modifications:
+
+    The Original UML we created gave an overview of the main structure to the game rather than specific parts of the actual logic of implementation, so there were no changes to the structure of the UML itself.
+
+Roles:
+    Lane:
+        My role in this project was with the design and implementation of the high level components to the game, and control flow. 
+        
+        As I was the one who primarily created the UML of the game, I already had the knowledge of the high level modules that LibGDX required in order to operate, so I took charge in the design and implementation of the control flow of the program, outside of game logic and rendering.
+
+Management:
+
+    In order to keep a tight control on management, we maintained a strict control over the creation and modifications to modules through a shared document, where we actively shared which modules we were currently working on, and a global changelog to the game. we used these systems in order to avoid misscommunication, and to avoid merge conflicts.
+
+External Libraries:
+
+    As discussed throughout the report, we are using the LibGDX library, which provides high level utilities for the control and rendering of the game.
+
+    We decided to use this library in order to streamline the development of the game, as it provided us many useful utilities, primarily those in the rendering of the game.
+
+Enhancing Code Quality:
+
+    //TODO
+
+Challenges:
+
+    //TODO
