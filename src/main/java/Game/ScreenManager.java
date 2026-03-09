@@ -1,22 +1,17 @@
 package Game;
 
-import com.badlogic.gdx.Screen;
-import com.sun.tools.javac.Main;
-
-import java.util.Stack;
-
 /**
- *
+ * The screen manager is a singleton that is responsible for initializing and switching the active screen on request.
  * @author Luke McRae
  * @version 1.1
  */
 public class ScreenManager {
     GdxGame game;
-    private ScreenManager() {
-        // singleton
-    }
-    // initialize singleton
     private static ScreenManager instance;
+
+    private ScreenManager() {}
+
+    // initialize singleton
     public static ScreenManager getInstance(GdxGame game) {
         if (instance == null) {
             instance = new ScreenManager();
@@ -25,20 +20,15 @@ public class ScreenManager {
         return instance;
     }
 
-    public void SetMenuScreen(PlayerData data) {
-       game.setScreen(new MainMenuScreen(game, data));
+    public void SetMenuScreen() {
+        game.setScreen(new MainMenuScreen(game));
     }
 
     public void SetGameScreen(int id) {
         game.setScreen(new GameScreen(game, id));
     }
 
-    public void render(float delta) {
-    }
-
-    public void resize(int width, int height) {
-    }
-
-    public void dispose() {
+    public void dispose(){
+        // empty
     }
 }

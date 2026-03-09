@@ -54,8 +54,7 @@ public class GdxGame extends Game {
         generator.dispose();
 
         // set the initial screen
-        // if data exists, load level, otherwise load menu
-        screenManager.SetMenuScreen(playerData);
+        screenManager.SetMenuScreen();
     }
 
     @Override
