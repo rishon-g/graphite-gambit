@@ -3,6 +3,7 @@ package Entities;
 import Components.Transform;
 import com.badlogic.gdx.graphics.Texture;
 import Game.GameWorld;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * The Entity class represents an object or character in the game world.
@@ -16,9 +17,6 @@ abstract public class Entity {
     // position and scale of the entity
     public Transform transform;
 
-    // texture used for rendering the entity (can be null for invisible entities)
-    public Texture sprite;
-
     // reference to the game world the entity belongs to (used for interactions with other entities)
     protected GameWorld world;
 
@@ -27,7 +25,6 @@ abstract public class Entity {
      */
     public Entity(GameWorld world) {
         this.transform = new Transform();
-        this.sprite = null;
         this.world = world;
     }
 
@@ -38,5 +35,5 @@ abstract public class Entity {
      */
 
     abstract public void update(float delta);
-    abstract public void render();
+    abstract public void render(SpriteBatch batch);
 }

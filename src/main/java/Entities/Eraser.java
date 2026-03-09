@@ -1,5 +1,6 @@
 package Entities;
 import Game.GameWorld;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * The Eraser class represents an eraser entity in the game, extending from Entity.
@@ -24,7 +25,7 @@ public class Eraser extends Enemy {
      * The render method is called every frame after update to render the eraser entity on the screen.
      */
     @Override
-    public void render() {
+    public void render(SpriteBatch batch) {
     }
 
     /**
