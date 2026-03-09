@@ -25,6 +25,7 @@ public class WorldLoader {
     public GameWorld loadWorld(int id){
         GameWorld world = new GameWorld();
 
+        /*
         // parse level data from json file
         Json json = new Json();
         String path = "./Worlds/level" + id + ".json";
@@ -48,8 +49,11 @@ public class WorldLoader {
 
             //TODO: set entity sprite based on entity data
 
+
+
+
             world.entities.add(entity);
-        }
+        } */
 
         return world;
     }

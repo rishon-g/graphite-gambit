@@ -1,0 +1,27 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "bigobjects.tsx": {
+            "dynamicWrapping": true
+        },
+        "maintiles.tsx": {
+            "dynamicWrapping": false
+        }
+    },
+    "last.externalTilesetPath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/maps",
+    "last.imagePath": "/Users/rishonghosh/Downloads",
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": "1",
+    "openFiles": [
+    ],
+    "project": "level1.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
+}

@@ -1,14 +1,25 @@
 package Game;
 
+import Game.Worlds.Asset.AssetService;
+import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 
     // reference to the main game class, used for switching screens.
     GdxGame game;
+
+    Viewport viewport;
+    AssetService assetService;
+
+    OrthogonalTiledMapRenderer mapRenderer;
 
     // the game world that contains all entities and tilemap data for this screen
     GameWorld world;
@@ -25,14 +36,19 @@ public class GameScreen implements Screen {
      */
     public GameScreen(GdxGame game, int id) {
         this.game = game;
-        camera = new OrthographicCamera();
+        camera = game.getCamera();
         batch = game.getBatch();
         this.world = new WorldLoader().loadWorld(id);
+        viewport = game.getViewport();
+        assetService = game.getAssetService();
+        mapRenderer = new OrthogonalTiledMapRenderer(null,
+                GdxGame.UNIT_SCALE, this.batch);
     }
 
     @Override
     public void show() {
-        camera.setToOrtho(false, 1960, 1080);
+        this.assetService.load(MapAsset.LEVEL1);
+        this.mapRenderer.setMap(this.assetService.get(MapAsset.LEVEL1));
     }
 
     /**
@@ -42,13 +58,29 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        world.update(delta);
+        // 1. FREEZE TIME AND PHYSICS
+        // Comment out the world update so gravity stops pulling your player down!
+        // world.update(delta);
 
+        // 2. DETACH THE CAMERA
+        // Comment out the camera tracker
+        // world.updateCamera(camera);
+
+        // 3. HARDCODE CAMERA TO THE CENTER OF THE MAP
+        camera.position.set(15f, 10f, 0f);
         camera.update();
-        world.updateCamera(camera);
+        viewport.apply();
 
+        // 4. WIPE THE SCREEN
+        ScreenUtils.clear(Color.NAVY);
+
+        // 5. DRAW THE MAP
+        this.batch.setColor(Color.WHITE);
+        this.mapRenderer.setView(this.camera);
+        this.mapRenderer.render();
+
+        // 6. DRAW ENTITIES
         batch.setProjectionMatrix(camera.combined);
-
         batch.begin();
         world.render(batch);
         batch.end();
@@ -56,7 +88,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -81,6 +113,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         world.dispose();
+        mapRenderer.dispose();
     }
     
 }
