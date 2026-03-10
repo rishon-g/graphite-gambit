@@ -1,7 +1,6 @@
 package Entities;
 
 import Components.Transform;
-import com.badlogic.gdx.graphics.Texture;
 import Game.GameWorld;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -28,13 +27,6 @@ abstract public class Entity {
         this.world = world;
     }
 
-    /**
-     * Moves the entity by the given amounts.
-     * @param dx x amount to move
-     * @param dy y amount to move
-     */
-
     abstract public void update(float delta);
     abstract public void render(SpriteBatch batch, float delta);
-    abstract public void dispose();
 }

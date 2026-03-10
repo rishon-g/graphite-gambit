@@ -2,13 +2,27 @@ package Game;
 import Entities.Entity;
 import Entities.Player;
 
+import Components.Transform;
+import Components.Vec2;
+
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+/**
+ * The GameWorld class is responsible for managing the world, it's entities, and control over the game.
+ * 
+ * @author Lane Jacobson
+ * @version 1.1
+ */
 public class GameWorld {
+    // measurements for physics
+    static final int TILE_SIZE = 50;
+    static final int X_ORIGIN = 0;
+    static final int Y_ORIGIN = 0;
+
     // list of all entities in the game world
     Vector<Entity> entities;
 
@@ -43,17 +57,24 @@ public class GameWorld {
      * @param delta time since last update (used for movement and animations)
      */
     public void update(float delta) {
+        // World Updates
+        // TODO
+
+        // Entity Updates
         for (Entity entity : entities) {
             entity.update(delta);
         }
+
+        // Resolve Deaths
+        // TODO
     }
 
     /**
      * Renders all entities in the game world. This method is called every frame after update.
      */
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, float delta) {
         for (Entity entity : entities) {
-            entity.render(batch);
+            entity.render(batch, delta);
         }
     }
 
@@ -62,11 +83,7 @@ public class GameWorld {
      * Called when the game is closed to free up memory and resources.
      */
     public void dispose() {
-        for (Entity entity : entities) {
-            //if (entity.sprite != null) {
-            //    entity.sprite.dispose();
-            //}
-        }
+        // EMPTY
     }
 
     /**
@@ -76,5 +93,33 @@ public class GameWorld {
      */
     public void updateCamera(OrthographicCamera camera){
         camera.position.set(player.transform.x, player.transform.y, 0);
+    }
+
+    /**
+     * Called by and entity of the world in order to request to move.
+     * Handles any collisions between the entity and the map, then moves it in an allowed way.
+     * 
+     * @param t the transform of the entity
+     */
+    public void requestMove(Transform t, float delta){
+        // calculate dx and dy from velocities
+        Vec2 movement = new Vec2(t.velocity.x * delta, t.velocity.y * delta);
+
+        // actual values to move the entity by
+        Vec2 translate = new Vec2();
+
+        // horizontal movement
+        if(movement.x != 0){
+
+            // rightward movement
+        }
+
+        // vertical movement
+        if(movement.y != 0){
+
+        }
+
+        // move the entity
+        t.move(translate);
     }
 }
