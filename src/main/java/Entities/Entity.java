@@ -27,6 +27,31 @@ abstract public class Entity {
         this.world = world;
     }
 
-    abstract public void update(float delta);
+    /**
+     * Updates the internal system of the entity, then requests the world to move.
+     * Called every frame by the world this entity is contained within.
+     * 
+     * @param delta time since last update
+     */
+    public void update(float delta){
+        updateInternal(delta);
+        world.requestMove(transform, delta);
+    }
+
+    /**
+     * Updates any internal systems of the entity such as velocity.
+     * Called every frame, and abstracted for descendants to implement.
+     * 
+     * @param delta time since last update
+     */
+    abstract public void updateInternal(float delta);
+
+    /**
+     * Adds the sprite, or animation frame of the entity to the spritebatch to be rendered.
+     * Called every frame by the world this entity is contained within.
+     * 
+     * @param batch spritebatch to be rendered
+     * @param delta time since last update
+     */
     abstract public void render(SpriteBatch batch, float delta);
 }

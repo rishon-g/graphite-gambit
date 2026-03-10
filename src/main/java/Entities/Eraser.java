@@ -18,7 +18,7 @@ public class Eraser extends Enemy {
      * @param delta time since last update (used for movement and animations)
      */
     @Override
-    public void update(float delta) {
+    public void updateInternal(float delta) {
     }
 
     /**
