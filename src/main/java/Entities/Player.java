@@ -81,5 +81,5 @@ public class Player extends Entity {
      * Renders the player on the screen. This method is called every frame after update().
      */
     @Override
-    public void render(SpriteBatch batch) {}
+    public void render(SpriteBatch batch, float delta) {}
 }

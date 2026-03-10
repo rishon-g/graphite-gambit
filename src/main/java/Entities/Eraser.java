@@ -25,7 +25,7 @@ public class Eraser extends Enemy {
      * The render method is called every frame after update to render the eraser entity on the screen.
      */
     @Override
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, float delta) {
     }
 
     /**

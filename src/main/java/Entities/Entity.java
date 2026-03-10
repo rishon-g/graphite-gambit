@@ -35,5 +35,6 @@ abstract public class Entity {
      */
 
     abstract public void update(float delta);
-    abstract public void render(SpriteBatch batch);
+    abstract public void render(SpriteBatch batch, float delta);
+    abstract public void dispose();
 }
