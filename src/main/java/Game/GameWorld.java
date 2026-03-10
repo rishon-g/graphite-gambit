@@ -4,6 +4,7 @@ import Entities.Player;
 
 import Components.Transform;
 import Components.Vec2;
+import Components.Corner;
 
 import java.util.Vector;
 
@@ -92,7 +93,19 @@ public class GameWorld {
      * @param camera the camera following the player.
      */
     public void updateCamera(OrthographicCamera camera){
-        camera.position.set(player.transform.x, player.transform.y, 0);
+        camera.position.set(player.transform.position.x, player.transform.position.y, 0);
+    }
+
+    /**
+     * from a coordinate, calculates the indices of the tile that the coordinate resides within.
+     * @param coordinate the coordinate to query
+     * @return the tile that the coordinate is in
+     */
+    public Vec2 coordToIndex(Vec2 coordinate){
+        Vec2 index = new Vec2();
+        index.x = coordinate.x / TILE_SIZE - X_ORIGIN / TILE_SIZE;
+        index.y = coordinate.y / TILE_SIZE - Y_ORIGIN / TILE_SIZE;
+        return index;
     }
 
     /**
@@ -103,20 +116,123 @@ public class GameWorld {
      */
     public void requestMove(Transform t, float delta){
         // calculate dx and dy from velocities
-        Vec2 movement = new Vec2(t.velocity.x * delta, t.velocity.y * delta);
-
-        // actual values to move the entity by
-        Vec2 translate = new Vec2();
+        Vec2 translate = new Vec2(t.velocity.x * delta, t.velocity.y * delta);
 
         // horizontal movement
-        if(movement.x != 0){
-
+        if(translate.x != 0){
             // rightward movement
+            if(translate.x > 0){
+                // get positions of edges after movement 
+                Vec2 top_coord = t.getCorner(Corner.TR);
+                top_coord.x += translate.x;
+                Vec2 bottom_coord = t.getCorner(Corner.BR);
+                bottom_coord.x += translate.x;
+                
+                // adjust to not clip tile underneath
+                bottom_coord.y -= 1;
+
+                // get indices for new coordinates
+                Vec2 top_tile = coordToIndex(top_coord);
+                Vec2 bottom_tile = coordToIndex(bottom_coord);
+
+                // cast indices to integers for use
+                int tilex = (int)top_tile.x;
+                int topy = (int)top_tile.y;
+                int bottomy = (int)bottom_tile.y;
+
+                // check all coordinates between corners for collisions
+                for(int y = topy; y <= bottomy; y++){
+                    // check if collides with a wall
+                    if(tilemap[y][tilex] != 0){
+                        // set movement to be flush with the tile
+                        float tileLeft = tilex * TILE_SIZE;
+                        translate.x = tileLeft - t.getCorner(Corner.TR).x;
+                        break;
+                    }
+                }
+            }
+            
+            // leftward movement
+            else{
+                Vec2 top_coord = t.getCorner(Corner.TL);
+                top_coord.x += translate.x;
+
+                Vec2 bottom_coord = t.getCorner(Corner.BL);
+                bottom_coord.x += translate.x;
+
+                bottom_coord.y -= 1;
+
+                Vec2 top_tile = coordToIndex(top_coord);
+                Vec2 bottom_tile = coordToIndex(bottom_coord);
+
+                int tilex = (int)top_tile.x;
+                int topy = (int)top_tile.y;
+                int bottomy = (int)bottom_tile.y;
+
+                for(int y = topy; y <= bottomy; y++){
+                    if(tilemap[y][tilex] != 0){
+                        float tileRight = (tilex + 1) * TILE_SIZE;
+                        translate.x = tileRight - t.getCorner(Corner.TL).x;
+                        break;
+                    }
+                }
+            }
         }
 
         // vertical movement
-        if(movement.y != 0){
+        if(translate.y != 0){
 
+            // downward movement
+            if (translate.y > 0) {
+                Vec2 left_coord = t.getCorner(Corner.BL);
+                left_coord.y += translate.y;
+
+                Vec2 right_coord = t.getCorner(Corner.BR);
+                right_coord.y += translate.y;
+
+                right_coord.x -= 1;
+
+                Vec2 left_tile = coordToIndex(left_coord);
+                Vec2 right_tile = coordToIndex(right_coord);
+
+                int tiley = (int)left_tile.y;
+                int leftx = (int)left_tile.x;
+                int rightx = (int)right_tile.x;
+
+                for(int x = leftx; x <= rightx; x++){
+                    if(tilemap[tiley][x] != 0){
+                        float tileTop = tiley * TILE_SIZE;
+                        translate.y = tileTop - t.getCorner(Corner.BL).y;
+                        break;
+                    }
+                }                
+            }
+
+            // upward movement
+            else{
+                Vec2 left_coord = t.getCorner(Corner.TL);
+                left_coord.y += translate.y;
+
+                Vec2 right_coord = t.getCorner(Corner.TR);
+                right_coord.y += translate.y;
+
+                right_coord.x -= 1;
+
+                Vec2 left_tile = coordToIndex(left_coord);
+                Vec2 right_tile = coordToIndex(right_coord);
+
+                int tiley = (int)left_tile.y;
+                int leftx = (int)left_tile.x;
+                int rightx = (int)right_tile.x;
+
+                for(int x = leftx; x <= rightx; x++){
+                    if(tilemap[tiley][x] != 0){
+                        float tileBottom = (tiley + 1) * TILE_SIZE;
+                        translate.y = tileBottom - t.getCorner(Corner.TL).y;
+                        break;
+                    }
+                }
+            }
         }
 
         // move the entity
