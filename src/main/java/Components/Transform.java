@@ -1,5 +1,9 @@
 package Components;
 
+import Components.Corner;
+
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * The Transform component is responsible for storing the position and scale of an entity.
  * It is primarily used in rendering and collisions.
@@ -10,35 +14,29 @@ package Components;
  */
 public class Transform {
     // x and y positions (using top left corner as origin)
-    public float x, y;
+    public Vec2 position;
 
     // x and y pixel scales from the origin
-    public float w, h;
+    public Vec2 size;
 
     // x and y velocities (used for movement)
-    public float vx, vy;
+    public Vec2 velocity;
 
     /**
      * Default constructor for the Transform component, initializes all values to 0.
      */
     public Transform() {
-        this.x = 0;
-        this.y = 0;
-        this.w = 0;
-        this.h = 0;
-        this.vx = 0;
-        this.vy = 0;
+        position = new Vec2();
+        size = new Vec2();
+        velocity = new Vec2();
     }
 
     /**
      * Moves the transform by the given amounts.
-     * @param dx x amount to move
-     * @param dy y amount to move
+     * @param translate the coordinates to move the position by
      */
-
-    public void move(float dx, float dy) {
-        this.x += dx;
-        this.y += dy;
+    public void move(Vec2 translate) {
+        position.add(translate);
     }
 
     /**
@@ -47,18 +45,16 @@ public class Transform {
      * @param y y position
      */
     public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
+        position.set(x, y);
     }
 
     /**
-     * Sets the scale of the transform to the given values.
-     * @param w x scale
-     * @param h y scale
+     * Sets the size of the transform to the given values.
+     * @param w width (x size) of the transform
+     * @param h height (y size) of the transform
      */
     public void setScale(float w, float h) {
-        this.w = w;
-        this.h = h;
+       size.set(w, h);
     }
 
     /**
@@ -67,8 +63,7 @@ public class Transform {
      * @param vy y velocity
      */
     public void setVelocity(float vx, float vy) {
-        this.vx = vx;
-        this.vy = vy;
+        velocity.set(vx, vy);
     }
 
     /**
@@ -78,10 +73,43 @@ public class Transform {
      * @return true if the coordinates collide with the transform's area, false otherwise
      */
     public boolean collides(float x, float y){
-        if (x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h) {
+        if (x > this.position.x && x < this.position.x + this.size.x && y > this.position.y && y < this.position.y + this.size.y) {
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * gets the position of one corner of the transform.
+     * @param c the corner in question
+     * @return the position of the corner
+     */
+    public Vec2 getCorner(Corner c){
+        float x = position.x;
+        float y = position.y;
+
+        Vec2 pos = new Vec2();
+
+        switch(c){
+            case TL:
+                // no change to position
+                break;
+            case TR:
+                x += size.x;
+                break;
+            case BL:
+                y += size.y;
+                break;
+            case BR:
+                x += size.x;
+                y += size.y;
+                break;
+            default:
+                // return zeroes as temp debug
+                return pos;
+        }
+        pos.set(x, y);
+        return pos;
     }
 }

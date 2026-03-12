@@ -75,11 +75,11 @@ public class Player extends Entity {
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
-    public void update(float delta) {}
+    public void updateInternal(float delta) {}
 
     /**
      * Renders the player on the screen. This method is called every frame after update().
      */
     @Override
-    public void render(SpriteBatch batch) {}
+    public void render(SpriteBatch batch, float delta) {}
 }

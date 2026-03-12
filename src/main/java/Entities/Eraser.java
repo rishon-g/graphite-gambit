@@ -18,14 +18,14 @@ public class Eraser extends Enemy {
      * @param delta time since last update (used for movement and animations)
      */
     @Override
-    public void update(float delta) {
+    public void updateInternal(float delta) {
     }
 
     /**
      * The render method is called every frame after update to render the eraser entity on the screen.
      */
     @Override
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, float delta) {
     }
 
     /**

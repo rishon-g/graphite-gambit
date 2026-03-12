@@ -82,7 +82,7 @@ public class GameScreen implements Screen {
         // 6. DRAW ENTITIES
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        world.render(batch);
+        world.render(batch, delta);
         batch.end();
     }
 

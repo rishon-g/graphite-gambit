@@ -1,7 +1,6 @@
 package Entities;
 
 import Components.Transform;
-import com.badlogic.gdx.graphics.Texture;
 import Game.GameWorld;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -29,11 +28,30 @@ abstract public class Entity {
     }
 
     /**
-     * Moves the entity by the given amounts.
-     * @param dx x amount to move
-     * @param dy y amount to move
+     * Updates the internal system of the entity, then requests the world to move.
+     * Called every frame by the world this entity is contained within.
+     * 
+     * @param delta time since last update
      */
+    public void update(float delta){
+        updateInternal(delta);
+        world.requestMove(transform, delta);
+    }
 
-    abstract public void update(float delta);
-    abstract public void render(SpriteBatch batch);
+    /**
+     * Updates any internal systems of the entity such as velocity.
+     * Called every frame, and abstracted for descendants to implement.
+     * 
+     * @param delta time since last update
+     */
+    abstract public void updateInternal(float delta);
+
+    /**
+     * Adds the sprite, or animation frame of the entity to the spritebatch to be rendered.
+     * Called every frame by the world this entity is contained within.
+     * 
+     * @param batch spritebatch to be rendered
+     * @param delta time since last update
+     */
+    abstract public void render(SpriteBatch batch, float delta);
 }
