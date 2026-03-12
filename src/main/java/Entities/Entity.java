@@ -19,12 +19,15 @@ abstract public class Entity {
     // reference to the game world the entity belongs to (used for interactions with other entities)
     protected GameWorld world;
 
+    protected boolean dead;
+
     /**
      * Constructor for the Entity class.
      */
     public Entity(GameWorld world) {
         this.transform = new Transform();
         this.world = world;
+        dead = false;
     }
 
     /**
@@ -36,6 +39,14 @@ abstract public class Entity {
     public void update(float delta){
         updateInternal(delta);
         world.requestMove(transform, delta);
+    }
+
+    /**
+     * Returns whether or not the entity is dead.
+     * @return true if dead, false if not.
+     */
+    public boolean dead(){
+        return dead;
     }
 
     /**

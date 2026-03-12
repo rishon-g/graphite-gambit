@@ -38,7 +38,7 @@ public class GameScreen implements Screen {
         this.game = game;
         camera = game.getCamera();
         batch = game.getBatch();
-        this.world = new WorldLoader().loadWorld(id);
+        this.world = new WorldLoader().loadWorld(id, this);
         viewport = game.getViewport();
         assetService = game.getAssetService();
         mapRenderer = new OrthogonalTiledMapRenderer(null,
@@ -116,4 +116,20 @@ public class GameScreen implements Screen {
         mapRenderer.dispose();
     }
     
+    /**
+     * Handles the event that the GameWorld is finished with it's operation.
+     * 
+     * @param won true if the player won, false if not
+     */
+    public void gameEnd(boolean won){
+
+        // Updates the player save if won level
+        if(won){
+            PlayerData d = PlayerData.obtainPlayerData();
+            d.completeLevel(world.getId(), world.getScore());
+        }
+        // Load Main Menu
+        ScreenManager m = ScreenManager.getInstance(game);
+        m.SetMenuScreen();
+    }
 }
