@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * 
  * @param world the game world the eraser belongs to
  */
-public class Eraser extends Enemy {
+public class Eraser extends Nonplayer {
     public Eraser(GameWorld world) {
         super(world);
     }
@@ -32,6 +32,7 @@ public class Eraser extends Enemy {
      * The attack method is called when the eraser attacks the player.
      */
     @Override
-    public void attack() {
+    public void playerCollide(Player player) {
+        // TODO
     }
 }
