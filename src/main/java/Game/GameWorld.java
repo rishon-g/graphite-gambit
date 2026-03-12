@@ -109,7 +109,9 @@ public class GameWorld {
         // Resolve entity to player collisions
         for (Entity entity : entities) {
             if(entity instanceof Nonplayer){
-                ((Nonplayer)entity).playerCollide(player);
+                if(entity.transform.collides(player.transform)){
+                    ((Nonplayer)entity).playerCollide(player);
+                }
             }
         }
 

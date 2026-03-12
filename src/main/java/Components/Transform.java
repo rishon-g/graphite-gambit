@@ -77,6 +77,23 @@ public class Transform {
     }
 
     /**
+     * Calculates whether or not this transform collides with another transform.
+     * @param t the transform to check
+     * @return true if the transforms collide, otherwise false
+     */
+    public boolean collides(Transform t){
+        if(position.x > t.position.x + t.size.x ||
+           position.x + size.x < t.position.x ||
+           position.y > t.position.y + t.size.y || 
+           position.y + size.y < t.position.y){
+
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    /**
      * gets the position of one corner of the transform.
      * @param c the corner in question
      * @return the position of the corner
