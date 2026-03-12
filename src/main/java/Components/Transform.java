@@ -1,9 +1,5 @@
 package Components;
 
-import Components.Corner;
-
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * The Transform component is responsible for storing the position and scale of an entity.
  * It is primarily used in rendering and collisions.
