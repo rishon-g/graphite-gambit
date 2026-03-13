@@ -35,19 +35,32 @@ public class GameScreen implements Screen {
      */
     public GameScreen(GdxGame game, int id) {
         this.game = game;
-        camera = game.getCamera();
-        batch = game.getBatch();
-        this.world = new WorldLoader().loadWorld(id, this);
-        viewport = game.getViewport();
-        assetService = game.getAssetService();
-        mapRenderer = new OrthogonalTiledMapRenderer(null,
-                GdxGame.UNIT_SCALE, this.batch);
+        this.camera = game.getCamera();
+        this.batch = game.getBatch();
+        this.viewport = game.getViewport();
+        this.assetService = game.getAssetService();
+
+
+        // determine which level asset to use based on the ID
+        MapAsset currentLevel = MapAsset.getLevelAsset(id);
+
+        // load the asset
+        this.assetService.load(currentLevel);
+
+        // then, load the world
+        this.world = new WorldLoader().loadWorld(game, this, id);
+
+        // initialize the renderer with the newly loaded map
+        this.mapRenderer = new OrthogonalTiledMapRenderer(
+                this.assetService.get(currentLevel),
+                GdxGame.UNIT_SCALE,
+                this.batch
+        );
+
     }
 
     @Override
     public void show() {
-        this.assetService.load(MapAsset.LEVEL1);
-        this.mapRenderer.setMap(this.assetService.get(MapAsset.LEVEL1));
     }
 
     /**
@@ -57,28 +70,37 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        // 1. FREEZE TIME AND PHYSICS
-        // Comment out the world update so gravity stops pulling your player down!
-        // world.update(delta);
 
-        // 2. DETACH THE CAMERA
-        // Comment out the camera tracker
-        // world.updateCamera(camera);
+        // run update loops
+        world.update(delta);
 
-        // 3. HARDCODE CAMERA TO THE CENTER OF THE MAP
-        camera.position.set(15f, 10f, 0f);
+        // follow with camera
+        world.updateCamera(camera);
         camera.update();
         viewport.apply();
 
-        // 4. WIPE THE SCREEN
-        ScreenUtils.clear(Color.NAVY);
+        // wipe the screen
+        ScreenUtils.clear(Color.BLACK);
 
-        // 5. DRAW THE MAP
+        // draw map
         this.batch.setColor(Color.WHITE);
-        this.mapRenderer.setView(this.camera);
+
+
+
+        // expand the camera's "culling box" by 5 world units such that big objects do not despawn
+        float bleed = 5f;
+        float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
+        float startY = this.camera.position.y - (this.camera.viewportHeight / 2f) - bleed;
+        float boxWidth = this.camera.viewportWidth + (bleed * 2);
+        float boxHeight = this.camera.viewportHeight + (bleed * 2);
+
+        this.mapRenderer.setView(this.camera.combined, startX, startY, boxWidth, boxHeight);
+
+
+
         this.mapRenderer.render();
 
-        // 6. DRAW ENTITIES
+        // draw entities
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         world.render(batch, delta);

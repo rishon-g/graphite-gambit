@@ -1,4 +1,9 @@
 package Entities;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Game.GameWorld;
@@ -12,10 +17,12 @@ import Game.GameWorld;
  * @since 2026-2-26
  */
 public class Player extends Entity {
+    private Texture dummyTexture;
     // health (graphite) of the player
     private int health;
     private int maxHealth;
     private int points;
+    private float speed = 400f; // pixels per second
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -24,6 +31,13 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
+
+        // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.RED);
+        pixmap.fill();
+        this.dummyTexture = new Texture(pixmap);
+        pixmap.dispose();
     }
 
     /**
@@ -75,11 +89,35 @@ public class Player extends Entity {
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
-    public void updateInternal(float delta) {}
+    public void updateInternal(float delta) {
+        float vx = 0;
+        float vy = 0;
+
+        // 1. Check Keyboard Input
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) vy = speed;
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) vy = -speed;
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) vx = -speed;
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) vx = speed;
+
+        // 2. Set the velocity in the Transform
+        this.transform.setVelocity(vx, vy);
+
+        // 3. Ask the GameWorld to move the player safely (handles collisions)
+        this.world.requestMove(this.transform, delta);
+    }
 
     /**
      * Renders the player on the screen. This method is called every frame after update().
      */
     @Override
-    public void render(SpriteBatch batch, float delta) {}
+    public void render(SpriteBatch batch, float delta) {
+
+        // draw the red square at the player's scaled position (by scaled we mean the pixel size)
+        batch.draw(dummyTexture,
+                this.transform.position.x * Game.GdxGame.UNIT_SCALE,
+                this.transform.position.y * Game.GdxGame.UNIT_SCALE,
+                this.transform.size.x * Game.GdxGame.UNIT_SCALE,
+                this.transform.size.y * Game.GdxGame.UNIT_SCALE
+        );
+    }
 }

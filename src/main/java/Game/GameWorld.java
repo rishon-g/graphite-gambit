@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
  */
 public class GameWorld {
     // measurements for physics
-    static final int TILE_SIZE = 50;
+    static final int TILE_SIZE = 128;
     static final int X_ORIGIN = 0;
     static final int Y_ORIGIN = 0;
 
@@ -155,7 +155,11 @@ public class GameWorld {
      * @param camera the camera following the player.
      */
     public void updateCamera(OrthographicCamera camera){
-        camera.position.set(player.transform.position.x, player.transform.position.y, 0);
+        camera.position.set(
+                player.transform.position.x * GdxGame.UNIT_SCALE,
+                player.transform.position.y * GdxGame.UNIT_SCALE,
+                0
+        );
     }
 
     /**
@@ -186,118 +190,81 @@ public class GameWorld {
             if(translate.x > 0){
                 // get positions of edges after movement 
                 Vec2 top_coord = t.getCorner(Corner.TR);
-                top_coord.x += translate.x;
                 Vec2 bottom_coord = t.getCorner(Corner.BR);
-                bottom_coord.x += translate.x;
-                
-                // adjust to not clip tile underneath
-                bottom_coord.y -= 1;
 
-                // get indices for new coordinates
-                Vec2 top_tile = coordToIndex(top_coord);
-                Vec2 bottom_tile = coordToIndex(bottom_coord);
+                // check collisions at the new X position
+                if (isCollisionAt(top_coord.x + translate.x, top_coord.y) ||
+                        isCollisionAt(bottom_coord.x + translate.x, bottom_coord.y)) {
 
-                // cast indices to integers for use
-                int tilex = (int)top_tile.x;
-                int topy = (int)top_tile.y;
-                int bottomy = (int)bottom_tile.y;
-
-                // check all coordinates between corners for collisions
-                for(int y = topy; y <= bottomy; y++){
-                    // check if collides with a wall
-                    if(tilemap[y][tilex] != 0){
-                        // set movement to be flush with the tile
-                        float tileLeft = tilex * TILE_SIZE;
-                        translate.x = tileLeft - t.getCorner(Corner.TR).x;
-                        break;
-                    }
+                    // snap player flush to the tile's left edge
+                    // we use math.floor and cast TILE_SIZE to float to prevent early int division
+                    float tileLeft = ((float)Math.floor((top_coord.x + translate.x) / (float)TILE_SIZE)) * TILE_SIZE;
+                    translate.x = tileLeft - top_coord.x - 0.01f; // tiny offset to prevent sticking
                 }
             }
-            
             // leftward movement
             else{
                 Vec2 top_coord = t.getCorner(Corner.TL);
-                top_coord.x += translate.x;
-
                 Vec2 bottom_coord = t.getCorner(Corner.BL);
-                bottom_coord.x += translate.x;
 
-                bottom_coord.y -= 1;
+                if (isCollisionAt(top_coord.x + translate.x, top_coord.y) ||
+                        isCollisionAt(bottom_coord.x + translate.x, bottom_coord.y)) {
 
-                Vec2 top_tile = coordToIndex(top_coord);
-                Vec2 bottom_tile = coordToIndex(bottom_coord);
 
-                int tilex = (int)top_tile.x;
-                int topy = (int)top_tile.y;
-                int bottomy = (int)bottom_tile.y;
-
-                for(int y = topy; y <= bottomy; y++){
-                    if(tilemap[y][tilex] != 0){
-                        float tileRight = (tilex + 1) * TILE_SIZE;
-                        translate.x = tileRight - t.getCorner(Corner.TL).x;
-                        break;
-                    }
+                    float tileRight = ((float)Math.floor((top_coord.x + translate.x) / (float)TILE_SIZE) + 1) * TILE_SIZE;
+                    translate.x = tileRight - top_coord.x + 0.01f;
                 }
             }
         }
-
         // vertical movement
         if(translate.y != 0){
 
-            // downward movement
-            if (translate.y > 0) {
-                Vec2 left_coord = t.getCorner(Corner.BL);
-                left_coord.y += translate.y;
-
-                Vec2 right_coord = t.getCorner(Corner.BR);
-                right_coord.y += translate.y;
-
-                right_coord.x -= 1;
-
-                Vec2 left_tile = coordToIndex(left_coord);
-                Vec2 right_tile = coordToIndex(right_coord);
-
-                int tiley = (int)left_tile.y;
-                int leftx = (int)left_tile.x;
-                int rightx = (int)right_tile.x;
-
-                for(int x = leftx; x <= rightx; x++){
-                    if(tilemap[tiley][x] != 0){
-                        float tileTop = tiley * TILE_SIZE;
-                        translate.y = tileTop - t.getCorner(Corner.BL).y;
-                        break;
-                    }
-                }                
-            }
-
-            // upward movement
-            else{
+            if (translate.y > 0) { // Moving Up
                 Vec2 left_coord = t.getCorner(Corner.TL);
-                left_coord.y += translate.y;
-
                 Vec2 right_coord = t.getCorner(Corner.TR);
-                right_coord.y += translate.y;
 
-                right_coord.x -= 1;
+                if (isCollisionAt(left_coord.x, left_coord.y + translate.y) ||
+                        isCollisionAt(right_coord.x, right_coord.y + translate.y)) {
 
-                Vec2 left_tile = coordToIndex(left_coord);
-                Vec2 right_tile = coordToIndex(right_coord);
-
-                int tiley = (int)left_tile.y;
-                int leftx = (int)left_tile.x;
-                int rightx = (int)right_tile.x;
-
-                for(int x = leftx; x <= rightx; x++){
-                    if(tilemap[tiley][x] != 0){
-                        float tileBottom = (tiley + 1) * TILE_SIZE;
-                        translate.y = tileBottom - t.getCorner(Corner.TL).y;
-                        break;
-                    }
+                    float tileBottom = ((float)Math.floor((left_coord.y + translate.y) / (float)TILE_SIZE)) * TILE_SIZE;
+                    translate.y = tileBottom - left_coord.y - 0.01f;
                 }
-            }
-        }
+            } else { // moving down
+                Vec2 left_coord = t.getCorner(Corner.BL);
+                Vec2 right_coord = t.getCorner(Corner.BR);
 
+                if (isCollisionAt(left_coord.x, left_coord.y + translate.y) ||
+                        isCollisionAt(right_coord.x, right_coord.y + translate.y)) {
+
+                    float tileTop = ((int)Math.floor((left_coord.y + translate.y) / (float)TILE_SIZE) + 1) * TILE_SIZE;
+                    translate.y = tileTop - left_coord.y + 0.01f;
+                }
+
+            }
+
+        }
         // move the entity
         t.move(translate);
     }
+
+    // helper method to keep requestMove clean
+    private boolean isCollisionAt(float x, float y) {
+
+        // 1. Pixel-perfect boundary check!
+        // tilemap.length is your map width (30), tilemap[0].length is your map height (20)
+        if (x < 0 || x >= tilemap.length * TILE_SIZE || y < 0 || y >= tilemap[0].length * TILE_SIZE) {
+            return true; // Hit the edge of the world!
+        }
+
+        // 2. Tile index math (Safe now, because we proved x and y are positive!)
+        int ix = (int) (x / TILE_SIZE);
+        int iy = (int) (y / TILE_SIZE);
+
+        // 3. Since the white paper grid is walkable, we just return false.
+        // If you later add tiles you CAN'T walk on, you would do: return tilemap[ix][iy] != 0;
+        return false;
+    }
+
 }
+
+
