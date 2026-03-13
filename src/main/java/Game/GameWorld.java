@@ -92,6 +92,23 @@ public class GameWorld {
             }
         }
     }
+    /**
+     * getter for the player
+     * @return player
+     */
+    public Player getPlayer(){ return player; }
+
+    /**
+     * getter for the tilemap
+     * @return tilemap
+     */
+    public int[][] getTilemap(){ return tilemap; }
+
+    /**
+     * getter for the TileSize
+     * @return TILE_SIZE
+     */
+    public static int getTileSize(){ return TILE_SIZE; }
 
     /**
      * Updates all entities in the game world.

@@ -52,12 +52,12 @@ public class AStar {
         PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingInt(n -> n.f));
 
         // The first node
-        int startH = manhattan(startX, startY, endX, endY);
+        int startH = chebyshev(startX, startY, endX, endY);
         Node start = new Node(startX, startY, 0, startH, null);
         open.add(start);
         bestG[startX][startY] = 0;
 
-        int[][] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+        int[][] directions = { {1,0}, {-1,0}, {0,1}, {0,-1}, {1,1}, {1,-1}, {-1,1}, {-1,-1} };
 
         while (!open.isEmpty()) {
             Node cur = open.poll();
@@ -80,6 +80,7 @@ public class AStar {
                 if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
                 if (isBlocked(map, nx, ny)) continue;
                 if (closed[nx][ny]) continue;
+                if (isDiagonalMove(d[0], d[1]) && cutsCorner(map, cur.x, cur.y, nx, ny)) continue;
 
                 int ng = cur.g + 1;
 
@@ -87,7 +88,7 @@ public class AStar {
                 bestG[nx][ny] = ng;
 
                 // Manhattan Distance Heuristic
-                int nf = ng + manhattan(nx, ny, endX, endY);
+                int nf = ng + chebyshev(nx, ny, endX, endY);
 
                 open.add(new Node(nx, ny, ng, nf, cur));
             }
@@ -103,8 +104,25 @@ public class AStar {
     }
 
     /** Manhattan Distance Heuristic */
-    private static int manhattan(int x1, int y1, int x2, int y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    private static int chebyshev(int x1, int y1, int x2, int y2) {
+        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+    }
+
+    /** True if move is diagonal. */
+    private static boolean isDiagonalMove(int dx, int dy) {
+        return dx != 0 && dy != 0;
+    }
+
+    /** Prevent diagonal movement through a blocked corner. */
+    private static boolean cutsCorner(int[][] map, int x, int y, int nx, int ny) {
+        int dx = nx - x;
+        int dy = ny - y;
+
+        if (dx == 0 || dy == 0) {
+            return false;
+        }
+
+        return isBlocked(map, x + dx, y) || isBlocked(map, x, y + dy);
     }
 
     /** Restoring the path from the goal to the start via parent. */
