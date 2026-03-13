@@ -1,9 +1,5 @@
 package Components;
 
-import Components.Corner;
-
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * The Transform component is responsible for storing the position and scale of an entity.
  * It is primarily used in rendering and collisions.
@@ -77,6 +73,23 @@ public class Transform {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Calculates whether or not this transform collides with another transform.
+     * @param t the transform to check
+     * @return true if the transforms collide, otherwise false
+     */
+    public boolean collides(Transform t){
+        if(position.x > t.position.x + t.size.x ||
+           position.x + size.x < t.position.x ||
+           position.y > t.position.y + t.size.y || 
+           position.y + size.y < t.position.y){
+
+            return false;
+        }else{
+            return true;
         }
     }
 

@@ -67,7 +67,7 @@ public class Player extends Entity {
             
         // If health drops to 0 or below, handle game end logic
         }else if (this.health <= 0) {
-            //TODO: game end logic
+            dead = true;
         }
     }
 

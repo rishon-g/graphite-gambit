@@ -22,8 +22,8 @@ public class WorldLoader {
      * @param id identifier for the world to load (e.g. level number)
      * @return the loaded GameWorld object with tilemap and entities initialized according to the level data
      */
-    public GameWorld loadWorld(int id){
-        GameWorld world = new GameWorld();
+    public GameWorld loadWorld(int id, GameScreen screen){
+        GameWorld world = new GameWorld(id, screen);
 
         /*
         // parse level data from json file

@@ -1,6 +1,7 @@
 package Game;
 import Entities.Entity;
 import Entities.Player;
+import Entities.Nonplayer;
 
 import Components.Transform;
 import Components.Vec2;
@@ -24,6 +25,9 @@ public class GameWorld {
     static final int X_ORIGIN = 0;
     static final int Y_ORIGIN = 0;
 
+    int points;
+    float time;
+
     // list of all entities in the game world
     Vector<Entity> entities;
 
@@ -33,11 +37,47 @@ public class GameWorld {
     // tilemap for the world (can be used for rendering and collisions)
     int[][] tilemap;
 
+    // reference to the id of this world
+    int worldId;
+
+    // reference to the managing screen
+    GameScreen screen;
+
     /**
      * Constructor for the GameWorld class, initializes the entities vector and creates the player entity.
+     * @param id The id of this world
+     * @param screen a reference to the creating screen
      */
-    public GameWorld() {
+    public GameWorld(int id, GameScreen screen) {
         this.entities = new Vector<Entity>();
+        this.worldId = id;
+        this.screen = screen;
+        this.points = 0;
+        this.time = 0;
+    }
+
+    /**
+     * Increments/Decrements the amount of points belonging to the user.
+     * @param p increment to points
+     */
+    public void score(int p){
+        this.points += p;
+    }
+
+    /**
+     * Getter for points
+     * @return points
+     */
+    public int getScore(){
+        return points;
+    }
+
+    /**
+     * getter for the worldId
+     * @return worldId
+     */
+    public int getId(){
+        return worldId;
     }
 
     public void initializeTilemap(int width, int height, Array<String> tileData) {
@@ -52,22 +92,61 @@ public class GameWorld {
             }
         }
     }
+    /**
+     * getter for the player
+     * @return player
+     */
+    public Player getPlayer(){ return player; }
+
+    /**
+     * getter for the tilemap
+     * @return tilemap
+     */
+    public int[][] getTilemap(){ return tilemap; }
+
+    /**
+     * getter for the TileSize
+     * @return TILE_SIZE
+     */
+    public static int getTileSize(){ return TILE_SIZE; }
 
     /**
      * Updates all entities in the game world.
      * @param delta time since last update (used for movement and animations)
      */
     public void update(float delta) {
-        // World Updates
-        // TODO
+        // World updates
+        time += delta;
 
-        // Entity Updates
+        // Entity updates
         for (Entity entity : entities) {
             entity.update(delta);
         }
 
-        // Resolve Deaths
-        // TODO
+        // Resolve entity to player collisions
+        for (Entity entity : entities) {
+            if(entity instanceof Nonplayer){
+                if(entity.transform.collides(player.transform)){
+                    ((Nonplayer)entity).playerCollide(player);
+                }
+            }
+        }
+
+        // Resolve deaths
+        for(int i = entities.size() - 1; i >= 0; i--) {
+            if(entities.get(i).dead()){
+
+                // Handle game over
+                if(entities.get(i) instanceof Player){
+                    screen.gameEnd(false);
+                }
+
+                // Remove entity from list
+                else{
+                    entities.remove(i);
+                }
+            }
+        }
     }
 
     /**
