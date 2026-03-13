@@ -250,18 +250,17 @@ public class GameWorld {
     // helper method to keep requestMove clean
     private boolean isCollisionAt(float x, float y) {
 
-        // 1. Pixel-perfect boundary check!
+
         // tilemap.length is your map width (30), tilemap[0].length is your map height (20)
         if (x < 0 || x >= tilemap.length * TILE_SIZE || y < 0 || y >= tilemap[0].length * TILE_SIZE) {
             return true; // Hit the edge of the world!
         }
 
-        // 2. Tile index math (Safe now, because we proved x and y are positive!)
+        // 2. tile index math
         int ix = (int) (x / TILE_SIZE);
         int iy = (int) (y / TILE_SIZE);
 
-        // 3. Since the white paper grid is walkable, we just return false.
-        // If you later add tiles you CAN'T walk on, you would do: return tilemap[ix][iy] != 0;
+        // since the white paper grid is walkable, we just return false.
         return false;
     }
 
