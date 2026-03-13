@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="maintiles" tilewidth="1168" tileheight="1024" tilecount="22" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="maintiles" tilewidth="1168" tileheight="1024" tilecount="24" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="73">
   <image source="../images/desk.png" width="310" height="296"/>
@@ -109,6 +109,12 @@
  </tile>
  <tile id="97">
   <image source="../images/1_ePZmG6fJPlBkKZHiNIdFsA-removebg-preview.png" width="528" height="473"/>
+ </tile>
+ <tile id="98">
+  <image source="../images/protractor.png" width="384" height="384"/>
+ </tile>
+ <tile id="99">
+  <image source="../images/scribble.png" width="448" height="306"/>
  </tile>
  <wangsets>
   <wangset name="Unnamed Set" type="corner" tile="-1">
