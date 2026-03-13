@@ -29,6 +29,7 @@ public class Transform {
 
     /**
      * Moves the transform by the given amounts.
+     *
      * @param translate the coordinates to move the position by
      */
     public void move(Vec2 translate) {
@@ -37,6 +38,7 @@ public class Transform {
 
     /**
      * Sets the position of the transform to the given coordinates.
+     *
      * @param x x position
      * @param y y position
      */
@@ -46,15 +48,17 @@ public class Transform {
 
     /**
      * Sets the size of the transform to the given values.
+     *
      * @param w width (x size) of the transform
      * @param h height (y size) of the transform
      */
     public void setScale(float w, float h) {
-       size.set(w, h);
+        size.set(w, h);
     }
 
     /**
      * Sets the velocity of the transform to the given values.
+     *
      * @param vx x velocity
      * @param vy y velocity
      */
@@ -64,11 +68,12 @@ public class Transform {
 
     /**
      * Checks if the given coordinates collide with the transform's area.
+     *
      * @param x x coordinate to check
      * @param y y coordinate to check
      * @return true if the coordinates collide with the transform's area, false otherwise
      */
-    public boolean collides(float x, float y){
+    public boolean collides(float x, float y) {
         if (x > this.position.x && x < this.position.x + this.size.x && y > this.position.y && y < this.position.y + this.size.y) {
             return true;
         } else {
@@ -78,51 +83,49 @@ public class Transform {
 
     /**
      * Calculates whether or not this transform collides with another transform.
+     *
      * @param t the transform to check
      * @return true if the transforms collide, otherwise false
      */
-    public boolean collides(Transform t){
-        if(position.x > t.position.x + t.size.x ||
-           position.x + size.x < t.position.x ||
-           position.y > t.position.y + t.size.y || 
-           position.y + size.y < t.position.y){
+    public boolean collides(Transform t) {
+        if (position.x > t.position.x + t.size.x ||
+                position.x + size.x < t.position.x ||
+                position.y > t.position.y + t.size.y ||
+                position.y + size.y < t.position.y) {
 
             return false;
-        }else{
+        } else {
             return true;
         }
     }
 
     /**
      * gets the position of one corner of the transform.
+     *
      * @param c the corner in question
      * @return the position of the corner
      */
-    public Vec2 getCorner(Corner c){
+    public Vec2 getCorner(Corner c) {
         float x = position.x;
         float y = position.y;
-
         Vec2 pos = new Vec2();
 
-        switch(c){
-            case TL:
-                // no change to position
-                break;
-            case TR:
-                x += size.x;
-                break;
+        switch (c) {
             case BL:
-                y += size.y;
-                break;
+                break; // libGDX Origin
             case BR:
                 x += size.x;
+                break;
+            case TL:
+                y += size.y;
+                break; // Y increases Up
+            case TR:
+                x += size.x;
                 y += size.y;
                 break;
-            default:
-                // return zeroes as temp debug
-                return pos;
         }
         pos.set(x, y);
         return pos;
+
     }
 }

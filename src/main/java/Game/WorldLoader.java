@@ -3,6 +3,9 @@ package Game;
 import Entities.Entity;
 import Entities.Player;
 
+import Game.Worlds.Asset.MapAsset;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.Gdx;
 
@@ -22,38 +25,35 @@ public class WorldLoader {
      * @param id identifier for the world to load (e.g. level number)
      * @return the loaded GameWorld object with tilemap and entities initialized according to the level data
      */
-    public GameWorld loadWorld(int id, GameScreen screen){
+    public GameWorld loadWorld(GdxGame game, GameScreen screen, int id){
         GameWorld world = new GameWorld(id, screen);
 
-        /*
-        // parse level data from json file
-        Json json = new Json();
-        String path = "./Worlds/level" + id + ".json";
-        LevelData data = json.fromJson(LevelData.class, Gdx.files.internal(path));
+        // get the map dynamically using the id
+        MapAsset currentLevel = MapAsset.getLevelAsset(id);
+        TiledMap map = game.getAssetService().get(currentLevel);
 
-        // create tilemap from level data
-        world.initializeTilemap(data.xSize, data.ySize, data.tiles);
+        // populate the 2D array
+        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
+        world.tilemap = new int[layer.getWidth()][layer.getHeight()];
 
-        for(EntityData entityData : data.entities) {
-            
-            // make proper entity based on name in entity data
-            Entity entity;
-            if (entityData.name.equals("Player")) {
-                entity = new Player(world);
-            }else{
-                continue;
+        for (int x = 0; x < layer.getWidth(); x++) {
+            for (int y = 0; y < layer.getHeight(); y++) {
+                TiledMapTileLayer.Cell cell = layer.getCell(x, y);
+                if (cell != null && cell.getTile() != null) {
+                    world.tilemap[x][y] = cell.getTile().getId();
+                } else {
+                    world.tilemap[x][y] = 0;
+                }
             }
+        }
 
-            // set entity position based on entity data and add to world
-            entity.transform.setPosition(entityData.x, entityData.y);
-
-            //TODO: set entity sprite based on entity data
-
-
-
-
-            world.entities.add(entity);
-        } */
+        // spawn the player
+        Entity dummyPlayer = new Player(world);
+        // coordinates: (15,10). we multiply by 128 to get pixels for transform
+        dummyPlayer.transform.setPosition(15 * 128, 10 * 128);
+        dummyPlayer.transform.setScale(100, 100);
+        world.entities.add(dummyPlayer);
+        world.player = (Player) dummyPlayer;
 
         return world;
     }
