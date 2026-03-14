@@ -8,10 +8,10 @@
     ],
     "fileStates": {
         "bigobjects.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "maintiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
         }
     },
     "last.externalTilesetPath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/maps",

@@ -74,7 +74,7 @@ public class Transform {
      * @return true if the coordinates collide with the transform's area, false otherwise
      */
     public boolean collides(float x, float y) {
-        if (x > this.position.x && x < this.position.x + this.size.x && y > this.position.y && y < this.position.y + this.size.y) {
+        if (x >= this.position.x && x <= this.position.x + this.size.x && y >= this.position.y && y <= this.position.y + this.size.y) {
             return true;
         } else {
             return false;
@@ -88,10 +88,10 @@ public class Transform {
      * @return true if the transforms collide, otherwise false
      */
     public boolean collides(Transform t) {
-        if (position.x > t.position.x + t.size.x ||
-                position.x + size.x < t.position.x ||
-                position.y > t.position.y + t.size.y ||
-                position.y + size.y < t.position.y) {
+        if (position.x >= t.position.x + t.size.x ||
+                position.x + size.x <= t.position.x ||
+                position.y >= t.position.y + t.size.y ||
+                position.y + size.y <= t.position.y) {
 
             return false;
         } else {

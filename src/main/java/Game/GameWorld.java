@@ -31,8 +31,12 @@ public class GameWorld {
     // list of all entities in the game world
     Vector<Entity> entities;
 
+    // list of all solid objects
+    public Array<Transform> solidObjects = new Array<>();
+
     // separate reference to the player entity
     Player player;
+
 
     // tilemap for the world (can be used for rendering and collisions)
     int[][] tilemap;
@@ -198,89 +202,55 @@ public class GameWorld {
      * @param t the transform of the entity
      */
     public void requestMove(Transform t, float delta){
-        // calculate dx and dy from velocities
-        Vec2 translate = new Vec2(t.velocity.x * delta, t.velocity.y * delta);
+        float dx = t.velocity.x * delta;
+        float dy = t.velocity.y * delta;
+
+        // grid boundary check, so we cant traverse outside of the map
+        if (t.position.x + dx < 0) dx = -t.position.x;
+        if (t.position.x + t.size.x + dx > tilemap.length * TILE_SIZE) dx = (tilemap.length * TILE_SIZE) - (t.position.x + t.size.x);
+        if (t.position.y + dy < 0) dy = -t.position.y;
+        if (t.position.y + t.size.y + dy > tilemap[0].length * TILE_SIZE) dy = (tilemap[0].length * TILE_SIZE) - (t.position.y + t.size.y);
+
+        // phantom box to test movements before actually moving the player
+        Transform testBox = new Transform();
+        testBox.setScale(t.size.x, t.size.y);
 
         // horizontal movement
-        if(translate.x != 0){
-            // rightward movement
-            if(translate.x > 0){
-                // get positions of edges after movement 
-                Vec2 top_coord = t.getCorner(Corner.TR);
-                Vec2 bottom_coord = t.getCorner(Corner.BR);
+        if (dx != 0) {
+            testBox.setPosition(t.position.x + dx, t.position.y); // lets see if this collides
 
-                // check collisions at the new X position
-                if (isCollisionAt(top_coord.x + translate.x, top_coord.y) ||
-                        isCollisionAt(bottom_coord.x + translate.x, bottom_coord.y)) {
-
-                    // snap player flush to the tile's left edge
-                    // we use math.floor and cast TILE_SIZE to float to prevent early int division
-                    float tileLeft = ((float)Math.floor((top_coord.x + translate.x) / (float)TILE_SIZE)) * TILE_SIZE;
-                    translate.x = tileLeft - top_coord.x - 0.01f; // tiny offset to prevent sticking
+            for (Transform wall : solidObjects) {
+                if (testBox.collides(wall)) {
+                    // snap exactly to the edge of the custom rectangle
+                    if (dx > 0) { // move right
+                        dx = wall.position.x - (t.position.x + t.size.x) - 0.01f;
+                    } else { // move left
+                        dx = (wall.position.x + wall.size.x) - t.position.x + 0.01f;
+                    }
+                    testBox.setPosition(t.position.x + dx, t.position.y); // update phantom box
                 }
             }
-            // leftward movement
-            else{
-                Vec2 top_coord = t.getCorner(Corner.TL);
-                Vec2 bottom_coord = t.getCorner(Corner.BL);
-
-                if (isCollisionAt(top_coord.x + translate.x, top_coord.y) ||
-                        isCollisionAt(bottom_coord.x + translate.x, bottom_coord.y)) {
-
-
-                    float tileRight = ((float)Math.floor((top_coord.x + translate.x) / (float)TILE_SIZE) + 1) * TILE_SIZE;
-                    translate.x = tileRight - top_coord.x + 0.01f;
-                }
-            }
+            t.move(new Vec2(dx, 0)); // only now we will move after phantom box passes test
         }
+
         // vertical movement
-        if(translate.y != 0){
+        if (dy != 0) {
+            testBox.setPosition(t.position.x, t.position.y + dy); // test y move
 
-            if (translate.y > 0) { // Moving Up
-                Vec2 left_coord = t.getCorner(Corner.TL);
-                Vec2 right_coord = t.getCorner(Corner.TR);
-
-                if (isCollisionAt(left_coord.x, left_coord.y + translate.y) ||
-                        isCollisionAt(right_coord.x, right_coord.y + translate.y)) {
-
-                    float tileBottom = ((float)Math.floor((left_coord.y + translate.y) / (float)TILE_SIZE)) * TILE_SIZE;
-                    translate.y = tileBottom - left_coord.y - 0.01f;
+            for (Transform wall : solidObjects) {
+                if (testBox.collides(wall)) {
+                    // snap exactly to the edge of the custom rectangle
+                    if (dy > 0) { // move up
+                        dy = wall.position.y - (t.position.y + t.size.y) - 0.01f;
+                    } else { // move down
+                        dy = (wall.position.y + wall.size.y) - t.position.y + 0.01f;
+                    }
+                    testBox.setPosition(t.position.x, t.position.y + dy); // update phantom box
                 }
-            } else { // moving down
-                Vec2 left_coord = t.getCorner(Corner.BL);
-                Vec2 right_coord = t.getCorner(Corner.BR);
-
-                if (isCollisionAt(left_coord.x, left_coord.y + translate.y) ||
-                        isCollisionAt(right_coord.x, right_coord.y + translate.y)) {
-
-                    float tileTop = ((int)Math.floor((left_coord.y + translate.y) / (float)TILE_SIZE) + 1) * TILE_SIZE;
-                    translate.y = tileTop - left_coord.y + 0.01f;
-                }
-
             }
-
+            t.move(new Vec2(0, dy)); // same thing as before but now for y
         }
-        // move the entity
-        t.move(translate);
     }
-
-    // helper method to keep requestMove clean
-    private boolean isCollisionAt(float x, float y) {
-
-
-        // tilemap.length is your map width (30), tilemap[0].length is your map height (20)
-        if (x < 0 || x >= tilemap.length * TILE_SIZE || y < 0 || y >= tilemap[0].length * TILE_SIZE) {
-            return true; // Hit the edge of the world!
-        }
-
-        // 2. tile index math
-        int ix = (int) (x / TILE_SIZE);
-        int iy = (int) (y / TILE_SIZE);
-
-        // since the white paper grid is walkable, we just return false.
-        return false;
-    }
-
 }
 
 

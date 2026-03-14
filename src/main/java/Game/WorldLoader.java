@@ -1,11 +1,16 @@
 package Game;
 
+import Components.Transform;
 import Entities.Entity;
 import Entities.Player;
 
 import Game.Worlds.Asset.MapAsset;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.Gdx;
 
@@ -47,10 +52,31 @@ public class WorldLoader {
             }
         }
 
+        // get collisions object layer
+        MapLayer collisionLayer = map.getLayers().get("collisions");
+
+        if (collisionLayer != null) {
+            // loop through all hitboxes
+            for (MapObject object : collisionLayer.getObjects()) {
+
+                // we only use rectangles (for now)
+                if (object instanceof RectangleMapObject) {
+                    Rectangle rect = ((RectangleMapObject) object).getRectangle();
+
+                    Transform wall = new Transform();
+                    wall.setPosition(rect.x, rect.y);
+                    wall.setScale(rect.width, rect.height);
+
+                    // add to solid object array, so we know not to collide with these elements
+                    world.solidObjects.add(wall);
+                }
+            }
+        }
+
         // spawn the player
         Entity dummyPlayer = new Player(world);
         // coordinates: (15,10). we multiply by 128 to get pixels for transform
-        dummyPlayer.transform.setPosition(15 * 128, 10 * 128);
+        dummyPlayer.transform.setPosition(3 * 128, 17 * 128);
         dummyPlayer.transform.setScale(100, 100);
         world.entities.add(dummyPlayer);
         world.player = (Player) dummyPlayer;
