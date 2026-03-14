@@ -10,7 +10,6 @@ import Components.Corner;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
@@ -80,18 +79,6 @@ public class GameWorld {
         return worldId;
     }
 
-    public void initializeTilemap(int width, int height, Array<String> tileData) {
-        // initialize tilemap
-        this.tilemap = new int[width][height];
-
-        // parse and place tile data 
-        for (int y = 0; y < height; y++) {
-            String row = tileData.get(y);
-            for (int x = 0; x < width; x++) {
-                this.tilemap[x][y] = Character.getNumericValue(row.charAt(x));
-            }
-        }
-    }
     /**
      * getter for the player
      * @return player

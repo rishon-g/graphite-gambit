@@ -11,8 +11,5 @@ import com.badlogic.gdx.utils.Array;
  * @since 2026-2-26
  */
 public class LevelData {
-    public int xSize;
-    public int ySize;
-    public Array<String> tiles;
     public Array<EntityData> entities;
 }
