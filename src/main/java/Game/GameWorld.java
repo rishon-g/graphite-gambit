@@ -230,7 +230,8 @@ public class GameWorld {
                     testBox.setPosition(t.position.x + dx, t.position.y); // update phantom box
                 }
             }
-            t.move(new Vec2(dx, 0)); // only now we will move after phantom box passes test
+            t.move(new Vec2(dx, 0)); // if there is a collision, the testBox provides
+            // us with a dx value that is flush with the collision rectangle, otherwise we move as normal
         }
 
         // vertical movement

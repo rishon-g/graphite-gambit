@@ -93,16 +93,25 @@ public class Player extends Entity {
         float vx = 0;
         float vy = 0;
 
-        // 1. Check Keyboard Input
+        // check keyboard input
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) vy = speed;
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) vy = -speed;
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) vx = -speed;
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) vx = speed;
 
-        // 2. Set the velocity in the Transform
+        if (vx != 0 && vy != 0) {
+            // calculate current diagonal speed
+            float currentSpeed = (float) Math.sqrt((vx * vx) + (vy * vy));
+
+            // scale vx and vy down so the total speed equals our limit
+            vx = (vx / currentSpeed) * speed;
+            vy = (vy / currentSpeed) * speed;
+        }
+
+        // set the velocity in the transform
         this.transform.setVelocity(vx, vy);
 
-        // 3. Ask the GameWorld to move the player safely (handles collisions)
+        // ask the GameWorld to move the player safely (this handles collisions)
         this.world.requestMove(this.transform, delta);
     }
 
