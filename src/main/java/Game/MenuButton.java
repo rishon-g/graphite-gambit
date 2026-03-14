@@ -56,11 +56,15 @@ public class MenuButton {
     }
 
     public boolean isClicked(Viewport viewport) {
-        return isHovered(viewport) && Gdx.input.isButtonPressed(com.badlogic.gdx.Input.Buttons.LEFT);
+        return isHovered(viewport) && Gdx.input.isButtonJustPressed(com.badlogic.gdx.Input.Buttons.LEFT);
     }
 
     public void dispose() {
         normalTexture.dispose();
         hoverTexture.dispose();
+    }
+
+    public boolean textureIs(Texture texture) {
+        return (normalTexture == texture);
     }
 }

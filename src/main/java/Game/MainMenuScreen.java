@@ -34,36 +34,15 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture background = new Texture(Gdx.files.internal("images/menu-background.png"));
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
+    private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
 
-    int buttonCount = -1;
-    // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+    public boolean musicOn = true;
+    public boolean sfxOn = true;
 
-    /**
-     * helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
-     * change variables as needed to adjust spacing and size
-     * @param text the text to display on the button
-     * @return a new MenuButton object to add to the buttons array
-     */
-    private MenuButton createCenteredButton(String text) {
-        // global parameters for buttons
-        int startingY = 700;
-        int spacing = 20;
-        int height = 80;
-        int width = 800;
-
-        int deltaY = -(height + spacing);
-        buttonCount++;
-        return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * buttonCount), width, height);
+    private enum Layout {
+        MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
-
-    // create buttons
-    private final MenuButton[] buttons = new MenuButton[] {
-            createCenteredButton("START GAME"),
-            createCenteredButton("CONTINUE"),
-            createCenteredButton("HOW TO PLAY"),
-            createCenteredButton("SETTINGS"),
-            createCenteredButton("QUIT"),
-    };
+    private Layout currentLayout = Layout.MAIN;
 
     public MainMenuScreen(GdxGame game) {
         this.game = game;
@@ -73,6 +52,85 @@ public class MainMenuScreen extends ScreenAdapter {
         this.header_font = game.getHeaderFont();
         this.playerData = PlayerData.obtainPlayerData();
     }
+
+    private void changeLayout(Layout layout) {
+        currentLayout = layout;
+        buttons = switch (layout) {
+            case MAIN -> menuButtons;
+            case LEVEL_SELECT -> levelSelectButtons;
+            case SETTINGS -> settingsButtons;
+            case HOW_TO_PLAY -> howToPlayButtons;
+        };
+    }
+
+    // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+
+    /**
+     * helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+     * change variables as needed to adjust spacing and size
+     * @param text the text to display on the button
+     * @return a new MenuButton object to add to the buttons array
+     */
+    private MenuButton createCenteredButton(String text, int ID, boolean isDisabled) {
+        // global parameters for buttons
+        int startingY = 700;
+        int spacing = 20;
+        int height = 80;
+        int width = 800;
+
+        int deltaY = -(height + spacing);
+        if (isDisabled) {
+            return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+        } else {
+            return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+        }
+    }
+
+    // create buttons
+    private final MenuButton[] menuButtons = new MenuButton[] {
+            createCenteredButton("START GAME", 0, false),
+            createCenteredButton("LEVEL SELECT", 1, false),
+            createCenteredButton("HOW TO PLAY", 2, false),
+            createCenteredButton("SETTINGS", 3, false),
+            createCenteredButton("QUIT", 4, false),
+    };
+    private MenuButton[] buttons = menuButtons;
+
+    private MenuButton[] levelButtons() {
+        MenuButton[] buttons = new MenuButton[5];
+        buttons[0] = createCenteredButton("BACK", 0, false);
+        int highestLevel = 1;
+        if (playerData != null) {
+            highestLevel = playerData.getLevelUnlocked();
+        }
+        for (int i = 1; i < 5; i++) {
+            int highScore = 0;
+            if (playerData != null) {
+                highScore = playerData.getScore(i);
+            }
+            if (highestLevel >= i) {
+                buttons[i] = createCenteredButton("LEVEL " + (i) + "                 Score: " + highScore, i, false);
+            } else {
+                buttons[i] = createCenteredButton("LEVEL " + (i), i, true);
+            }
+        }
+        return buttons;
+    }
+    private final MenuButton[] levelSelectButtons = levelButtons();
+
+    private final MenuButton musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
+    private final MenuButton musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
+    private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
+    private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
+    private final MenuButton[] settingsButtons = new MenuButton[]{
+            createCenteredButton("BACK", 0, false),
+            musicOnButton,
+            sfxOnButton,
+    };
+
+    private final MenuButton[] howToPlayButtons = new MenuButton[]{
+            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 300, 800, 80),
+    };
 
     @Override
     public void render(float delta) {
@@ -84,19 +142,52 @@ public class MainMenuScreen extends ScreenAdapter {
         // draw background
         batch.draw(background, 0, 0, screenWidth, screenHeight);
 
-        // render title
-        layout.setText(header_font, "GRAPHITE GAMBIT");
-        header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+        if (currentLayout == Layout.MAIN) {
+            // render title
+            layout.setText(header_font, "GRAPHITE GAMBIT");
+            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+        }
+
+        if (currentLayout == Layout.LEVEL_SELECT) {
+            layout.setText(header_font, "LEVEL SELECT");
+            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+        }
+
+        if (currentLayout == Layout.SETTINGS) {
+            layout.setText(header_font, "SETTINGS");
+            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+        }
+
+        if (currentLayout == Layout.HOW_TO_PLAY) {
+            layout.setText(header_font, "HOW TO PLAY");
+            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+            layout.setText(font, """
+                    This is the instructions of how to play
+                    Will fill in when game is completed
+                    -
+                    -
+                    -
+                    -
+                    -
+                    -
+                    -
+                    -
+                    """);
+            font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 820);
+        }
 
         // render buttons
         for (int i = 0; i < buttons.length; i++) {
             buttons[i].render(batch, font, i == selectedIndex);
             if (buttons[i].isHovered(viewport)) selectedIndex = i;
-            if (buttons[i].isClicked(viewport)) activateButton(i);
+            if (buttons[i].isClicked(viewport)) {
+                activateButton(i);
+                break;
+            }
         }
         boolean buttonHovered = false;
-        for (int i = 0; i < buttons.length; i++) {
-            if(buttons[i].isHovered(viewport)) buttonHovered = true;
+        for (MenuButton button : buttons) {
+            if (button.isHovered(viewport)) buttonHovered = true;
         }
         if (!buttonHovered) selectedIndex = -1;
         batch.end();
@@ -107,20 +198,70 @@ public class MainMenuScreen extends ScreenAdapter {
      * @param index clicked button index (index is based on time of creation)
      */
     private void activateButton(int index) {
-        if (index == 0) {
-            screenManager.SetGameScreen(1);
-        }
-        if (index == 1) {
-            // switch to level select screen
-        }
-        if (index == 2) {
-            // clear screen and display how to play screen
-        }
-        if (index == 3) {
-            // clear screen and display settings screen
-        }
-        if (index == 4) {
-            Gdx.app.exit();
+        if (buttons[index].textureIs(disabledButton)) return;
+        if (currentLayout == Layout.MAIN) {
+            if (index == 0) {
+                screenManager.SetGameScreen(1);
+            }
+            if (index == 1) {
+                // switch to level select screen
+                changeLayout(Layout.LEVEL_SELECT);
+            }
+            if (index == 2) {
+                // clear screen and display how to play screen
+                changeLayout(Layout.HOW_TO_PLAY);
+            }
+            if (index == 3) {
+                // clear screen and display settings screen
+                changeLayout(Layout.SETTINGS);
+            }
+            if (index == 4) {
+                Gdx.app.exit();
+            }
+        } else if (currentLayout == Layout.LEVEL_SELECT) {
+            if (index == 0) {
+                changeLayout(Layout.MAIN);
+            }
+            if (index == 1) {
+                screenManager.SetGameScreen(1);
+            }
+            if (index == 2) {
+                screenManager.SetGameScreen(2);
+            }
+            if (index == 3) {
+                screenManager.SetGameScreen(3);
+            }
+            if (index == 4) {
+                screenManager.SetGameScreen(4);
+            }
+        } else if (currentLayout == Layout.SETTINGS) {
+            if (index == 0) {
+                changeLayout(Layout.MAIN);
+            }
+            if (index == 1) {
+                // toggle volume
+                if (musicOn) {
+                    settingsButtons[1] = musicOffButton;
+                    musicOn = false;
+                } else {
+                    settingsButtons[1] = musicOnButton;
+                    musicOn = true;
+                }
+            }
+            if (index == 2) {
+                // toggle volume
+                if (sfxOn) {
+                    settingsButtons[2] = sfxOffButton;
+                    sfxOn = false;
+                } else {
+                    settingsButtons[2] = sfxOnButton;
+                    sfxOn = true;
+                }
+            }
+        } else if (currentLayout == Layout.HOW_TO_PLAY) {
+            if (index == 0) {
+                changeLayout(Layout.MAIN);
+            }
         }
     }
 
