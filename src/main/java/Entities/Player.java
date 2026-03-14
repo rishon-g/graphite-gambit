@@ -23,6 +23,7 @@ public class Player extends Entity {
     private int maxHealth;
     private int points;
     private float speed = 400f; // pixels per second
+    private float drainTimer = 0f;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -32,6 +33,7 @@ public class Player extends Entity {
         this.health = 100;
         this.maxHealth = 100;
 
+        // TODO CHANGE AS SOON AS A SPRITE IS READY
         // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.RED);
@@ -90,6 +92,14 @@ public class Player extends Entity {
      */
     @Override
     public void updateInternal(float delta) {
+        drainTimer += delta;
+
+        // every 1 second, lose 2 health #TODO WILL NEED ADJUSTING OVER TIME
+        if (drainTimer >= 1.0f) {
+            modifyHealth(-2);
+            drainTimer -= 1.0f;
+        }
+
         float vx = 0;
         float vy = 0;
 
@@ -113,6 +123,8 @@ public class Player extends Entity {
 
         // ask the GameWorld to move the player safely (this handles collisions)
         this.world.requestMove(this.transform, delta);
+
+
     }
 
     /**
@@ -121,6 +133,7 @@ public class Player extends Entity {
     @Override
     public void render(SpriteBatch batch, float delta) {
 
+        // TODO change to actual sprite
         // draw the red square at the player's scaled position (by scaled we mean the pixel size)
         batch.draw(dummyTexture,
                 this.transform.position.x * Game.GdxGame.UNIT_SCALE,

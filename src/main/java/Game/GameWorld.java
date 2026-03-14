@@ -57,7 +57,7 @@ public class GameWorld {
         this.worldId = id;
         this.screen = screen;
         this.points = 0;
-        this.time = 0;
+        this.time = 300f;
     }
 
     /**
@@ -119,8 +119,14 @@ public class GameWorld {
      * @param delta time since last update (used for movement and animations)
      */
     public void update(float delta) {
-        // World updates
-        time += delta;
+        // subtract delta to count down
+        time -= delta;
+
+        // check for time over
+        if (time <= 0) {
+            time = 0;
+            screen.gameEnd(false); // Trigger game over if time hits zero
+        }
 
         // Entity updates
         for (Entity entity : entities) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="maintiles" tilewidth="152" tileheight="150" tilecount="35" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="maintiles" tilewidth="152" tileheight="150" tilecount="38" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="76">
   <image source="../images/paper1.png" width="152" height="150"/>
@@ -105,6 +105,15 @@
  </tile>
  <tile id="133">
   <image source="../images/4intersection.png" width="128" height="128"/>
+ </tile>
+ <tile id="134">
+  <image source="../images/GridTileBlue.png" width="128" height="128"/>
+ </tile>
+ <tile id="135">
+  <image source="../images/GridTileCornerBlue.png" width="128" height="128"/>
+ </tile>
+ <tile id="136">
+  <image source="../images/GridTileEdgeBlue.png" width="128" height="128"/>
  </tile>
  <wangsets>
   <wangset name="Unnamed Set" type="corner" tile="-1">

@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -41,10 +42,18 @@ public class GdxGame extends Game {
         assetService = new AssetService(new InternalFileHandleResolver());
 
         // load default font
-        var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto.ttf"));
+        var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart.ttf"));
         var fontParams = new FreeTypeFontGenerator.FreeTypeFontParameter();
         fontParams.size = 32;
         fontParams.color = Color.WHITE;
+
+        fontParams.borderWidth = 4f; // the thickness of the outline in pixels
+        fontParams.borderColor = Color.BLACK;
+
+        // turning off smoothing so pixels are crisp
+        fontParams.minFilter = Texture.TextureFilter.Nearest;
+        fontParams.magFilter = Texture.TextureFilter.Nearest;
+
         font = generator.generateFont(fontParams);
         generator.dispose();
 
