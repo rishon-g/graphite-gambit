@@ -32,7 +32,7 @@ public class MainMenuScreen extends ScreenAdapter {
     int screenHeight = Gdx.graphics.getHeight();
     private int selectedIndex = -1;
     private final Texture background = new Texture(Gdx.files.internal("images/menu-background.png"));
-    private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button-unhighlighted.png"));
+    private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
 
     int buttonCount = -1;
@@ -86,7 +86,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // render title
         layout.setText(header_font, "GRAPHITE GAMBIT");
-        font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+        header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
 
         // render buttons
         for (int i = 0; i < buttons.length; i++) {
@@ -94,6 +94,11 @@ public class MainMenuScreen extends ScreenAdapter {
             if (buttons[i].isHovered(viewport)) selectedIndex = i;
             if (buttons[i].isClicked(viewport)) activateButton(i);
         }
+        boolean buttonHovered = false;
+        for (int i = 0; i < buttons.length; i++) {
+            if(buttons[i].isHovered(viewport)) buttonHovered = true;
+        }
+        if (!buttonHovered) selectedIndex = -1;
         batch.end();
     }
 

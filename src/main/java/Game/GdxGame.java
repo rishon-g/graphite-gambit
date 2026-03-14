@@ -41,17 +41,19 @@ public class GdxGame extends Game {
         assetService = new AssetService(new InternalFileHandleResolver());
 
         // load default font
-        var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto.ttf"));
+        var generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/determination.ttf"));
         var fontParams = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        fontParams.size = 24;
+        fontParams.size = 32;
         fontParams.color = Color.BLACK;
         font = generator.generateFont(fontParams);
+        fontParams.size = 100;
         headerFont = generator.generateFont(fontParams);
         generator.dispose();
 
         // set the initial screen
         screenManager.SetMenuScreen();
     }
+
 
     @Override
     public void render() {
