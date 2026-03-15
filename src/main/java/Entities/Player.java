@@ -78,6 +78,19 @@ public class Player extends Entity {
      */
     @Override
     public void updateInternal(float delta) {
+        // graphite drain logic
+        // only tick if the player is moving (has velocity)
+        if (Math.abs(this.transform.velocity.x) > 1f || Math.abs(this.transform.velocity.y) > 1f) {
+            drainTimer += delta;
+
+            // every 1 second of MOVEMENT, lose 2 health TODO change accordingly
+            if (drainTimer >= 1.0f) {
+                modifyHealth(-2);
+                drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
+            }
+        }
+
+
         boolean up, down, left, right;
 
         // 1. Check Keyboard Input
@@ -92,24 +105,55 @@ public class Player extends Entity {
         if(up)yinput++;
         if(down)yinput--;
 
-        // 2. Calculate new y velocity
-        float direction = Math.signum(this.transform.velocity.y);
-        if(direction > 0 && !(yinput > 0))yinput--;
-        else if(direction < 0 && !(yinput < 0)) yinput++;
-        this.transform.velocity.y += (acceleration * delta * yinput);
-        if(this.transform.velocity.y > speed)this.transform.velocity.y = speed;
-        else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;
-        else if(Math.abs(this.transform.velocity.y) <= 0.1)this.transform.velocity.y = 0;
+        // 2. Calculate new Y velocity
+        if (yinput != 0) {
+            // accelerate in the direction of input
+            this.transform.velocity.y += acceleration * delta * yinput;
+        } else {
+            // decelerate towards zero
+            if (this.transform.velocity.y > 0) {
+                this.transform.velocity.y -= acceleration * delta;
+                if (this.transform.velocity.y < 0) this.transform.velocity.y = 0; // Prevent overshoot
+            } else if (this.transform.velocity.y < 0) {
+                this.transform.velocity.y += acceleration * delta;
+                if (this.transform.velocity.y > 0) this.transform.velocity.y = 0; // Prevent overshoot
+            }
+        }
+        // cap y speed
+        if (this.transform.velocity.y > speed) this.transform.velocity.y = speed;
+        else if (this.transform.velocity.y < -speed) this.transform.velocity.y = -speed;
 
 
-        // 3. Calculate new x velocity
-        direction = Math.signum(this.transform.velocity.x);
-        if(direction > 0 && !(xinput > 0))xinput--;
-        else if(direction < 0 && !(xinput < 0)) xinput++; 
-        this.transform.velocity.x += (acceleration * delta * xinput);
-        if(this.transform.velocity.x > speed)this.transform.velocity.x = speed;
-        else if(this.transform.velocity.x < -speed)this.transform.velocity.x = -speed;
-        else if(Math.abs(this.transform.velocity.x) <= 0.1)this.transform.velocity.x = 0;
+        // calculate new X velocity
+        if (xinput != 0) {
+            // accelerate in the direction of input
+            this.transform.velocity.x += acceleration * delta * xinput;
+        } else {
+            // decelerate towards zero
+            if (this.transform.velocity.x > 0) {
+                this.transform.velocity.x -= acceleration * delta;
+                if (this.transform.velocity.x < 0) this.transform.velocity.x = 0; // Prevent overshoot
+            } else if (this.transform.velocity.x < 0) {
+                this.transform.velocity.x += acceleration * delta;
+                if (this.transform.velocity.x > 0) this.transform.velocity.x = 0; // Prevent overshoot
+            }
+        }
+        // cap x speed
+        if (this.transform.velocity.x > speed) this.transform.velocity.x = speed;
+        else if (this.transform.velocity.x < -speed) this.transform.velocity.x = -speed;
+
+        // fix for diagonal strafing
+        // calculate the actual current diagonal speed using the Pythagorean theorem
+        float currentSpeed = (float) Math.sqrt(
+                (this.transform.velocity.x * this.transform.velocity.x) +
+                        (this.transform.velocity.y * this.transform.velocity.y)
+        );
+
+        // if diagonal speed exceeds the max speed, scale it back down (aka normalize)
+        if (currentSpeed > speed) {
+            this.transform.velocity.x = (this.transform.velocity.x / currentSpeed) * speed;
+            this.transform.velocity.y = (this.transform.velocity.y / currentSpeed) * speed;
+        }
 
     }
 
