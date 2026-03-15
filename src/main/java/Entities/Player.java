@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import Components.Vec2;
 import Game.GameWorld;
 
 /**
@@ -79,7 +78,7 @@ public class Player extends Entity {
     @Override
     public void updateInternal(float delta) {
         // Draw on floor in the middle of the feet of the sprite
-        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 4);
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
 
         // Movement
         boolean up, down, left, right;
@@ -134,9 +133,9 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-
         // TODO change to actual sprite
         // draw the red square at the player's scaled position (by scaled we mean the pixel size)
+        batch.setColor(1, 0, 0, 1);
         batch.draw(dummyTexture,
                 this.transform.position.x * Game.GdxGame.UNIT_SCALE,
                 this.transform.position.y * Game.GdxGame.UNIT_SCALE,

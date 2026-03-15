@@ -12,6 +12,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
+
+import java.security.DrbgParameters;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
@@ -39,6 +42,7 @@ public class WorldLoader {
 
         // populate the 2D array
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
+        world.setDimensions(layer.getWidth() * GameWorld.getTileSize(), layer.getHeight() * GameWorld.getTileSize());
         world.tilemap = new int[layer.getWidth()][layer.getHeight()];
 
         for (int x = 0; x < layer.getWidth(); x++) {
