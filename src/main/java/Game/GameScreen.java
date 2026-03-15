@@ -2,6 +2,9 @@ package Game;
 
 import Game.Worlds.Asset.AssetService;
 import Game.Worlds.Asset.MapAsset;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +23,8 @@ public class GameScreen implements Screen {
     // reference to the main game class, used for switching screens.
     GdxGame game;
 
+    ScreenManager screenManager= ScreenManager.getInstance(game);
+
     // for camera
     Viewport viewport;
 
@@ -36,12 +41,75 @@ public class GameScreen implements Screen {
     // UI
     Texture uiTexture;
     BitmapFont font;
+    BitmapFont menuFont;
+    BitmapFont headerFont;
     GlyphLayout layout = new GlyphLayout();
     OrthographicCamera uiCamera;
     Viewport uiViewport;
+    int selectedIndex = -1;
 
     // sprite batch used for rendering entities
     SpriteBatch batch;
+
+    // state variables
+    boolean paused = false;
+    boolean gameOver = false;
+    boolean won = false;
+
+    // menu textures
+    private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
+    private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
+    private final Texture textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
+
+    // menu buttons
+    private MenuButton[] mainButtons = new MenuButton[] {
+            new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70),
+            new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70),
+            new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
+            new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+    };
+
+    // settings buttons, instance for each toggled state to switch between
+    MenuButton musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70);
+    MenuButton musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70);
+    MenuButton sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70);
+    MenuButton sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70);
+    MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70);
+    MenuButton[] settingsButtons;
+
+    private enum Layout {
+        MAIN, SETTINGS
+    }
+    private GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
+
+    // switch sets of buttons based on the current layout
+    private MenuButton[] menuButtons = mainButtons;
+    private void changeLayout(GameScreen.Layout layout) {
+        MenuButton music;
+        MenuButton sfx;
+        // set settings buttons to match stored settings
+        if (game.isSfxPlaying()) {
+            sfx = sfxOnButton;
+        } else {
+            sfx = sfxOffButton;
+        }
+        if (game.isMusicPlaying()) {
+            music = musicOnButton;
+        } else {
+            music = musicOffButton;
+        }
+        settingsButtons = new MenuButton[] {
+                backButton,
+                music,
+                sfx,
+        };
+
+        currentLayout = layout;
+        menuButtons = switch (layout) {
+            case MAIN -> mainButtons;
+            case SETTINGS -> settingsButtons;
+        };
+    }
 
     /**
      * Constructor for the GameScreen class. Initializes all resources and the GameWorld.
@@ -73,6 +141,8 @@ public class GameScreen implements Screen {
 
         // UI: this handles everything overlayed on the screen
         this.font = game.getFont();
+        this.menuFont = game.getMenuFont();
+        this.headerFont = game.getHeaderFont();
         this.uiCamera = new OrthographicCamera();
         // 1920x1080 canvas for the HUD that stretches to fit the window
         this.uiViewport = new FitViewport(1920, 1080, uiCamera);
@@ -98,9 +168,16 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
+        if (!paused && !gameOver && !won) {
+            // run update loops
+            world.update(delta);
+        }
 
-        // run update loops
-        world.update(delta);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            // toggle pause
+            paused = !paused;
+            changeLayout(Layout.MAIN);
+        }
 
         // follow with camera
         world.updateCamera(camera);
@@ -163,10 +240,84 @@ public class GameScreen implements Screen {
 
         // reset batch color to white so we don't accidentally tint the whole game gray next frame
         batch.setColor(Color.WHITE);
+
+        // pause menu
+        if (paused) {
+            // transparent overlay
+            batch.setColor(0, 0, 0, 0.7f);
+            batch.draw(uiTexture, 0, 0, 1920, 1080);
+            batch.setColor(Color.WHITE);
+
+            // create pause menu
+            batch.draw(textBox, 1920/2 - 400, 1080/2 - 300, 800, 600);
+            layout.setText(headerFont, "PAUSED");
+            headerFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
+
+            // render buttons
+            for (int i = 0; i < menuButtons.length; i++) {
+                menuButtons[i].render(batch, menuFont, i == selectedIndex);
+                if (menuButtons[i].isHovered(uiViewport)) selectedIndex = i;
+                if (menuButtons[i].isClicked(uiViewport)) {
+                    activateButton(i);
+                    break;
+                }
+            }
+            boolean buttonHovered = false;
+            for (MenuButton button : menuButtons) {
+                if (button.isHovered(uiViewport)) buttonHovered = true;
+            }
+            if (!buttonHovered) selectedIndex = -1;
+        }
+
         batch.end();
 
         // return the viewport to the world camera for the next frame
         viewport.apply();
+    }
+
+    /**
+     * trigger code given the clicked button
+     * @param index index of the clicked button in its button array
+     */
+    private void activateButton(int index) {
+        if (currentLayout == Layout.MAIN) {
+            if (index == 0) {
+                paused = false;
+            }
+            if (index == 1) {
+                screenManager.SetGameScreen(world.getId());
+            }
+            if (index == 2) {
+                changeLayout(Layout.SETTINGS);
+            }
+            if (index == 3) {
+                screenManager.SetMenuScreen();
+            }
+        } else if (currentLayout == Layout.SETTINGS) {
+            if (index == 0) {
+                changeLayout(Layout.MAIN);
+            }
+            if (index == 1) {
+                // toggle music
+                if (game.isMusicPlaying()) {
+                    settingsButtons[1] = musicOffButton;
+                    game.setMusicPlaying(false);
+                } else {
+                    settingsButtons[1] = musicOnButton;
+                    game.setMusicPlaying(true);
+                }
+            }
+            if (index == 2) {
+                // toggle sfx
+                if (game.isSfxPlaying()) {
+                    settingsButtons[2] = sfxOffButton;
+                    game.setSfxPlaying(false);
+                } else {
+                    settingsButtons[2] = sfxOnButton;
+                    game.setSfxPlaying(true);
+                }
+            }
+        }
     }
 
     @Override
