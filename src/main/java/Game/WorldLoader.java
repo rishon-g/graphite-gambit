@@ -3,6 +3,7 @@ package Game;
 import Components.Transform;
 import Entities.Entity;
 import Entities.Player;
+import Entities.Eraser;
 
 import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.maps.MapLayer;
@@ -17,7 +18,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 /**
  * The WorldLoader class is responsible for loading specific game worlds (or levels) based on an identifier.
- * 
+ *
  * @author Lane Jacobson
  * @version 1.0
  */
@@ -26,7 +27,7 @@ public class WorldLoader {
     /**
      * Loads a game world based on the given identifier.
      * parses level data from a json file, creates the tilemap and entities based on the data, and returns the initialized GameWorld object.
-     * 
+     *
      * @param id identifier for the world to load (e.g. level number)
      * @return the loaded GameWorld object with tilemap and entities initialized according to the level data
      */
@@ -69,6 +70,23 @@ public class WorldLoader {
 
                     // add to solid object array, so we know not to collide with these elements
                     world.solidObjects.add(wall);
+
+                    // also mark blocked tiles for pathfinding
+                    int tileSize = GameWorld.getTileSize();
+
+                    int startX = (int)(wall.position.x / tileSize);
+                    int endX = (int)((wall.position.x + wall.size.x) / tileSize);
+                    int startY = (int)(wall.position.y / tileSize);
+                    int endY = (int)((wall.position.y + wall.size.y) / tileSize);
+
+                    for (int tx = startX; tx <= endX; tx++) {
+                        for (int ty = startY; ty <= endY; ty++) {
+                            if (tx >= 0 && tx < world.tilemap.length &&
+                                    ty >= 0 && ty < world.tilemap[0].length) {
+                                world.tilemap[tx][ty] = 1;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -87,6 +105,9 @@ public class WorldLoader {
                 case "Player":
                     newEntity = new Player(world);
                     world.player = (Player) newEntity;
+                    break;
+                case "Eraser":
+                    newEntity = new Eraser(world);
                     break;
                 default:
                     continue;
