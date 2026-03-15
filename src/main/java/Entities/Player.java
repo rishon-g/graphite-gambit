@@ -22,7 +22,8 @@ public class Player extends Entity {
     private int health;
     private int maxHealth;
     private int points;
-    private float speed = 400f; // pixels per second
+    private float speed = 600f; // pixels per second
+    private float acceleration = 3200f;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -38,6 +39,7 @@ public class Player extends Entity {
         pixmap.fill();
         this.dummyTexture = new Texture(pixmap);
         pixmap.dispose();
+        this.transform.setScale(100, 100);
     }
 
     /**
@@ -90,20 +92,39 @@ public class Player extends Entity {
      */
     @Override
     public void updateInternal(float delta) {
-        float vx = 0;
-        float vy = 0;
+        boolean up, down, left, right;
 
         // 1. Check Keyboard Input
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) vy = speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) vy = -speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) vx = -speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) vx = speed;
+        up = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
+        down = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
+        left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        // 2. Set the velocity in the Transform
-        this.transform.setVelocity(vx, vy);
+        int xinput = 0, yinput = 0;
+        if(right)xinput++;
+        if(left)xinput--;
+        if(up)yinput++;
+        if(down)yinput--;
 
-        // 3. Ask the GameWorld to move the player safely (handles collisions)
-        this.world.requestMove(this.transform, delta);
+        // 2. Calculate new y velocity
+        float direction = Math.signum(this.transform.velocity.y);
+        if(direction > 0 && !(yinput > 0))yinput--;
+        else if(direction < 0 && !(yinput < 0)) yinput++; 
+        this.transform.velocity.y += (acceleration * delta * yinput);
+        if(this.transform.velocity.y > speed)this.transform.velocity.y = speed;
+        else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;
+        else if(Math.abs(this.transform.velocity.y) <= 0.1)this.transform.velocity.y = 0;
+
+
+        // 3. Calculate new x velocity
+        direction = Math.signum(this.transform.velocity.x);
+        if(direction > 0 && !(xinput > 0))xinput--;
+        else if(direction < 0 && !(xinput < 0)) xinput++; 
+        this.transform.velocity.x += (acceleration * delta * xinput);
+        if(this.transform.velocity.x > speed)this.transform.velocity.x = speed;
+        else if(this.transform.velocity.x < -speed)this.transform.velocity.x = -speed;
+        else if(Math.abs(this.transform.velocity.x) <= 0.1)this.transform.velocity.x = 0;
+
     }
 
     /**
