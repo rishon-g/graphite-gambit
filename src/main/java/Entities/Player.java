@@ -21,7 +21,7 @@ public class Player extends Entity {
     // health (graphite) of the player
     private int health;
     private int maxHealth;
-    private int points;
+    private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
 
@@ -33,6 +33,7 @@ public class Player extends Entity {
         this.health = 100;
         this.maxHealth = 100;
 
+        // TODO CHANGE AS SOON AS A SPRITE IS READY
         // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.RED);
@@ -48,22 +49,6 @@ public class Player extends Entity {
      */
     public int getHealth() {
         return health;
-    }
-
-    /**
-     * Gets the current points of the player.
-     * @return current points
-     */
-    public int getPoints() {
-        return points;
-    }
-
-    /**
-     * Updates the player's points by the given amount.
-     * @param amount amount to add to points (can be negative)
-     */
-    public void updatePoints(int amount) {
-        this.points += amount;
     }
 
     /**
@@ -133,6 +118,7 @@ public class Player extends Entity {
     @Override
     public void render(SpriteBatch batch, float delta) {
 
+        // TODO change to actual sprite
         // draw the red square at the player's scaled position (by scaled we mean the pixel size)
         batch.draw(dummyTexture,
                 this.transform.position.x * Game.GdxGame.UNIT_SCALE,

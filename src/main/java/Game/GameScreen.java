@@ -5,19 +5,26 @@ import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class GameScreen implements Screen {
 
     // reference to the main game class, used for switching screens.
     GdxGame game;
 
+    // for camera
     Viewport viewport;
-    AssetService assetService;
 
+    // render maps and assets
+    AssetService assetService;
     OrthogonalTiledMapRenderer mapRenderer;
 
     // the game world that contains all entities and tilemap data for this screen
@@ -25,6 +32,13 @@ public class GameScreen implements Screen {
 
     // camera used for rendering the game world
     OrthographicCamera camera;
+
+    // UI
+    Texture uiTexture;
+    BitmapFont font;
+    GlyphLayout layout = new GlyphLayout();
+    OrthographicCamera uiCamera;
+    Viewport uiViewport;
 
     // sprite batch used for rendering entities
     SpriteBatch batch;
@@ -57,6 +71,20 @@ public class GameScreen implements Screen {
                 this.batch
         );
 
+        // UI: this handles everything overlayed on the screen
+        this.font = game.getFont();
+        this.uiCamera = new OrthographicCamera();
+        // 1920x1080 canvas for the HUD that stretches to fit the window
+        this.uiViewport = new FitViewport(1920, 1080, uiCamera);
+
+        // generate a 1x1 white pixel texture for drawing the health bar shapes
+        // TODO we need to add a nicer looking texture
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        this.uiTexture = new Texture(pixmap);
+        pixmap.dispose();
+
     }
 
     @Override
@@ -85,8 +113,6 @@ public class GameScreen implements Screen {
         // draw map
         this.batch.setColor(Color.WHITE);
 
-
-
         // expand the camera's "culling box" by 5 world units such that big objects do not despawn
         float bleed = 5f;
         float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
@@ -95,9 +121,6 @@ public class GameScreen implements Screen {
         float boxHeight = this.camera.viewportHeight + (bleed * 2);
 
         this.mapRenderer.setView(this.camera.combined, startX, startY, boxWidth, boxHeight);
-
-
-
         this.mapRenderer.render();
 
         // draw entities
@@ -105,11 +128,51 @@ public class GameScreen implements Screen {
         batch.begin();
         world.render(batch, delta);
         batch.end();
+
+        // static UI overlay
+        uiViewport.apply(); // switch to the UI canvas
+        batch.setProjectionMatrix(uiCamera.combined);
+        batch.begin();
+
+        // draw time
+        int seconds = (int) world.time;
+        font.draw(batch, "TIME: " + seconds, 50, 1030);
+
+        // draw score
+        String scoreText = "SCORE: " + world.getScore();
+        layout.setText(font, scoreText);
+        // subtract layout width so it perfectly aligns to the right edge
+        font.draw(batch, layout, 1920 - layout.width - 50, 1030);
+
+        // draw graphite bar (temporary for now)
+        float maxBarHeight = 600f;
+        float barWidth = 40f;
+        float barX = 50f;
+        float barY = 200f;
+
+        // calculate health percentage (player constructor sets max to 100)
+        float healthPct = (float) world.player.getHealth() / 100f;
+
+        // draw background (light gray: this represents the empty portion)
+        batch.setColor(Color.LIGHT_GRAY);
+        batch.draw(uiTexture, barX, barY, barWidth, maxBarHeight);
+
+        // draw foreground (dark grey: this represents the full portion)
+        batch.setColor(Color.DARK_GRAY);
+        batch.draw(uiTexture, barX, barY, barWidth, maxBarHeight * healthPct);
+
+        // reset batch color to white so we don't accidentally tint the whole game gray next frame
+        batch.setColor(Color.WHITE);
+        batch.end();
+
+        // return the viewport to the world camera for the next frame
+        viewport.apply();
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        uiViewport.update(width, height, true);
     }
 
     @Override
@@ -135,6 +198,7 @@ public class GameScreen implements Screen {
     public void dispose() {
         world.dispose();
         mapRenderer.dispose();
+        uiTexture.dispose();
     }
     
     /**

@@ -1,11 +1,16 @@
 package Game;
 
+import Components.Transform;
 import Entities.Entity;
 import Entities.Player;
 
 import Game.Worlds.Asset.MapAsset;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -47,7 +52,28 @@ public class WorldLoader {
             }
         }
 
-        // Load and spawn all other entities
+        // get collisions object layer
+        MapLayer collisionLayer = map.getLayers().get("collisions");
+
+        if (collisionLayer != null) {
+            // loop through all hitboxes
+            for (MapObject object : collisionLayer.getObjects()) {
+
+                // we only use rectangles (for now)
+                if (object instanceof RectangleMapObject) {
+                    Rectangle rect = ((RectangleMapObject) object).getRectangle();
+
+                    Transform wall = new Transform();
+                    wall.setPosition(rect.x, rect.y);
+                    wall.setScale(rect.width, rect.height);
+
+                    // add to solid object array, so we know not to collide with these elements
+                    world.solidObjects.add(wall);
+                }
+            }
+        }
+
+        // Load and spawn all entities
         Json json = new Json();
         FileHandle file = Gdx.files.internal("src/main/java/Game/Worlds/level" + id + ".json");
         LevelData data = json.fromJson(LevelData.class, file);
