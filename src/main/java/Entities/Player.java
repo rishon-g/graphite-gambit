@@ -24,6 +24,7 @@ public class Player extends Entity {
     private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
+    private int points;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
