@@ -143,13 +143,11 @@ private int drawWeight(int x, int y, int brushsize) {
     // Manhattan distance (fast, no sqrt)
     float dist = Math.abs(x) + Math.abs(y);
     
-    // Linear falloff from center (10) to edge (5)
-    // Normalize distance to 0-1 range
+    // Normalize distance
     float t = Math.min(dist / brushsize, 1.0f);
     
-    // Linear interpolation between 10 and 5
-    // 10 -> 5 as t goes 0 -> 1
-    return 5 + (int)(5 * (1.0f - t));
+    // Linearly degrade weight based on weight
+    return 7 + (int)(3 * (1.0f - t));
 }
 
     /**
@@ -192,6 +190,10 @@ private int drawWeight(int x, int y, int brushsize) {
         }
     }
 
+    /**
+     * Renders the drawable floor map within the world.
+     * @param batch the spritebatch to render from
+     */
     private void renderFloor(SpriteBatch batch){
         int last = 0;
         for(int y = 0; y < height / DRAW_SIZE; y++){
@@ -202,7 +204,7 @@ private int drawWeight(int x, int y, int brushsize) {
                     continue;
 
                 if(value != last){
-                    batch.setColor(0,0,0, (float)value/10);
+                    batch.setColor(0.2f,0.2f,0.2f, (float)value/14);
                     last = value;
                 }
 
