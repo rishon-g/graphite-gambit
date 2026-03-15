@@ -13,13 +13,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 
 /**
  * The WorldLoader class is responsible for loading specific game worlds (or levels) based on an identifier.
  * 
  * @author Lane Jacobson
  * @version 1.0
- * @since 2026-2-26
  */
 public class WorldLoader {
 
@@ -73,13 +73,29 @@ public class WorldLoader {
             }
         }
 
-        // spawn the player
-        Entity dummyPlayer = new Player(world);
-        // coordinates: (15,10). we multiply by 128 to get pixels for transform
-        dummyPlayer.transform.setPosition(3 * 128, 17 * 128);
-        dummyPlayer.transform.setScale(100, 100);
-        world.entities.add(dummyPlayer);
-        world.player = (Player) dummyPlayer;
+        // Load and spawn all entities
+        Json json = new Json();
+        FileHandle file = Gdx.files.internal("src/main/java/Game/Worlds/level" + id + ".json");
+        LevelData data = json.fromJson(LevelData.class, file);
+
+        for(EntityData entity : data.entities){
+
+            // dynamically create entity of any type
+            Entity newEntity;
+            System.out.println("New entity: " + entity.type);
+            switch(entity.type){
+                case "Player":
+                    newEntity = new Player(world);
+                    world.player = (Player) newEntity;
+                    break;
+                default:
+                    continue;
+            }
+
+            // set entity position and add to world
+            newEntity.transform.setTilePosition(entity.x, entity.y, 128);
+            world.entities.add(newEntity);
+        }
 
         return world;
     }

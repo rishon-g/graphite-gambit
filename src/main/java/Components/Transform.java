@@ -46,6 +46,10 @@ public class Transform {
         position.set(x, y);
     }
 
+    public void setTilePosition(float x, float y, int tileSize){
+        position.set(x*tileSize, y*tileSize);
+    }
+
     /**
      * Sets the size of the transform to the given values.
      *

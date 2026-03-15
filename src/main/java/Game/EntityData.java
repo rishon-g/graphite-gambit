@@ -9,8 +9,7 @@ package Game;
  * @since 2026-2-26
  */
 public class EntityData {
-    String name;
-    int x;
-    int y;
-    String sprite;
+    String type; // entity to be spawned
+    int x;       // x position to be spawned at
+    int y;       // y position to be spawned at
 }

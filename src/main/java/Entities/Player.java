@@ -21,9 +21,9 @@ public class Player extends Entity {
     // health (graphite) of the player
     private int health;
     private int maxHealth;
-    private int points;
-    private float speed = 400f; // pixels per second
     private float drainTimer = 0f;
+    private float speed = 600f; // pixels per second
+    private float acceleration = 3200f;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -40,6 +40,7 @@ public class Player extends Entity {
         pixmap.fill();
         this.dummyTexture = new Texture(pixmap);
         pixmap.dispose();
+        this.transform.setScale(100, 100);
     }
 
     /**
@@ -48,22 +49,6 @@ public class Player extends Entity {
      */
     public int getHealth() {
         return health;
-    }
-
-    /**
-     * Gets the current points of the player.
-     * @return current points
-     */
-    public int getPoints() {
-        return points;
-    }
-
-    /**
-     * Updates the player's points by the given amount.
-     * @param amount amount to add to points (can be negative)
-     */
-    public void updatePoints(int amount) {
-        this.points += amount;
     }
 
     /**
@@ -92,38 +77,38 @@ public class Player extends Entity {
      */
     @Override
     public void updateInternal(float delta) {
-        drainTimer += delta;
+        boolean up, down, left, right;
 
-        // every 1 second, lose 2 health #TODO WILL NEED ADJUSTING OVER TIME
-        if (drainTimer >= 1.0f) {
-            modifyHealth(-2);
-            drainTimer -= 1.0f;
-        }
+        // 1. Check Keyboard Input
+        up = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
+        down = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
+        left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        float vx = 0;
-        float vy = 0;
+        int xinput = 0, yinput = 0;
+        if(right)xinput++;
+        if(left)xinput--;
+        if(up)yinput++;
+        if(down)yinput--;
 
-        // check keyboard input
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) vy = speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) vy = -speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) vx = -speed;
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) vx = speed;
+        // 2. Calculate new y velocity
+        float direction = Math.signum(this.transform.velocity.y);
+        if(direction > 0 && !(yinput > 0))yinput--;
+        else if(direction < 0 && !(yinput < 0)) yinput++; 
+        this.transform.velocity.y += (acceleration * delta * yinput);
+        if(this.transform.velocity.y > speed)this.transform.velocity.y = speed;
+        else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;
+        else if(Math.abs(this.transform.velocity.y) <= 0.1)this.transform.velocity.y = 0;
 
-        if (vx != 0 && vy != 0) {
-            // calculate current diagonal speed
-            float currentSpeed = (float) Math.sqrt((vx * vx) + (vy * vy));
 
-            // scale vx and vy down so the total speed equals our limit
-            vx = (vx / currentSpeed) * speed;
-            vy = (vy / currentSpeed) * speed;
-        }
-
-        // set the velocity in the transform
-        this.transform.setVelocity(vx, vy);
-
-        // ask the GameWorld to move the player safely (this handles collisions)
-        this.world.requestMove(this.transform, delta);
-
+        // 3. Calculate new x velocity
+        direction = Math.signum(this.transform.velocity.x);
+        if(direction > 0 && !(xinput > 0))xinput--;
+        else if(direction < 0 && !(xinput < 0)) xinput++; 
+        this.transform.velocity.x += (acceleration * delta * xinput);
+        if(this.transform.velocity.x > speed)this.transform.velocity.x = speed;
+        else if(this.transform.velocity.x < -speed)this.transform.velocity.x = -speed;
+        else if(Math.abs(this.transform.velocity.x) <= 0.1)this.transform.velocity.x = 0;
 
     }
 
