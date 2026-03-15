@@ -7,11 +7,20 @@
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
         "bigobjects.tsx": {
             "dynamicWrapping": false
         },
-        "maintiles.tsx": {
+        "level1.tmx#maintiles": {
             "dynamicWrapping": true
+        },
+        "maintiles.tsx": {
+            "dynamicWrapping": false
+        },
+        "updatedtiles.tsx": {
+            "dynamicWrapping": false
         }
     },
     "last.externalTilesetPath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/maps",
@@ -23,5 +32,10 @@
     "project": "level1.tiled-project",
     "recentFiles": [
     ],
-    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 128,
+        "width": 128
+    }
 }
