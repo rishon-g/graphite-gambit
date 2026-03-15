@@ -1,6 +1,7 @@
 package Game;
 
 import Components.Transform;
+import Components.Vec2;
 import Entities.Entity;
 import Entities.Player;
 
@@ -10,7 +11,9 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -73,6 +76,36 @@ public class WorldLoader {
             }
         }
 
+
+        // extract pickups from tiled
+        MapLayer entitiesLayer = map.getLayers().get("entities");
+
+        if (entitiesLayer != null) {
+            for (MapObject object : entitiesLayer.getObjects()) {
+
+                // look for the custom property we added within tiled
+                if (object.getProperties().containsKey("type")) {
+                    String type = object.getProperties().get("type", String.class);
+
+                    // if the property equals "Pickup", save its location
+                    if (type != null && type.equals("Pickup")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            float spawnX = tileObject.getX() + 32f;
+                            float spawnY = tileObject.getY() + 32f;
+
+                            // add this coordinate to our GameWorld's list
+                            world.spawnPoints.add(new Vec2(spawnX, spawnY));
+                        }
+                    }
+
+
+
+                }
+            }
+        }
+
         // Load and spawn all entities
         Json json = new Json();
         FileHandle file = Gdx.files.internal("src/main/java/Game/Worlds/level" + id + ".json");
@@ -92,9 +125,10 @@ public class WorldLoader {
                     continue;
             }
 
-            // set entity position and add to world
+
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
             world.entities.add(newEntity);
+
         }
 
         return world;
