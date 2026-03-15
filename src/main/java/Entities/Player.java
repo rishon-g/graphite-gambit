@@ -64,7 +64,7 @@ public class Player extends Entity {
         if (this.health > maxHealth) {
             int excess = this.health - maxHealth;
             this.health = maxHealth;
-            this.points += excess;
+            world.score(excess);
             
         // If health drops to 0 or below, handle game end logic
         }else if (this.health <= 0) {
@@ -94,7 +94,7 @@ public class Player extends Entity {
         // 2. Calculate new y velocity
         float direction = Math.signum(this.transform.velocity.y);
         if(direction > 0 && !(yinput > 0))yinput--;
-        else if(direction < 0 && !(yinput < 0)) yinput++; 
+        else if(direction < 0 && !(yinput < 0)) yinput++;
         this.transform.velocity.y += (acceleration * delta * yinput);
         if(this.transform.velocity.y > speed)this.transform.velocity.y = speed;
         else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;

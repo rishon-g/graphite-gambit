@@ -10,6 +10,7 @@ import Components.Corner;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
@@ -35,7 +36,6 @@ public class GameWorld {
 
     // separate reference to the player entity
     Player player;
-
 
     // tilemap for the world (can be used for rendering and collisions)
     int[][] tilemap;
