@@ -47,7 +47,7 @@ public class MainMenuScreen extends ScreenAdapter {
     public MainMenuScreen(GdxGame game) {
         this.game = game;
         this.batch = game.getBatch();
-        this.font = game.getFont();
+        this.font = game.getMenuFont();
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
         this.playerData = PlayerData.obtainPlayerData();
@@ -109,7 +109,7 @@ public class MainMenuScreen extends ScreenAdapter {
                 highScore = playerData.getScore(i);
             }
             if (highestLevel >= i) {
-                buttons[i] = createCenteredButton("LEVEL " + (i) + "                 Score: " + highScore, i, false);
+                buttons[i] = createCenteredButton("LEVEL " + (i) + "    Score: " + highScore, i, false);
             } else {
                 buttons[i] = createCenteredButton("LEVEL " + (i), i, true);
             }
