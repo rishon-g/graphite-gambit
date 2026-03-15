@@ -91,6 +91,10 @@ public class PlayerData {
         }
     }
 
+    public int getLevelUnlocked() {
+        return levelUnlocked;
+    }
+
     /**
      * returns the highscore for a level
      * @param level the level of the game
