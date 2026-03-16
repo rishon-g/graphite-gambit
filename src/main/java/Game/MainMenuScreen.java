@@ -42,6 +42,7 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture whiteOut =  new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
     private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
     private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
+    private final Texture plot = new Texture(Gdx.files.internal("src/main/java/Entities/Assets/Plot.png"));
 
     public boolean musicOn = true;
     public boolean sfxOn = true;
@@ -241,7 +242,7 @@ public class MainMenuScreen extends ScreenAdapter {
             String line4 = "Collect PLOT POINTS!  ";
             layout.setText(font, line4);
             font.draw(batch, layout, startX, currentY);
-            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+            batch.draw(plot, startX + layout.width, currentY - 35f, iconSize, iconSize);
 
             currentY -= lineSpacing;
 
