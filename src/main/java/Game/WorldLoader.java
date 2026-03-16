@@ -1,8 +1,10 @@
 package Game;
 
 import Components.Transform;
+import Components.Vec2;
 import Entities.Entity;
 import Entities.Player;
+import Entities.Eraser;
 
 import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.maps.MapLayer;
@@ -10,14 +12,19 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
+
+import java.security.DrbgParameters;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 /**
  * The WorldLoader class is responsible for loading specific game worlds (or levels) based on an identifier.
- * 
+ *
  * @author Lane Jacobson
  * @version 1.0
  */
@@ -26,7 +33,7 @@ public class WorldLoader {
     /**
      * Loads a game world based on the given identifier.
      * parses level data from a json file, creates the tilemap and entities based on the data, and returns the initialized GameWorld object.
-     * 
+     *
      * @param id identifier for the world to load (e.g. level number)
      * @return the loaded GameWorld object with tilemap and entities initialized according to the level data
      */
@@ -39,6 +46,7 @@ public class WorldLoader {
 
         // populate the 2D array
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
+        world.setDimensions(layer.getWidth() * GameWorld.getTileSize(), layer.getHeight() * GameWorld.getTileSize());
         world.tilemap = new int[layer.getWidth()][layer.getHeight()];
 
         for (int x = 0; x < layer.getWidth(); x++) {
@@ -69,6 +77,53 @@ public class WorldLoader {
 
                     // add to solid object array, so we know not to collide with these elements
                     world.solidObjects.add(wall);
+
+                    // also mark blocked tiles for pathfinding
+                    int tileSize = GameWorld.getTileSize();
+
+                    int startX = (int)(wall.position.x / tileSize);
+                    int endX = (int)((wall.position.x + wall.size.x) / tileSize);
+                    int startY = (int)(wall.position.y / tileSize);
+                    int endY = (int)((wall.position.y + wall.size.y) / tileSize);
+
+                    for (int tx = startX; tx <= endX; tx++) {
+                        for (int ty = startY; ty <= endY; ty++) {
+                            if (tx >= 0 && tx < world.tilemap.length &&
+                                    ty >= 0 && ty < world.tilemap[0].length) {
+                                world.tilemap[tx][ty] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // extract pickups from tiled
+        MapLayer entitiesLayer = map.getLayers().get("entities");
+
+        if (entitiesLayer != null) {
+            for (MapObject object : entitiesLayer.getObjects()) {
+
+                // look for the custom property we added within tiled
+                if (object.getProperties().containsKey("type")) {
+                    String type = object.getProperties().get("type", String.class);
+
+                    // if the property equals "Pickup", save its location
+                    if (type != null && type.equals("Pickup")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            float spawnX = tileObject.getX() + 32f;
+                            float spawnY = tileObject.getY() + 32f;
+
+                            // add this coordinate to our GameWorld's list
+                            world.spawnPoints.add(new Vec2(spawnX, spawnY));
+                        }
+                    }
+
+
+
                 }
             }
         }
@@ -88,13 +143,17 @@ public class WorldLoader {
                     newEntity = new Player(world);
                     world.player = (Player) newEntity;
                     break;
+                case "Eraser":
+                    newEntity = new Eraser(world);
+                    break;
                 default:
                     continue;
             }
 
-            // set entity position and add to world
+
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
             world.entities.add(newEntity);
+
         }
 
         return world;

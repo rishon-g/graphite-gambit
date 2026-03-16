@@ -1,9 +1,13 @@
 package Entities;
+
+import Components.Transform;
 import Game.GameWorld;
 import Pathfinding.AStar;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import java.util.Collections;
 import java.util.List;
 /**
@@ -12,14 +16,18 @@ import java.util.List;
  */
 public class Eraser extends Nonplayer {
     /** Movement speed in world units per second. */
-    private static final float MOVE_SPEED = 100f;
+    private static final float MOVE_SPEED = 300f;
+
     /** Visual size of the eraser sprite in world units. */
-    private static final float DRAW_SIZE = 40f;
-    private static final Texture TEXTURE = new Texture(Gdx.files.internal("images/eraser.png"));
+    private static final float DRAW_SIZE = 60f;
+
     /** How often the eraser rebuilds its path to the player, in seconds. */
-    private static final float PATH_RECALC_TIME = 0.25f;
-    /** Distance threshold used to decide whether the eraser has already reached the target tile center. */
+    private static final float PATH_RECALC_TIME = 0.5f;
+
+    /** Distance threshold used to decide whether the eraser reached the next tile target. */
     private static final float TARGET_DIF = 5f;
+
+    private static Texture TEXTURE;
 
     private List<int[]> currentPath = Collections.emptyList();
     private int pathIndex = 0;
@@ -28,6 +36,20 @@ public class Eraser extends Nonplayer {
     public Eraser(GameWorld world) {
         super(world);
         transform.setScale(DRAW_SIZE, DRAW_SIZE);
+        TestTexture();
+    }
+
+    /**
+     * Creates testTexture for eraser.
+     */
+    private static void TestTexture() {
+        if (TEXTURE == null) {
+            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            pixmap.setColor(Color.RED);
+            pixmap.fill();
+            TEXTURE = new Texture(pixmap);
+            pixmap.dispose();
+        }
     }
 
     /**
@@ -63,7 +85,7 @@ public class Eraser extends Nonplayer {
 
         float dx = targetX - transform.position.x;
         float dy = targetY - transform.position.y;
-        float dist = (float)Math.sqrt(dx * dx + dy * dy);
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (dist <= TARGET_DIF) {
             transform.setPosition(targetX, targetY);
@@ -80,7 +102,7 @@ public class Eraser extends Nonplayer {
 
             dx = targetX - transform.position.x;
             dy = targetY - transform.position.y;
-            dist = (float)Math.sqrt(dx * dx + dy * dy);
+            dist = (float) Math.sqrt(dx * dx + dy * dy);
         }
 
         if (dist > 0f) {
@@ -98,7 +120,7 @@ public class Eraser extends Nonplayer {
      */
     private void rebuildPath(Player player) {
         int[][] map = world.getTilemap();
-        if (map == null) {
+        if (map == null || map.length == 0 || map[0].length == 0) {
             currentPath = Collections.emptyList();
             pathIndex = 0;
             return;
@@ -160,10 +182,10 @@ public class Eraser extends Nonplayer {
     public void render(SpriteBatch batch, float delta) {
         batch.draw(
                 TEXTURE,
-                transform.position.x,
-                transform.position.y,
-                transform.size.x,
-                transform.size.y
+                transform.position.x * Game.GdxGame.UNIT_SCALE,
+                transform.position.y * Game.GdxGame.UNIT_SCALE,
+                transform.size.x * Game.GdxGame.UNIT_SCALE,
+                transform.size.y * Game.GdxGame.UNIT_SCALE
         );
     }
 

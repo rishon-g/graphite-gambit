@@ -3,7 +3,7 @@ package Pathfinding;
 import java.util.*;
 
 /**
- * A* pathfinding of movement in 4 directions: (up/down/left/right).
+ * A* pathfinding of movement in 8 directions: (up/down/left/right and diagonally).
  *
  * Returns the path as a list of int[]{x,y} cells.
  */

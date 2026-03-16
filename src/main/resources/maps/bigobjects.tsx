@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1024" tileheight="1024" tilecount="13" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1024" tileheight="1024" tilecount="15" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="74">
   <image source="../images/hole4pixel.png" width="1024" height="1024"/>
@@ -39,5 +39,11 @@
  </tile>
  <tile id="89">
   <image source="../images/keypixel2.png" width="128" height="128"/>
+ </tile>
+ <tile id="90">
+  <image source="../images/cornerdesign.png" width="396" height="400"/>
+ </tile>
+ <tile id="91">
+  <image source="../images/pixeledcorner.png" width="396" height="400"/>
  </tile>
 </tileset>
