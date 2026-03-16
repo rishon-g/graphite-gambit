@@ -53,7 +53,7 @@ public class Player extends Entity {
         // pixmap.fill();
         // this.dummyTexture = new Texture(pixmap);
         // pixmap.dispose();
-        this.transform.setScale(128, 128);
+        this.transform.setScale(64, 64);
     }
 
     /**
@@ -161,15 +161,23 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        // draw the red square at the player's scaled position (by scaled we mean the pixel size)
         TextureRegion frame = front.getKeyFrame(time, true);
         batch.setColor(1,1,1,1);
 
+        // how big the sprite should actually look on screen
+        float visualWidth = 256f;
+        float visualHeight = 256f;
+
+        // calculate the offset to center the 256x256 image over the 128x128 hitbox
+        float offsetX = (visualWidth - this.transform.size.x) / 2f;
+        float offsetY = (visualHeight - this.transform.size.y) / 2f - 85; // tweaked to perfection
+
+        // draw the sprite using the offset and the new visual dimensions
         batch.draw(frame,
-                this.transform.position.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.position.y * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.y * Game.GdxGame.UNIT_SCALE
+                (this.transform.position.x - offsetX) * Game.GdxGame.UNIT_SCALE,
+                (this.transform.position.y - offsetY) * Game.GdxGame.UNIT_SCALE,
+                visualWidth * Game.GdxGame.UNIT_SCALE,
+                visualHeight * Game.GdxGame.UNIT_SCALE
         );
     }
 }
