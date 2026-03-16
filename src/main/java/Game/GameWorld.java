@@ -307,7 +307,6 @@ private int drawWeight(int x, int y, int brushsize) {
             }
         }
 
-
         // Entity updates
         for (Entity entity : entities) {
             entity.update(delta);
@@ -315,9 +314,9 @@ private int drawWeight(int x, int y, int brushsize) {
 
         // Resolve entity to player collisions
         for (Entity entity : entities) {
-            if(entity instanceof Nonplayer){
-                if(entity.transform.collides(player.transform)){
-                    ((Nonplayer)entity).playerCollide(player);
+            if (entity instanceof Nonplayer) {
+                if (isTouchingPlayer(entity.transform)) {
+                    ((Nonplayer) entity).playerCollide(player);
                 }
             }
         }
@@ -382,10 +381,65 @@ private int drawWeight(int x, int y, int brushsize) {
         return index;
     }
 
+    private Entity getEntityByTransform(Transform t) {
+        if (player != null && player.transform == t) {
+            return player;
+        }
+        for (Entity entity : entities) {
+            if (entity.transform == t) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    private boolean shouldBlockEntityMovement(Transform mover, Entity other) {
+        Entity moverEntity = getEntityByTransform(mover);
+
+        if (moverEntity == null || other == null) {
+            return false;
+        }
+
+        if (other.transform == mover) {
+            return false;
+        }
+
+        // Erasers block each other
+        if (moverEntity instanceof Nonplayer && other instanceof Nonplayer) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if a non-player entity is touching or very close to the player.
+     *
+     * @param other transform of the other entity
+     * @return true if the entity is close enough to count as contact
+     */
+    private boolean isTouchingPlayer(Transform other) {
+        float epsilon = 0.5f;
+
+        float playerLeft = player.transform.position.x;
+        float playerRight = player.transform.position.x + player.transform.size.x;
+        float playerBottom = player.transform.position.y;
+        float playerTop = player.transform.position.y + player.transform.size.y;
+
+        float otherLeft = other.position.x;
+        float otherRight = other.position.x + other.size.x;
+        float otherBottom = other.position.y;
+        float otherTop = other.position.y + other.size.y;
+
+        return !(playerLeft > otherRight + epsilon ||
+                playerRight < otherLeft - epsilon ||
+                playerBottom > otherTop + epsilon ||
+                playerTop < otherBottom - epsilon);
+    }
+
     /**
      * Called by and entity of the world in order to request to move.
      * Handles any collisions between the entity and the map, then moves it in an allowed way.
-     * 
+     *
      * @param t the transform of the entity
      */
     public void requestMove(Transform t, float delta){
@@ -406,6 +460,7 @@ private int drawWeight(int x, int y, int brushsize) {
         if (dx != 0) {
             testBox.setPosition(t.position.x + dx, t.position.y); // lets see if this collides
 
+            // collide with walls
             for (Transform wall : solidObjects) {
                 if (testBox.collides(wall)) {
                     // snap exactly to the edge of the custom rectangle
@@ -417,6 +472,23 @@ private int drawWeight(int x, int y, int brushsize) {
                     testBox.setPosition(t.position.x + dx, t.position.y); // update phantom box
                 }
             }
+
+            // collide with blocking entities
+            for (Entity entity : entities) {
+                if (!shouldBlockEntityMovement(t, entity)) {
+                    continue;
+                }
+
+                if (testBox.collides(entity.transform)) {
+                    if (dx > 0) {
+                        dx = entity.transform.position.x - (t.position.x + t.size.x) - 0.01f;
+                    } else {
+                        dx = (entity.transform.position.x + entity.transform.size.x) - t.position.x + 0.01f;
+                    }
+                    testBox.setPosition(t.position.x + dx, t.position.y);
+                }
+            }
+
             t.move(new Vec2(dx, 0)); // if there is a collision, the testBox provides
             // us with a dx value that is flush with the collision rectangle, otherwise we move as normal
         }
@@ -425,6 +497,7 @@ private int drawWeight(int x, int y, int brushsize) {
         if (dy != 0) {
             testBox.setPosition(t.position.x, t.position.y + dy); // test y move
 
+            // collide with walls
             for (Transform wall : solidObjects) {
                 if (testBox.collides(wall)) {
                     // snap exactly to the edge of the custom rectangle
@@ -436,6 +509,23 @@ private int drawWeight(int x, int y, int brushsize) {
                     testBox.setPosition(t.position.x, t.position.y + dy); // update phantom box
                 }
             }
+
+            // collide with blocking entities
+            for (Entity entity : entities) {
+                if (!shouldBlockEntityMovement(t, entity)) {
+                    continue;
+                }
+
+                if (testBox.collides(entity.transform)) {
+                    if (dy > 0) {
+                        dy = entity.transform.position.y - (t.position.y + t.size.y) - 0.01f;
+                    } else {
+                        dy = (entity.transform.position.y + entity.transform.size.y) - t.position.y + 0.01f;
+                    }
+                    testBox.setPosition(t.position.x, t.position.y + dy);
+                }
+            }
+
             t.move(new Vec2(0, dy)); // same thing as before but now for y
         }
     }
