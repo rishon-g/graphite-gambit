@@ -11,7 +11,7 @@
             "scaleInDock": 1
         },
         "bigobjects.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "level1.tmx": {
             "expandedObjectLayers": [
@@ -28,6 +28,14 @@
         },
         "level1.tmx#maintiles": {
             "dynamicWrapping": true
+        },
+        "level2.tmx": {
+            "scale": 0.1659,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1500.9041591320076,
+                "y": 1473.7793851717906
+            }
         },
         "maintiles.tsx": {
             "dynamicWrapping": false

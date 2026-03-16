@@ -137,6 +137,28 @@ public class WorldLoader {
                             world.entities.add(puddle);
                         }
                     }
+                    // door
+                    else if (type != null && (type.equals("DoorLeft") || type.equals("DoorRight"))) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+                            String partWord = type.equals("DoorLeft") ? "Left" : "Right";
+
+                            Door doorPart = new Door(world, partWord);
+                            doorPart.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(doorPart);
+                        }
+                    }
+
+                    // exit point
+                    else if (type != null && type.equals("ExitPoint")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            ExitPoint exit = new ExitPoint(world);
+                            exit.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(exit);
+                        }
+                    }
                 }
             }
         }
@@ -180,4 +202,5 @@ public class WorldLoader {
 
         return world;
     }
+
 }

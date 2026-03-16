@@ -115,7 +115,11 @@ public class GameWorld {
         score(100);
         this.plotpoints--;
         if(plotpoints <= 0){
-            screen.gameEnd(true);
+            for (Entity e : entities) {
+                if (e instanceof Entities.Door) {
+                    e.dead = true; // This removes it from the world instantly
+                }
+            }
         }
     }
 
@@ -249,7 +253,7 @@ private int drawWeight(int x, int y, int brushsize) {
         // subtract delta to count down
         time -= delta;
 
-        // check for time over
+        // check for font.getData().setScale(1.0f);time over
         if (time <= 0) {
             time = 0;
             screen.gameEnd(false); // Trigger game over if time hits zero
@@ -400,6 +404,10 @@ private int drawWeight(int x, int y, int brushsize) {
             return false;
         }
 
+        if (other instanceof Entities.Door) {
+            return true;
+        }
+
         if (other.transform == mover) {
             return false;
         }
@@ -434,6 +442,13 @@ private int drawWeight(int x, int y, int brushsize) {
                 playerRight < otherLeft - epsilon ||
                 playerBottom > otherTop + epsilon ||
                 playerTop < otherBottom - epsilon);
+    }
+
+    /**
+     * Public method for the ExitPoint to trigger the win condition
+     */
+    public void winGame() {
+        screen.gameEnd(true);
     }
 
     /**

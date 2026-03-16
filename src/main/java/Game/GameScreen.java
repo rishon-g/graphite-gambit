@@ -336,12 +336,21 @@ public class GameScreen implements Screen {
             if (!buttonHovered) selectedIndex = -1;
         }
 
-        if (world.getPlayer().isStunned) {
-            layout.setText(headerFont, "MASH SPACE!");
 
-            headerFont.setColor(Color.RED);
-            headerFont.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
-            headerFont.setColor(Color.WHITE);
+        // draw stun
+        if (world.getPlayer().isStunned && !gameOver && !gameWon) {
+
+            font.getData().setScale(2.0f);
+
+            layout.setText(font, "MASH SPACE!");
+
+
+            // 3. Draw it dead center
+            font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
+
+            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
+            font.getData().setScale(1.0f);
+            font.setColor(Color.WHITE);
         }
 
         batch.end();

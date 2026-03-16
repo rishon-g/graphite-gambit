@@ -19,7 +19,7 @@ abstract public class Entity {
     // reference to the game world the entity belongs to (used for interactions with other entities)
     protected GameWorld world;
 
-    protected boolean dead;
+    public boolean dead;
 
     /**
      * Constructor for the Entity class.
