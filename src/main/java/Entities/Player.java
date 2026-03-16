@@ -4,7 +4,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import Game.GameWorld;
 
@@ -17,14 +19,14 @@ import Game.GameWorld;
  * @since 2026-2-26
  */
 public class Player extends Entity {
-    private Texture dummyTexture;
     // health (graphite) of the player
     private int health;
     private int maxHealth;
     private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
-    private int points;
+    private TextureRegion sprites[][];
+    private int facing = 0;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -33,15 +35,23 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
+        Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
+        sprites = new TextureRegion[4][4];
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < 4; j++){
+                sprites[i][j] = sheet[i][j];
+            }
+        }
 
         // TODO CHANGE AS SOON AS A SPRITE IS READY
         // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.RED);
-        pixmap.fill();
-        this.dummyTexture = new Texture(pixmap);
-        pixmap.dispose();
-        this.transform.setScale(100, 100);
+        // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        // pixmap.setColor(Color.RED);
+        // pixmap.fill();
+        // this.dummyTexture = new Texture(pixmap);
+        // pixmap.dispose();
+        this.transform.setScale(64, 128);
     }
 
     /**
@@ -94,7 +104,6 @@ public class Player extends Entity {
             }
         }
 
-
         boolean up, down, left, right;
 
         // 1. Check Keyboard Input
@@ -108,6 +117,17 @@ public class Player extends Entity {
         if(left)xinput--;
         if(up)yinput++;
         if(down)yinput--;
+
+        // recalibrate animation direction
+        if(yinput < 0){
+            facing = 0;
+        }else if(yinput > 0){
+            facing = 1;
+        }else if(xinput > 0){
+            facing = 2;
+        }else if(xinput < 0){
+            facing = 3;
+        }
 
         int xclamp = 0, yclamp = 0;
 
@@ -148,14 +168,24 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        // TODO change to actual sprite
-        // draw the red square at the player's scaled position (by scaled we mean the pixel size)
-        batch.setColor(1, 0, 0, 1);
-        batch.draw(dummyTexture,
-                this.transform.position.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.position.y * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.y * Game.GdxGame.UNIT_SCALE
+        int healthIndex = (health - 1) / 25;
+        TextureRegion frame = sprites[facing][healthIndex];
+        batch.setColor(1,1,1,1);
+
+        // how big the sprite should actually look on screen
+        float visualWidth = 200f;
+        float visualHeight = 256f;
+
+        // calculate the offset to center the 256x256 image over the 128x128 hitbox
+        float offsetX = (visualWidth - this.transform.size.x) / 2f;
+        float offsetY = (visualHeight - this.transform.size.y) / 2f - 65; // tweaked to perfection
+
+        // draw the sprite using the offset and the new visual dimensions
+        batch.draw(frame,
+                (this.transform.position.x - offsetX) * Game.GdxGame.UNIT_SCALE,
+                (this.transform.position.y - offsetY) * Game.GdxGame.UNIT_SCALE,
+                visualWidth * Game.GdxGame.UNIT_SCALE,
+                visualHeight * Game.GdxGame.UNIT_SCALE
         );
 
         batch.setColor(Color.WHITE);

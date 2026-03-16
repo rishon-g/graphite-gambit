@@ -45,6 +45,7 @@ public class GameWorld {
 
     int points;
     float time;
+    int plotpoints;
 
     // list of all entities in the game world
     Vector<Entity> entities;
@@ -82,6 +83,7 @@ public class GameWorld {
         this.worldId = id;
         this.screen = screen;
         this.points = 0;
+        this.plotpoints = 0;
         this.time = 300f;
         createPixel();
     }
@@ -104,6 +106,17 @@ public class GameWorld {
      */
     public void score(int p){
         this.points += p;
+    }
+
+    /**
+     * Called when the player scores a plot point. grants points, and reduces plot point counter.
+     */
+    public void plotPointCollected(){
+        score(100);
+        this.plotpoints--;
+        if(plotpoints <= 0){
+            screen.gameEnd(true);
+        }
     }
 
     /**

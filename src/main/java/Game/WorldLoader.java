@@ -5,6 +5,7 @@ import Components.Vec2;
 import Entities.Entity;
 import Entities.Player;
 import Entities.Eraser;
+import Entities.Node;
 
 import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.maps.MapLayer;
@@ -162,6 +163,10 @@ public class WorldLoader {
                     break;
                 case "Eraser":
                     newEntity = new Eraser(world);
+                    break;
+                case "Node":
+                    newEntity = new Node(world);
+                    world.plotpoints++;
                     break;
                 default:
                     continue;

@@ -1,13 +1,17 @@
 package Entities;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Game.GameWorld;
 
 public class Node extends Nonplayer {
+    Texture texture;
 
     public Node(GameWorld world){
         super(world);
+        texture = new Texture("src/main/java/Entities/Assets/Plot.png");
+        transform.setScale(32, 32);
     }
 
     @Override
@@ -17,7 +21,13 @@ public class Node extends Nonplayer {
 
     @Override
     public void render(SpriteBatch batch, float delta) {
-        // TODO
+        batch.draw(
+                texture,
+                transform.position.x * Game.GdxGame.UNIT_SCALE,
+                transform.position.y * Game.GdxGame.UNIT_SCALE,
+                transform.size.x * Game.GdxGame.UNIT_SCALE,
+                transform.size.y * Game.GdxGame.UNIT_SCALE
+        );
     }
 
     /**
@@ -26,7 +36,7 @@ public class Node extends Nonplayer {
      */
     @Override
     public void playerCollide(Player player) {
-        world.score(100);
+        world.plotPointCollected();
         dead = true;
     }
 }
