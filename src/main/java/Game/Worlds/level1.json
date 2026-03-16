@@ -1,9 +1,19 @@
 {
-    "entities": [
-        {
-            "type": "Player",
-            "x": 3,
-            "y": 17
-        }
-    ]
+  "entities": [
+    {
+      "type": "Player",
+      "x": 3,
+      "y": 17
+    },
+    {
+      "type": "Eraser",
+      "x": 7,
+      "y": 17
+    },
+    {
+      "type": "Eraser",
+      "x": 12,
+      "y": 14
+    }
+  ]
 }

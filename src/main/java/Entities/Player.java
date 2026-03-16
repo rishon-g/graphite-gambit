@@ -78,6 +78,10 @@ public class Player extends Entity {
      */
     @Override
     public void updateInternal(float delta) {
+        // Draw on floor in the middle of the feet of the sprite
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
+
+        // Movement
         // graphite drain logic
         // only tick if the player is moving (has velocity)
         if (Math.abs(this.transform.velocity.x) > 1f || Math.abs(this.transform.velocity.y) > 1f) {
@@ -105,55 +109,37 @@ public class Player extends Entity {
         if(up)yinput++;
         if(down)yinput--;
 
-        // 2. Calculate new Y velocity
-        if (yinput != 0) {
-            // accelerate in the direction of input
-            this.transform.velocity.y += acceleration * delta * yinput;
-        } else {
-            // decelerate towards zero
-            if (this.transform.velocity.y > 0) {
-                this.transform.velocity.y -= acceleration * delta;
-                if (this.transform.velocity.y < 0) this.transform.velocity.y = 0; // Prevent overshoot
-            } else if (this.transform.velocity.y < 0) {
-                this.transform.velocity.y += acceleration * delta;
-                if (this.transform.velocity.y > 0) this.transform.velocity.y = 0; // Prevent overshoot
-            }
+        int xclamp = 0, yclamp = 0;
+
+        // 2. Calculate new y velocity
+        if(transform.velocity.y != 0){
+        float direction = Math.signum(this.transform.velocity.y);
+            if(direction > 0 && !(yinput > 0)){yclamp = 1; yinput--;}
+            else if(direction < 0 && !(yinput < 0)){yclamp = -1; yinput++;}
         }
-        // cap y speed
-        if (this.transform.velocity.y > speed) this.transform.velocity.y = speed;
-        else if (this.transform.velocity.y < -speed) this.transform.velocity.y = -speed;
+        this.transform.velocity.y += (acceleration * delta * yinput);
+        if(yclamp > 0)
+            this.transform.velocity.y = Math.max(0, this.transform.velocity.y);
+        else if(yclamp < 0)
+            this.transform.velocity.y = Math.min(0, this.transform.velocity.y);
 
-
-        // calculate new X velocity
-        if (xinput != 0) {
-            // accelerate in the direction of input
-            this.transform.velocity.x += acceleration * delta * xinput;
-        } else {
-            // decelerate towards zero
-            if (this.transform.velocity.x > 0) {
-                this.transform.velocity.x -= acceleration * delta;
-                if (this.transform.velocity.x < 0) this.transform.velocity.x = 0; // Prevent overshoot
-            } else if (this.transform.velocity.x < 0) {
-                this.transform.velocity.x += acceleration * delta;
-                if (this.transform.velocity.x > 0) this.transform.velocity.x = 0; // Prevent overshoot
-            }
+        // 3. Calculate new x velocity
+        if(transform.velocity.x != 0){
+        float direction = Math.signum(this.transform.velocity.x);
+            if(direction > 0 && !(xinput > 0)){xclamp = 1; xinput--;}
+            else if(direction < 0 && !(xinput < 0)){xclamp = -1; xinput++;}
         }
-        // cap x speed
-        if (this.transform.velocity.x > speed) this.transform.velocity.x = speed;
-        else if (this.transform.velocity.x < -speed) this.transform.velocity.x = -speed;
+        this.transform.velocity.x += (acceleration * delta * xinput);
+        if(xclamp > 0)
+            this.transform.velocity.x = Math.max(0, this.transform.velocity.x);
+        else if(xclamp < 0)
+            this.transform.velocity.x = Math.min(0, this.transform.velocity.x);
 
-        // fix for diagonal strafing
-        // calculate the actual current diagonal speed using the Pythagorean theorem
-        float currentSpeed = (float) Math.sqrt(
-                (this.transform.velocity.x * this.transform.velocity.x) +
-                        (this.transform.velocity.y * this.transform.velocity.y)
-        );
-
-        // if diagonal speed exceeds the max speed, scale it back down (aka normalize)
-        if (currentSpeed > speed) {
-            this.transform.velocity.x = (this.transform.velocity.x / currentSpeed) * speed;
-            this.transform.velocity.y = (this.transform.velocity.y / currentSpeed) * speed;
-        }
+        // 4. Check boundaries
+        if(this.transform.velocity.y > speed)this.transform.velocity.y = speed;
+        else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;
+        if(this.transform.velocity.x > speed)this.transform.velocity.x = speed;
+        else if(this.transform.velocity.x < -speed)this.transform.velocity.x = -speed;
 
     }
 
@@ -162,9 +148,9 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-
         // TODO change to actual sprite
         // draw the red square at the player's scaled position (by scaled we mean the pixel size)
+        batch.setColor(1, 0, 0, 1);
         batch.draw(dummyTexture,
                 this.transform.position.x * Game.GdxGame.UNIT_SCALE,
                 this.transform.position.y * Game.GdxGame.UNIT_SCALE,
