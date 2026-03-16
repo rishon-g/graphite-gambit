@@ -26,6 +26,7 @@ public class GdxGame extends Game {
 
     private SpriteBatch batch;
     private BitmapFont font;
+    private BitmapFont menuFont;
     private BitmapFont headerFont;
     private ScreenManager screenManager;
     private OrthographicCamera camera;
@@ -57,7 +58,13 @@ public class GdxGame extends Game {
 
 
         font = generator.generateFont(fontParams);
-        fontParams.size = 100;
+        fontParams.borderColor = Color.CLEAR;
+        fontParams.color = Color.BLACK;
+        fontParams.size = 32;
+        fontParams.spaceX = -5;
+        menuFont = generator.generateFont(fontParams);
+        fontParams.size = 76;
+        fontParams.spaceX = -8;
         headerFont = generator.generateFont(fontParams);
         generator.dispose();
 
@@ -82,6 +89,7 @@ public class GdxGame extends Game {
         screenManager.dispose();
         batch.dispose();
         font.dispose();
+        menuFont.dispose();
         headerFont.dispose();
         assetService.debugDiagnostics();
         assetService.dispose();
@@ -97,6 +105,10 @@ public class GdxGame extends Game {
 
     public BitmapFont getHeaderFont() {
         return headerFont;
+    }
+
+    public BitmapFont getMenuFont() {
+        return menuFont;
     }
 
     public AssetService getAssetService() {

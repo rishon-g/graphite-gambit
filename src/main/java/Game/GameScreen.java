@@ -144,25 +144,35 @@ public class GameScreen implements Screen {
         // subtract layout width so it perfectly aligns to the right edge
         font.draw(batch, layout, 1920 - layout.width - 50, 1030);
 
-        // draw graphite bar (temporary for now)
-        float maxBarHeight = 600f;
-        float barWidth = 40f;
-        float barX = 50f;
-        float barY = 200f;
+        // draw graphite bar
+        float barWidth = 800f;
+        float barHeight = 40f;
+        float barX = (1920f - barWidth) / 2f; // mathematical centering
+        float barY = 50f; //
 
-        // calculate health percentage (player constructor sets max to 100)
+        // calculate health percentage
         float healthPct = (float) world.player.getHealth() / 100f;
 
-        // draw background (light gray: this represents the empty portion)
+        // draw the border
+        batch.setColor(Color.BLACK);
+        batch.draw(uiTexture, barX - 4f, barY - 4f, barWidth + 8f, barHeight + 8f);
+
+        // draw a light-grey background for the bar
         batch.setColor(Color.LIGHT_GRAY);
-        batch.draw(uiTexture, barX, barY, barWidth, maxBarHeight);
+        batch.draw(uiTexture, barX, barY, barWidth, barHeight);
 
-        // draw foreground (dark grey: this represents the full portion)
+        // draw the dark grey filled portion
         batch.setColor(Color.DARK_GRAY);
-        batch.draw(uiTexture, barX, barY, barWidth, maxBarHeight * healthPct);
+        // dynamically changes according to health at the moment
+        batch.draw(uiTexture, barX, barY, barWidth * healthPct, barHeight);
 
-        // reset batch color to white so we don't accidentally tint the whole game gray next frame
+        // reset batch color to white before drawing text
         batch.setColor(Color.WHITE);
+
+        // draw graphite text
+        String graphiteText = "GRAPHITE";
+        layout.setText(font, graphiteText);
+        font.draw(batch, layout, (1920f - layout.width) / 2f, barY + 30f);
         batch.end();
 
         // return the viewport to the world camera for the next frame

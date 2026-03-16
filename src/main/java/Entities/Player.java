@@ -24,6 +24,7 @@ public class Player extends Entity {
     private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
+    private int points;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -81,6 +82,19 @@ public class Player extends Entity {
         world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
 
         // Movement
+        // graphite drain logic
+        // only tick if the player is moving (has velocity)
+        if (Math.abs(this.transform.velocity.x) > 1f || Math.abs(this.transform.velocity.y) > 1f) {
+            drainTimer += delta;
+
+            // every 1 second of MOVEMENT, lose 2 health TODO change accordingly
+            if (drainTimer >= 1.0f) {
+                modifyHealth(-2);
+                drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
+            }
+        }
+
+
         boolean up, down, left, right;
 
         // 1. Check Keyboard Input
@@ -126,6 +140,7 @@ public class Player extends Entity {
         else if(this.transform.velocity.y < -speed)this.transform.velocity.y = -speed;
         if(this.transform.velocity.x > speed)this.transform.velocity.x = speed;
         else if(this.transform.velocity.x < -speed)this.transform.velocity.x = -speed;
+
     }
 
     /**
