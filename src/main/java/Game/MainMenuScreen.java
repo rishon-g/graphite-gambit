@@ -98,17 +98,16 @@ public class MainMenuScreen extends ScreenAdapter {
         MenuButton[] buttons = new MenuButton[5];
         buttons[0] = createCenteredButton("BACK", 0, false);
         int highestLevel = 1;
-        if (playerData != null) {
-            highestLevel = playerData.getLevelUnlocked();
+        if (PlayerData.obtainPlayerData() != null) {
+            highestLevel = PlayerData.obtainPlayerData().getLevelUnlocked();
         }
         for (int i = 1; i < 5; i++) {
             int highScore = 0;
-            if (playerData != null) {
+            if (PlayerData.obtainPlayerData() != null) {
                 try {
-                    highScore = playerData.getScore(i);
+                    highScore = PlayerData.obtainPlayerData().getScore(i);
                 } catch (IndexOutOfBoundsException e) {
-                    // If the score doesn't exist yet, just leave it at 0!
-                    highScore = 0;
+                    // If the score doesn't exist yet, just leave it at 0
                 }
             }
             if (highestLevel >= i) {
