@@ -10,13 +10,19 @@ import Components.Corner;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import com.badlogic.gdx.math.MathUtils;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector2;
+
 
 /**
  * The GameWorld class is responsible for managing the world, it's entities, and control over the game.
@@ -30,6 +36,12 @@ public class GameWorld {
     static final int X_ORIGIN = 0;
     static final int Y_ORIGIN = 0;
     static final int DRAW_SIZE = 3;
+
+    // spawner variables
+    public Array<Vec2> spawnPoints = new Array<>();
+    private float spawnTimer = 0f;
+    private final float SPAWN_INTERVAL = 5.0f;
+    private final int MAX_PICKUPS = 3;
 
     int points;
     float time;
@@ -227,6 +239,59 @@ private int drawWeight(int x, int y, int brushsize) {
             time = 0;
             screen.gameEnd(false); // Trigger game over if time hits zero
         }
+
+        // random spawner logic (meant for graphite shards for now)
+        if (spawnPoints.size > 0) {
+            spawnTimer += delta;
+
+            if (spawnTimer >= SPAWN_INTERVAL) {
+
+                // count how many pickups concurrently are on the map
+                int currentPickups = 0;
+                for (Entity e : entities) {
+                    if (e instanceof Entities.Pickup) {
+                        currentPickups++;
+                    }
+                }
+
+                // do we have room to spawn more?
+                if (currentPickups < MAX_PICKUPS) {
+
+                    int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
+                    Vec2 chosenLoc = spawnPoints.get(randomIndex);
+
+                    // occupancy check (making sure they don't spawn in the same location)
+                    boolean spotTaken = false;
+                    for (Entity e : entities) {
+                        if (e instanceof Entities.Pickup) {
+                            // if an existing pickup is extremely close to our chosen location
+                            if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
+                                    Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
+                                spotTaken = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // we only spawn if the spot is completely empty
+                    if (!spotTaken) {
+                        Entities.Pickup newPickup = new Entities.Pickup(this);
+                        newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
+                        this.entities.add(newPickup);
+
+                        // successfully spawned, so we reset the time
+                        // if the spot was taken, this time is not reset because it will instantly try again
+                        // until it finds an empty spot
+                        spawnTimer = 0f;
+                    }
+
+                } else {
+                    // we are at max limit but we try to spawn more
+                    spawnTimer = 0f;
+                }
+            }
+        }
+
 
         // Entity updates
         for (Entity entity : entities) {
