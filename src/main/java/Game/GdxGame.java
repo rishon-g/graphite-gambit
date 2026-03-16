@@ -33,10 +33,6 @@ public class GdxGame extends Game {
     private Viewport viewport;
     private AssetService assetService;
 
-    // audio
-    private boolean musicPlaying = true;
-    private boolean sfxPlaying = true;
-
 
     @Override
     public void create() {
@@ -125,21 +121,5 @@ public class GdxGame extends Game {
 
     public OrthographicCamera getCamera() {
         return camera;
-    }
-
-    public boolean isMusicPlaying() {
-        return musicPlaying;
-    }
-
-    public boolean isSfxPlaying() {
-        return sfxPlaying;
-    }
-
-    public void setMusicPlaying(boolean musicPlaying) {
-        this.musicPlaying = musicPlaying;
-    }
-
-    public void setSfxPlaying(boolean sfxPlaying) {
-        this.sfxPlaying = sfxPlaying;
     }
 }
