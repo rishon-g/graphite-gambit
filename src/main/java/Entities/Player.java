@@ -19,16 +19,14 @@ import Game.GameWorld;
  * @since 2026-2-26
  */
 public class Player extends Entity {
-    private Texture dummyTexture;
     // health (graphite) of the player
     private int health;
     private int maxHealth;
-    private float time;
     private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
-    private int points;
-    private Animation<TextureRegion> front;
+    private TextureRegion sprites[][];
+    private int facing = 0;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -37,14 +35,14 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
-        this.time = 0;
-        Texture png = new Texture("src/main/java/Entities/Assets/Pencil.png");
-        TextureRegion[][] sheet = TextureRegion.split(png, 64, 64);
-        TextureRegion[] sprites = new TextureRegion[4];
+        Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
+        sprites = new TextureRegion[4][4];
         for(int i = 0; i < 4; i++){
-            sprites[i] = sheet[0][i];
+            for(int j = 0; j < 4; j++){
+                sprites[i][j] = sheet[i][j];
+            }
         }
-        front = new Animation<>(0.25f, sprites);
 
         // TODO CHANGE AS SOON AS A SPRITE IS READY
         // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
@@ -53,7 +51,7 @@ public class Player extends Entity {
         // pixmap.fill();
         // this.dummyTexture = new Texture(pixmap);
         // pixmap.dispose();
-        this.transform.setScale(64, 64);
+        this.transform.setScale(64, 128);
     }
 
     /**
@@ -105,8 +103,6 @@ public class Player extends Entity {
                 drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
             }
         }
-        time += delta;
-
 
         boolean up, down, left, right;
 
@@ -121,6 +117,17 @@ public class Player extends Entity {
         if(left)xinput--;
         if(up)yinput++;
         if(down)yinput--;
+
+        // recalibrate animation direction
+        if(yinput < 0){
+            facing = 0;
+        }else if(yinput > 0){
+            facing = 1;
+        }else if(xinput > 0){
+            facing = 2;
+        }else if(xinput < 0){
+            facing = 3;
+        }
 
         int xclamp = 0, yclamp = 0;
 
@@ -161,7 +168,8 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        TextureRegion frame = front.getKeyFrame(time, true);
+        int healthIndex = (health - 1) / 25;
+        TextureRegion frame = sprites[facing][healthIndex];
         batch.setColor(1,1,1,1);
 
         // how big the sprite should actually look on screen
