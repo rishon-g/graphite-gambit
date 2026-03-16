@@ -157,5 +157,7 @@ public class Player extends Entity {
                 this.transform.size.x * Game.GdxGame.UNIT_SCALE,
                 this.transform.size.y * Game.GdxGame.UNIT_SCALE
         );
+
+        batch.setColor(Color.WHITE);
     }
 }
