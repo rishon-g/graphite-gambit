@@ -54,16 +54,6 @@ public class MainMenuScreen extends ScreenAdapter {
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
 
-    private void changeLayout(Layout layout) {
-        currentLayout = layout;
-        buttons = switch (layout) {
-            case MAIN -> menuButtons;
-            case LEVEL_SELECT -> levelButtons();
-            case SETTINGS -> settingsButtons;
-            case HOW_TO_PLAY -> howToPlayButtons;
-        };
-    }
-
     // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
 
     /**
