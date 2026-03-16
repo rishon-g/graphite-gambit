@@ -224,6 +224,8 @@ private int drawWeight(int x, int y, int brushsize) {
                 batch.draw(pixel,x*DRAW_SIZE*GdxGame.UNIT_SCALE,y*DRAW_SIZE*GdxGame.UNIT_SCALE,DRAW_SIZE*GdxGame.UNIT_SCALE,DRAW_SIZE*GdxGame.UNIT_SCALE);
             }
         }
+
+        batch.setColor(Color.WHITE);
     }
 
     /**

@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
@@ -24,12 +24,12 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Batch batch;
     private final BitmapFont font;
     private final BitmapFont header_font;
-    private final Viewport viewport = new ScreenViewport();
+    private final Viewport viewport = new FitViewport(1920, 1080);
     private final GlyphLayout layout = new GlyphLayout();
     private final ScreenManager screenManager;
     private final PlayerData playerData;
-    int screenWidth = Gdx.graphics.getWidth();
-    int screenHeight = Gdx.graphics.getHeight();
+    int screenWidth = 1920;
+    int screenHeight = 1080;
     private int selectedIndex = -1;
     private final Texture background = new Texture(Gdx.files.internal("images/menu-background.png"));
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
