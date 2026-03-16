@@ -1,4 +1,5 @@
 package Entities;
+import Game.AudioManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -143,6 +144,9 @@ public class Player extends Entity {
         }
 
 
+        // play sharpener sound
+        Game.AudioManager.getInstance().updateSharpenerSound(isStunned);
+
         // handle immunity
         if (isImmune) {
             immunityTimer -= delta;
@@ -175,9 +179,6 @@ public class Player extends Entity {
         float baseSpeed = 600f; //
         speed = baseSpeed * currentSpeedMultiplier;
 
-        // 2. IMMEDIATELY reset the multiplier back to normal for the next frame
-        currentSpeedMultiplier = 1.0f;
-
         boolean up, down, left, right;
 
         // 1. Check Keyboard Input
@@ -188,7 +189,14 @@ public class Player extends Entity {
 
         // update moving sound effect
         boolean isMoving = up || down || left || right;
-        Game.AudioManager.getInstance().updateMoveSound(isMoving);
+        if (currentSpeedMultiplier == INK_SLOW_FACTOR) {
+            Game.AudioManager.getInstance().updateMoveSound(isMoving, true);
+        } else {
+            Game.AudioManager.getInstance().updateMoveSound(isMoving, false);
+        }
+
+        // 2. IMMEDIATELY reset the multiplier back to normal for the next frame
+        currentSpeedMultiplier = 1.0f;
 
         int xinput = 0, yinput = 0;
         if(right)xinput++;

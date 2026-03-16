@@ -17,6 +17,8 @@ public class AudioManager implements Disposable {
     // Sounds
     private Music gameMusic;
     private Sound moveSound;
+    private Sound puddleSound;
+    private Sound sharpenerSound;
     private Sound damageSound;
     private Sound scoreSound;
     private Sound hoverSound;
@@ -26,6 +28,8 @@ public class AudioManager implements Disposable {
     private final float musicVolumeInit = 0.1f;
     private float musicVolume = 0.1f;
     private float moveVolume = 0.4f;
+    private float puddleVolume = 1f;
+    private float sharpenerVolume = 0.8f;
     private float damageVolume = 1f;
     private float scoreVolume = 0.5f;
     private float hoverVolume = 0.2f;
@@ -34,6 +38,11 @@ public class AudioManager implements Disposable {
     // track looping state
     private long moveSoundId = -1;
     private boolean moveWasPlaying = false;
+    private boolean moveWasSlowed = false;
+
+    // sharpener looping state
+    private long sharpenerSoundId = -1;
+    private boolean sharpenerWasPlaying = false;
 
     private AudioManager(GdxGame game) {
         this.game = game;
@@ -59,6 +68,8 @@ public class AudioManager implements Disposable {
         gameMusic.setVolume(musicVolume);
 
         moveSound   = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_move.mp3"));
+        puddleSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_puddle.mp3"));
+        sharpenerSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_sharpener.mp3"));
         damageSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_damage.mp3"));
         scoreSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_score.mp3"));
         hoverSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_hover.mp3"));
@@ -101,16 +112,24 @@ public class AudioManager implements Disposable {
      * Call every frame from Player.updateInternal().
      * @param isMoving true while any movement key is held
      */
-    public void updateMoveSound(boolean isMoving) {
+    public void updateMoveSound(boolean isMoving, boolean slowed) {
         if (!game.isSfxPlaying()) {
             stopMoveSound();
             return;
         }
-        if (isMoving && !moveWasPlaying) {
-            // loop the pencil sound
-            moveSoundId = moveSound.loop(moveVolume);
-            moveWasPlaying = true;
-        } else if (!isMoving && moveWasPlaying) {
+        if (isMoving) {
+            // Start sound, or swap if slowed state changed
+            if (!moveWasPlaying || slowed != moveWasSlowed) {
+                stopMoveSound(); // stop whichever sound is active
+                if (slowed) {
+                    moveSoundId = puddleSound.loop(puddleVolume);
+                } else {
+                    moveSoundId = moveSound.loop(moveVolume);
+                }
+                moveWasPlaying = true;
+                moveWasSlowed = slowed;
+            }
+        } else if (moveWasPlaying) {
             stopMoveSound();
         }
     }
@@ -118,9 +137,37 @@ public class AudioManager implements Disposable {
     public void stopMoveSound() {
         if (moveSoundId != -1) {
             moveSound.stop(moveSoundId);
+            puddleSound.stop(moveSoundId);
             moveSoundId = -1;
         }
         moveWasPlaying = false;
+        moveWasSlowed = false;
+    }
+
+    /**
+     * Call every frame from Player.updateInternal().
+     * @param isStunned true while the player is stunned by a sharpener
+     */
+    public void updateSharpenerSound(boolean isStunned) {
+        if (!game.isSfxPlaying()) {
+            stopSharpenerSound();
+            return;
+        }
+        if (isStunned && !sharpenerWasPlaying) {
+            playScore();
+            sharpenerSoundId = sharpenerSound.loop(sharpenerVolume);
+            sharpenerWasPlaying = true;
+        } else if (!isStunned && sharpenerWasPlaying) {
+            stopSharpenerSound();
+        }
+    }
+
+    public void stopSharpenerSound() {
+        if (sharpenerSoundId != -1) {
+            sharpenerSound.stop(sharpenerSoundId);
+            sharpenerSoundId = -1;
+        }
+        sharpenerWasPlaying = false;
     }
 
     public void playDamage() {
@@ -152,6 +199,7 @@ public class AudioManager implements Disposable {
         game.setSfxPlaying(enabled);
         if (!enabled) {
             stopMoveSound();
+            stopSharpenerSound();
         }
     }
 
@@ -159,6 +207,8 @@ public class AudioManager implements Disposable {
     public void dispose() {
         gameMusic.dispose();
         moveSound.dispose();
+        puddleSound.dispose();
+        sharpenerSound.dispose();
         damageSound.dispose();
         scoreSound.dispose();
         instance = null;

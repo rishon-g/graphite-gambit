@@ -1,5 +1,6 @@
 package Entities;
 
+import Game.AudioManager;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
