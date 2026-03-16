@@ -10,8 +10,12 @@ import Components.Corner;
 import java.util.Vector;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -25,6 +29,7 @@ public class GameWorld {
     static final int TILE_SIZE = 128;
     static final int X_ORIGIN = 0;
     static final int Y_ORIGIN = 0;
+    static final int DRAW_SIZE = 3;
 
     int points;
     float time;
@@ -38,8 +43,16 @@ public class GameWorld {
     // separate reference to the player entity
     Player player;
 
+    // the size of the map
+    int width, height;
+
     // tilemap for the world (can be used for rendering and collisions)
     int[][] tilemap;
+
+    // map for the floor drawings
+    short[][] drawmap;
+
+    TextureRegion pixel;
 
     // reference to the id of this world
     int worldId;
@@ -58,6 +71,19 @@ public class GameWorld {
         this.screen = screen;
         this.points = 0;
         this.time = 300f;
+        createPixel();
+    }
+
+    /**
+     * sets the dimensions of the world in tiles
+     * @param width the width in tiles of the world
+     * @param height the height in tiles of the world
+     */
+    public void setDimensions(int width, int height){
+        System.out.println(width + ", " + height);
+        this.width = width;
+        this.height = height;
+        drawmap = new short[height/DRAW_SIZE][width/DRAW_SIZE];
     }
 
     /**
@@ -101,6 +127,92 @@ public class GameWorld {
      * @return TILE_SIZE
      */
     public static int getTileSize(){ return TILE_SIZE; }
+
+    /**
+     * Initializes the pixel needed for floor drawing
+     */
+    private void createPixel(){
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        Texture tex = new Texture(pixmap);
+        pixel = new TextureRegion(tex);
+        pixmap.dispose();
+    }
+
+private int drawWeight(int x, int y, int brushsize) {
+    // Manhattan distance (fast, no sqrt)
+    float dist = Math.abs(x) + Math.abs(y);
+    
+    // Normalize distance
+    float t = Math.min(dist / brushsize, 1.0f);
+    
+    // Linearly degrade weight based on weight
+    return 7 + (int)(3 * (1.0f - t));
+}
+
+    /**
+     * Draws in graphite around the location requested by the entity.
+     * @param position Position to draw at
+     * @param erase true if it should instead erase
+     * @param brushsize width of drawing
+     */
+    public void floorDraw(Vec2 position, boolean erase, int brushsize){
+        floorDraw(position.x, position.y, erase, brushsize);
+    }
+
+    /**
+     * Draws in graphite around the location requested by the entity.
+     * @param posx x position to draw at
+     * @param posy y position to draw at
+     * @param erase true if it should instead erase
+     * @param brushsize width of drawing
+     */
+    public void floorDraw(float posx, float posy, boolean erase, int brushsize){
+        int tilex = (int)posx / DRAW_SIZE, tiley = (int)posy / DRAW_SIZE;
+        for(int y = -brushsize; y <= brushsize; y++){
+            int offset = brushsize - Math.abs(y);
+            for(int x = -offset; x <= offset; x++){
+                
+                // pixel draw position
+                int xindex = tilex + x, yindex = tiley + y;
+
+                //System.out.println("at: (" + xindex + ", " + yindex + ")");
+
+                // out of bounds checking
+                if(xindex < 0 || xindex >= width/DRAW_SIZE || yindex < 0 || yindex >= height/DRAW_SIZE){
+                    continue;
+                }
+
+                // draw on position
+                if(erase)drawmap[yindex][xindex] = (short)Math.min(drawmap[yindex][xindex], 10 - drawWeight(x, y, brushsize));
+                else drawmap[yindex][xindex] = (short)Math.max(drawmap[yindex][xindex], drawWeight(x, y, brushsize));
+            }
+        }
+    }
+
+    /**
+     * Renders the drawable floor map within the world.
+     * @param batch the spritebatch to render from
+     */
+    private void renderFloor(SpriteBatch batch){
+        int last = 0;
+        for(int y = 0; y < height / DRAW_SIZE; y++){
+            for(int x = 0; x < width / DRAW_SIZE; x++){
+                int value = drawmap[y][x];
+
+                if(value <= 0)
+                    continue;
+
+                if(value != last){
+                    batch.setColor(0.2f,0.2f,0.2f, (float)value/14);
+                    last = value;
+                }
+
+                batch.draw(pixel,x*DRAW_SIZE*GdxGame.UNIT_SCALE,y*DRAW_SIZE*GdxGame.UNIT_SCALE,DRAW_SIZE*GdxGame.UNIT_SCALE,DRAW_SIZE*GdxGame.UNIT_SCALE);
+            }
+        }
+    }
 
     /**
      * Updates all entities in the game world.
@@ -151,6 +263,7 @@ public class GameWorld {
      * Renders all entities in the game world. This method is called every frame after update.
      */
     public void render(SpriteBatch batch, float delta) {
+        renderFloor(batch);
         for (Entity entity : entities) {
             entity.render(batch, delta);
         }
