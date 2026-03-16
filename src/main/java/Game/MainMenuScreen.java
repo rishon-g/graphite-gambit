@@ -196,15 +196,23 @@ public class MainMenuScreen extends ScreenAdapter {
         // render buttons
         for (int i = 0; i < buttons.length; i++) {
             buttons[i].render(batch, font, i == selectedIndex);
-            if (buttons[i].isHovered(viewport)) selectedIndex = i;
+            if (buttons[i].isHovered(viewport)) {
+                if (selectedIndex != i) {
+                    selectedIndex = i;
+                    AudioManager.getInstance().playHover();
+                }
+            }
             if (buttons[i].isClicked(viewport)) {
+                AudioManager.getInstance().playClick();
                 activateButton(i);
                 break;
             }
         }
         boolean buttonHovered = false;
         for (MenuButton button : buttons) {
-            if (button.isHovered(viewport)) buttonHovered = true;
+            if (button.isHovered(viewport)) {
+                buttonHovered = true;
+            }
         }
         if (!buttonHovered) selectedIndex = -1;
         batch.end();

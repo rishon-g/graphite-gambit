@@ -328,8 +328,14 @@ public class GameScreen implements Screen {
             // render buttons
             for (int i = 0; i < menuButtons.length; i++) {
                 menuButtons[i].render(batch, menuFont, i == selectedIndex);
-                if (menuButtons[i].isHovered(uiViewport)) selectedIndex = i;
+                if (menuButtons[i].isHovered(uiViewport)) {
+                    if (selectedIndex != i) {
+                        selectedIndex = i;
+                        AudioManager.getInstance().playHover();
+                    }
+                }
                 if (menuButtons[i].isClicked(uiViewport)) {
+                    AudioManager.getInstance().playClick();
                     activateButton(i);
                     break;
                 }

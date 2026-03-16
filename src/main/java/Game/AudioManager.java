@@ -19,6 +19,8 @@ public class AudioManager implements Disposable {
     private Sound moveSound;
     private Sound damageSound;
     private Sound scoreSound;
+    private Sound hoverSound;
+    private Sound clickSound;
 
     // Volume variables
     private final float musicVolumeInit = 0.1f;
@@ -26,6 +28,8 @@ public class AudioManager implements Disposable {
     private float moveVolume = 0.4f;
     private float damageVolume = 1f;
     private float scoreVolume = 0.5f;
+    private float hoverVolume = 0.2f;
+    private float clickVolume = 0.5f;
 
     // track looping state
     private long moveSoundId = -1;
@@ -57,6 +61,8 @@ public class AudioManager implements Disposable {
         moveSound   = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_move.mp3"));
         damageSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_damage.mp3"));
         scoreSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_score.mp3"));
+        hoverSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_hover.mp3"));
+        clickSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_click.mp3"));
     }
 
     // music controls
@@ -126,6 +132,18 @@ public class AudioManager implements Disposable {
     public void playScore() {
         if (game.isSfxPlaying()) {
             scoreSound.play(scoreVolume);
+        }
+    }
+
+    public void playHover() {
+        if (game.isSfxPlaying()) {
+            hoverSound.play(hoverVolume);
+        }
+    }
+
+    public void playClick() {
+        if (game.isSfxPlaying()) {
+            clickSound.play(clickVolume);
         }
     }
 
