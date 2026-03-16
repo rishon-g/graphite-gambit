@@ -7,29 +7,23 @@
     },
     {
       "type": "Eraser",
-      "x": 20,
-      "y": 1
+      "x": 7,
+      "y": 17
     },
     {
       "type": "Eraser",
-      "x": 25,
+      "x": 12,
       "y": 14
     },
     {
       "type": "Eraser",
-      "x": 2,
-      "y": 1
+      "x": 24,
+      "y": 4
     },
     {
         "type": "Node",
         "x": 2,
         "y": 1
-    },
-
-    {
-      "type": "PencilSharpener",
-      "x": 20,
-      "y": 0
     }
   ]
 }

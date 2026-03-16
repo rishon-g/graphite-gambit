@@ -65,7 +65,7 @@ public class GameScreen implements Screen {
     private final Texture textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
 
     // menu buttons
-    private MenuButton[] mainButtons = new MenuButton[] {
+    private final MenuButton[] mainButtons = new MenuButton[] {
             new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70),
             new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70),
             new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
@@ -203,6 +203,8 @@ public class GameScreen implements Screen {
             }
             changeLayout(Layout.MAIN);
         }
+
+
 
         //TODO REMOVE DEBUG INPUTS
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
@@ -345,6 +347,23 @@ public class GameScreen implements Screen {
                 if (button.isHovered(uiViewport)) buttonHovered = true;
             }
             if (!buttonHovered) selectedIndex = -1;
+        }
+
+
+        // draw stun
+        if (world.getPlayer().isStunned && !gameOver && !gameWon) {
+
+            font.getData().setScale(2.0f);
+
+            layout.setText(font, "MASH SPACE!");
+
+
+            // 3. Draw it dead center
+            font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
+
+            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
+            font.getData().setScale(1.0f);
+            font.setColor(Color.WHITE);
         }
 
         batch.end();

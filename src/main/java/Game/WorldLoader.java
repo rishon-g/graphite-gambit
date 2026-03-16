@@ -2,10 +2,7 @@ package Game;
 
 import Components.Transform;
 import Components.Vec2;
-import Entities.Entity;
-import Entities.Player;
-import Entities.Eraser;
-import Entities.Node;
+import Entities.*;
 
 import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.maps.MapLayer;
@@ -83,9 +80,9 @@ public class WorldLoader {
                     int tileSize = GameWorld.getTileSize();
 
                     int startX = (int)(wall.position.x / tileSize);
-                    int endX = (int)((wall.position.x + wall.size.x) / tileSize);
+                    int endX = (int)((wall.position.x + wall.size.x - 0.01f) / tileSize);
                     int startY = (int)(wall.position.y / tileSize);
-                    int endY = (int)((wall.position.y + wall.size.y) / tileSize);
+                    int endY = (int)((wall.position.y + wall.size.y - 0.01f) / tileSize);
 
                     for (int tx = startX; tx <= endX; tx++) {
                         for (int ty = startY; ty <= endY; ty++) {
@@ -140,6 +137,39 @@ public class WorldLoader {
                             world.entities.add(puddle);
                         }
                     }
+                    // door
+                    else if (type != null && (type.equals("DoorLeft") || type.equals("DoorRight"))) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+                            String partWord = type.equals("DoorLeft") ? "Left" : "Right";
+
+                            Door doorPart = new Door(world, partWord);
+                            doorPart.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(doorPart);
+                        }
+                    }
+
+                    // exit point
+                    else if (type != null && type.equals("ExitPoint")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            ExitPoint exit = new ExitPoint(world);
+                            exit.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(exit);
+                        }
+                    }
+
+                    // ink
+                    else if (type != null && type.equals("Ink")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            Ink inkArea = new Ink(world);
+                            inkArea.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(inkArea);
+                        }
+                    }
                 }
             }
         }
@@ -168,6 +198,9 @@ public class WorldLoader {
                     newEntity = new Node(world);
                     world.plotpoints++;
                     break;
+                case "PencilSharpener":
+                    newEntity = new PencilSharpener(world);
+                    break;
                 default:
                     continue;
             }
@@ -180,4 +213,5 @@ public class WorldLoader {
 
         return world;
     }
+
 }
