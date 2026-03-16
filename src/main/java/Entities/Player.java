@@ -168,7 +168,7 @@ public class Player extends Entity {
             if (stunTimer <= 0) {
                 isStunned = false;
                 isImmune = true;
-                immunityTimer = 3.0f;
+                immunityTimer = 1.0f;
             }
 
             // skip the rest of the update method so the player can't move
