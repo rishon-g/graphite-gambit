@@ -320,11 +320,14 @@ public class GameScreen implements Screen {
                 layout.setText(menuFont, "LEVEL " + world.getId());
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 680);
 
-                layout.setText(menuFont, "TIME BONUS: " + seconds);
+                layout.setText(menuFont, "SCORE: " + (world.getScore() - seconds));
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 630);
 
-                layout.setText(menuFont, "FINAL SCORE: " + world.getScore());
+                layout.setText(menuFont, "TIME BONUS: " + seconds);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 580);
+
+                layout.setText(menuFont, "FINAL SCORE: " + world.getScore());
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 530);
             }
 
             // render buttons
@@ -478,6 +481,7 @@ public class GameScreen implements Screen {
         gameWon = false;
         gameOver = false;
         AudioManager.getInstance(game).setMusicHalfVolume();
+        int currentScore = world.getScore();
 
         // Updates the player save if won level
         if(won){
