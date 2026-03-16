@@ -2,10 +2,7 @@ package Game;
 
 import Components.Transform;
 import Components.Vec2;
-import Entities.Entity;
-import Entities.Player;
-import Entities.Eraser;
-import Entities.Node;
+import Entities.*;
 
 import Game.Worlds.Asset.MapAsset;
 import com.badlogic.gdx.maps.MapLayer;
@@ -167,6 +164,9 @@ public class WorldLoader {
                 case "Node":
                     newEntity = new Node(world);
                     world.plotpoints++;
+                    break;
+                case "PencilSharpener":
+                    newEntity = new PencilSharpener(world);
                     break;
                 default:
                     continue;

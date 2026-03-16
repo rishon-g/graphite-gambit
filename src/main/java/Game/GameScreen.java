@@ -197,6 +197,8 @@ public class GameScreen implements Screen {
             changeLayout(Layout.MAIN);
         }
 
+
+
         //TODO REMOVE DEBUG INPUTS
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             // lose game
@@ -332,6 +334,14 @@ public class GameScreen implements Screen {
                 if (button.isHovered(uiViewport)) buttonHovered = true;
             }
             if (!buttonHovered) selectedIndex = -1;
+        }
+
+        if (world.getPlayer().isStunned) {
+            layout.setText(headerFont, "MASH SPACE!");
+
+            headerFont.setColor(Color.RED);
+            headerFont.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
+            headerFont.setColor(Color.WHITE);
         }
 
         batch.end();

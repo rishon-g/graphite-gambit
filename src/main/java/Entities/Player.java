@@ -28,6 +28,14 @@ public class Player extends Entity {
     private TextureRegion sprites[][];
     private int facing = 0;
 
+
+    // stun & immunity
+    public boolean isStunned = false;
+    public float stunTimer = 0f;
+    public boolean isImmune = false;
+    public float immunityTimer = 0f;
+    private float time;
+
     /**
      * Constructor for the Player class, initializes health and points to default values.
      */
@@ -35,6 +43,7 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
+        this.time = 0;
         Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
@@ -62,6 +71,8 @@ public class Player extends Entity {
         return health;
     }
 
+
+
     /**
      * Modifies the player's health by the given amount.
      * Excess healing is converted to points.
@@ -83,11 +94,27 @@ public class Player extends Entity {
         }
     }
 
+
+    /**
+     * Traps the player for a set duration.
+     */
+    public void stun(float duration) {
+        if (!isImmune && !isStunned) {
+            this.isStunned = true;
+            this.stunTimer = duration;
+            this.transform.velocity.set(0, 0); // Instantly stop movement
+        }
+    }
+
     /**
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
     public void updateInternal(float delta) {
+        // update time
+        time += delta;
+
+
         // Draw on floor in the middle of the feet of the sprite
         world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
 
@@ -102,6 +129,35 @@ public class Player extends Entity {
                 modifyHealth(-2);
                 drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
             }
+        }
+
+
+        // 1. Handle Immunity
+        if (isImmune) {
+            immunityTimer -= delta;
+            if (immunityTimer <= 0) {
+                isImmune = false;
+            }
+        }
+
+        // handle stun state
+        if (isStunned) {
+            stunTimer -= delta;
+
+            // player mashes space to escape faster
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                stunTimer -= 0.5f;
+            }
+
+            // did we escape
+            if (stunTimer <= 0) {
+                isStunned = false;
+                isImmune = true;
+                immunityTimer = 3.0f;
+            }
+
+            // skip the rest of the update method so the player can't move
+            return;
         }
 
         boolean up, down, left, right;
@@ -172,6 +228,16 @@ public class Player extends Entity {
         TextureRegion frame = sprites[facing][healthIndex];
         batch.setColor(1,1,1,1);
 
+        if (isImmune) {
+            // Math.sin oscillates between -1 and 1.
+            // We scale it so the alpha (transparency) rapidly bounces between 0.3 (faint) and 1.0 (solid)!
+            float flashAlpha = 0.65f + (float)(Math.sin(time * 20f) * 0.35f);
+            batch.setColor(1, 1, 1, flashAlpha);
+        } else {
+            // Draw normally if not immune
+            batch.setColor(1, 1, 1, 1);
+        }
+
         // how big the sprite should actually look on screen
         float visualWidth = 200f;
         float visualHeight = 256f;
@@ -190,4 +256,7 @@ public class Player extends Entity {
 
         batch.setColor(Color.WHITE);
     }
+
+
+
 }

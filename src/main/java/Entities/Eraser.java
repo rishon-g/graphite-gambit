@@ -35,6 +35,11 @@ public class Eraser extends Nonplayer {
 
     private static Texture TEXTURE;
 
+
+    // respawning
+    private float startX = -1;
+    private float startY = -1;
+
     private List<int[]> currentPath = Collections.emptyList();
     private int pathIndex = 0;
     private float pathTimer = 0f;
@@ -65,6 +70,11 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void updateInternal(float delta) {
+        if (startX == -1) {
+            startX = this.transform.position.x;
+            startY = this.transform.position.y;
+        }
+
         Player player = world.getPlayer();
         if (player == null) {
             transform.setVelocity(0, 0);
@@ -276,11 +286,23 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void playerCollide(Player player) {
-        if (attackCooldownTimer > 0f) {
+        // Respect cooldown and immunity states
+        if (attackCooldownTimer > 0f || player.isStunned || player.isImmune) {
             return;
         }
 
         player.modifyHealth(-ATTACK_DAMAGE);
+
+        // despawn: we teleport the eraser back to where it first appeared in the world
+        this.transform.setPosition(startX, startY);
+
+
+        // reset: we clear the path so it has to re-calculate from the start position
+        this.currentPath = java.util.Collections.emptyList();
+        this.pathIndex = 0;
+        this.pathTimer = 0f;
+
+        // start the cooldown immediately so it doesn't double-attack if it respawns near the player
         attackCooldownTimer = ATTACK_COOLDOWN;
     }
 
