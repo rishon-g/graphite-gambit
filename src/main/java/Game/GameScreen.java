@@ -165,7 +165,10 @@ public class GameScreen implements Screen {
     public void render(float delta) {
 
         // run update loops
-        world.update(delta);
+        if (!paused) {
+            // run update loops
+            world.update(delta);
+        }
 
         // follow with camera
         world.updateCamera(camera);

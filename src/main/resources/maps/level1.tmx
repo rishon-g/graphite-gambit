@@ -88,7 +88,7 @@
     <property name="type" value="Pickup"/>
    </properties>
   </object>
-  <object id="70" gid="140" x="2432" y="640" width="128" height="128">
+  <object id="70" gid="140" x="2560" y="640" width="128" height="128">
    <properties>
     <property name="type" value="Pickup"/>
    </properties>
