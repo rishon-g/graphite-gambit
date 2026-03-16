@@ -36,9 +36,6 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
     private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
 
-    public boolean musicOn = true;
-    public boolean sfxOn = true;
-
     private enum Layout {
         MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
@@ -54,6 +51,25 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     private void changeLayout(Layout layout) {
+        MenuButton music;
+        MenuButton sfx;
+        // set settings buttons to match stored settings
+        if (game.isSfxPlaying()) {
+            sfx = sfxOnButton;
+        } else {
+            sfx = sfxOffButton;
+        }
+        if (game.isMusicPlaying()) {
+            music = musicOnButton;
+        } else {
+            music = musicOffButton;
+        }
+        settingsButtons = new MenuButton[] {
+                backButton,
+                music,
+                sfx,
+        };
+
         currentLayout = layout;
         buttons = switch (layout) {
             case MAIN -> menuButtons;
@@ -122,11 +138,8 @@ public class MainMenuScreen extends ScreenAdapter {
     private final MenuButton musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
     private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
     private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
-    private final MenuButton[] settingsButtons = new MenuButton[]{
-            createCenteredButton("BACK", 0, false),
-            musicOnButton,
-            sfxOnButton,
-    };
+    private final MenuButton backButton = createCenteredButton("BACK", 0, false);
+    private MenuButton[] settingsButtons;
 
     private final MenuButton[] howToPlayButtons = new MenuButton[]{
             new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 300, 800, 80),
@@ -240,22 +253,22 @@ public class MainMenuScreen extends ScreenAdapter {
             }
             if (index == 1) {
                 // toggle volume
-                if (musicOn) {
+                if (game.isMusicPlaying()) {
                     settingsButtons[1] = musicOffButton;
-                    musicOn = false;
+                    game.setMusicPlaying(false);
                 } else {
                     settingsButtons[1] = musicOnButton;
-                    musicOn = true;
+                    game.setMusicPlaying(true);
                 }
             }
             if (index == 2) {
                 // toggle volume
-                if (sfxOn) {
+                if (game.isSfxPlaying()) {
                     settingsButtons[2] = sfxOffButton;
-                    sfxOn = false;
+                    game.setSfxPlaying(false);
                 } else {
                     settingsButtons[2] = sfxOnButton;
-                    sfxOn = true;
+                    game.setSfxPlaying(true);
                 }
             }
         } else if (currentLayout == Layout.HOW_TO_PLAY) {
