@@ -320,10 +320,10 @@ public class GameScreen implements Screen {
                 layout.setText(menuFont, "LEVEL " + world.getId());
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 680);
 
-                layout.setText(menuFont, "SCORE: " + world.getScore());
+                layout.setText(menuFont, "TIME BONUS: " + seconds);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 630);
 
-                layout.setText(menuFont, "TIME REMAINING: " + seconds);
+                layout.setText(menuFont, "FINAL SCORE: " + world.getScore());
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 580);
             }
 
@@ -483,6 +483,10 @@ public class GameScreen implements Screen {
         if(won){
             changeLayout(Layout.WON);
             gameWon = true;
+
+            int timeBonus = (int) world.time;
+            world.score(timeBonus);
+
             PlayerData d = PlayerData.obtainPlayerData();
             d.completeLevel(world.getId(), world.getScore());
         } else {

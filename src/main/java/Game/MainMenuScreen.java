@@ -36,6 +36,13 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
     private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
 
+    private Texture eraserIcon;
+    private Texture sharpenerIcon;
+    private final Texture ink  = new Texture(Gdx.files.internal("sprites/ink.png"));
+    private final Texture whiteOut =  new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
+    private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
+    private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
+
     public boolean musicOn = true;
     public boolean sfxOn = true;
 
@@ -122,7 +129,7 @@ public class MainMenuScreen extends ScreenAdapter {
     private MenuButton[] settingsButtons = new MenuButton[]{};
 
     private final MenuButton[] howToPlayButtons = new MenuButton[]{
-            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 300, 800, 80),
+            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80),
     };
 
     private void changeLayout(Layout layout) {
@@ -183,19 +190,71 @@ public class MainMenuScreen extends ScreenAdapter {
         if (currentLayout == Layout.HOW_TO_PLAY) {
             layout.setText(header_font, "HOW TO PLAY");
             header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
-            layout.setText(font, """
-                    This is the instructions of how to play
-                    Will fill in when game is completed
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    """);
-            font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 820);
+
+            // layout
+            float startX = 300;
+            float currentY = 820f;
+            float lineSpacing = 70f;
+            float iconSize = 50f;
+
+            // --- LINE 1: ERASERS ---
+            String line1 = "Avoid ERASERS!  ";
+            layout.setText(font, line1);
+            font.draw(batch, layout, startX, currentY);
+            // Draw image exactly after the text ends! (Adjust the -35 offset to center it vertically with the text)
+            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            // Move down to the next line
+            currentY -= lineSpacing;
+
+            String line = "Watch out for WHITE-OUT  ";
+            layout.setText(font, line);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(whiteOut, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= 45;
+
+            String linec = "and INK SPILLS!  ";
+            layout.setText(font, linec);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(ink, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+
+
+
+            currentY -= lineSpacing;
+
+            // --- LINE 2: SHARPENERS ---
+            String line2 = "Don't get caught by PENCIL SHARPENERS!  ";
+            layout.setText(font, line2);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line3 = "Collect GRAPHITE!  ";
+            layout.setText(font, line3);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line4 = "Collect PLOT POINTS!  ";
+            layout.setText(font, line4);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
+            layout.setText(font, line5);
+            font.draw(batch, layout, startX, currentY);
+
+            currentY -= 45;
+            String line5c = "are collected to WIN!  ";
+            layout.setText(font, line5c);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(trophy, startX + layout.width, currentY - 35f, iconSize, iconSize);
         }
 
         // render buttons
@@ -290,5 +349,16 @@ public class MainMenuScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        // ... your other dispose code ...
+        eraserIcon.dispose();
+        sharpenerIcon.dispose();
+        ink.dispose();
+        whiteOut.dispose();
+        graphite.dispose();
+        trophy.dispose();
     }
 }
