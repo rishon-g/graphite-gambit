@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 /**
  * The Eraser class represents an eraser entity in the game, extending from Entity.
- * The eraser moves toward the player, damaging them on contact, then is destroyed.
+ * The eraser moves toward the player and damages them on contact.
  */
 public class Eraser extends Nonplayer {
     /** Movement speed in world units per second. */
@@ -27,11 +27,18 @@ public class Eraser extends Nonplayer {
     /** Distance threshold used to decide whether the eraser reached the next tile target. */
     private static final float TARGET_DIF = 5f;
 
+    /** How far around the player we search for a reachable chase tile. */
+    private static final int TARGET_SEARCH_RADIUS = 2;
+
+    private static final int ATTACK_DAMAGE = 10;
+    private static final float ATTACK_COOLDOWN = 1.0f;
+
     private static Texture TEXTURE;
 
     private List<int[]> currentPath = Collections.emptyList();
     private int pathIndex = 0;
     private float pathTimer = 0f;
+    private float attackCooldownTimer = 0f;
 
     public Eraser(GameWorld world) {
         super(world);
@@ -62,6 +69,17 @@ public class Eraser extends Nonplayer {
         if (player == null) {
             transform.setVelocity(0, 0);
             return;
+        }
+
+        if (attackCooldownTimer > 0f) {
+            attackCooldownTimer -= delta;
+            if (attackCooldownTimer < 0f) {
+                attackCooldownTimer = 0f;
+            }
+        }
+
+        if (Math.abs(transform.velocity.x) > 1f || Math.abs(transform.velocity.y) > 1f) {
+            eraseWithHitbox();
         }
 
         pathTimer += delta;
@@ -126,15 +144,79 @@ public class Eraser extends Nonplayer {
             return;
         }
 
-        int startX = worldToTileX(transform.position.x);
-        int startY = worldToTileY(transform.position.y);
-        int endX = worldToTileX(player.transform.position.x);
-        int endY = worldToTileY(player.transform.position.y);
+        int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
+        int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
+
+        int[] targetTile = findBestTargetTile(player, map, startX, startY);
+        if (targetTile == null) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            return;
+        }
+
+        int endX = targetTile[0];
+        int endY = targetTile[1];
+
+        if (startX == endX && startY == endY) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            return;
+        }
 
         currentPath = AStar.findPath(map, startX, startY, endX, endY);
         pathIndex = 0;
     }
 
+    /**
+     * Finds the best reachable tile to chase near the player.
+     */
+    private int[] findBestTargetTile(Player player, int[][] map, int startX, int startY) {
+        float playerCenterX = player.transform.position.x + player.transform.size.x / 2f;
+        float playerCenterY = player.transform.position.y + player.transform.size.y / 2f;
+        int baseX = worldToTileX(playerCenterX);
+        int baseY = worldToTileY(playerCenterY);
+
+        List<int[]> bestPath = Collections.emptyList();
+        int[] bestTile = null;
+
+        for (int radius = 0; radius <= TARGET_SEARCH_RADIUS; radius++) {
+            for (int tx = baseX - radius; tx <= baseX + radius; tx++) {
+                for (int ty = baseY - radius; ty <= baseY + radius; ty++) {
+                    if (!isInsideMap(map, tx, ty) || isBlocked(map, tx, ty)) {
+                        continue;
+                    }
+
+                    if (Math.max(Math.abs(tx - baseX), Math.abs(ty - baseY)) != radius) {
+                        continue;
+                    }
+
+                    if (tx == startX && ty == startY) {
+                        return new int[]{tx, ty};
+                    }
+
+                    List<int[]> path = AStar.findPath(map, startX, startY, tx, ty);
+                    if (!path.isEmpty() && (bestTile == null || path.size() < bestPath.size())) {
+                        bestTile = new int[]{tx, ty};
+                        bestPath = path;
+                    }
+                }
+            }
+
+            if (bestTile != null) {
+                return bestTile;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isInsideMap(int[][] map, int x, int y) {
+        return x >= 0 && y >= 0 && x < map.length && y < map[0].length;
+    }
+
+    private boolean isBlocked(int[][] map, int x, int y) {
+        return map[x][y] == 1;
+    }
     /**
      * Conversion a world x-coordinate into a tile x-coordinate.
      *
@@ -194,7 +276,32 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void playerCollide(Player player) {
-        player.modifyHealth(-10);
-        dead = true;
+        if (attackCooldownTimer > 0f) {
+            return;
+        }
+
+        player.modifyHealth(-ATTACK_DAMAGE);
+        attackCooldownTimer = ATTACK_COOLDOWN;
+    }
+
+    /**
+     * Erases player-drawn floor tiles across the eraser's whole hitbox.
+     */
+    private void eraseWithHitbox() {
+        float left = transform.position.x;
+        float bottom = transform.position.y;
+        float width = transform.size.x;
+        float height = transform.size.y;
+
+        int brushSize = 1;
+        float step = 8f;
+
+        for (float x = left; x <= left + width; x += step) {
+            for (float y = bottom; y <= bottom + height; y += step) {
+                world.floorDraw(x, y, true, brushSize);
+            }
+        }
+
+        world.floorDraw(left + width / 2f, bottom + height / 2f, true, brushSize);
     }
 }

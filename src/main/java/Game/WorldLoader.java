@@ -82,9 +82,9 @@ public class WorldLoader {
                     int tileSize = GameWorld.getTileSize();
 
                     int startX = (int)(wall.position.x / tileSize);
-                    int endX = (int)((wall.position.x + wall.size.x) / tileSize);
+                    int endX = (int)((wall.position.x + wall.size.x - 0.01f) / tileSize);
                     int startY = (int)(wall.position.y / tileSize);
-                    int endY = (int)((wall.position.y + wall.size.y) / tileSize);
+                    int endY = (int)((wall.position.y + wall.size.y - 0.01f) / tileSize);
 
                     for (int tx = startX; tx <= endX; tx++) {
                         for (int ty = startY; ty <= endY; ty++) {
