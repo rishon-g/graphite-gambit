@@ -2,7 +2,6 @@ package Game;
 
 import Game.Worlds.Asset.AssetService;
 import Game.Worlds.Asset.MapAsset;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -38,11 +37,15 @@ public class GameScreen implements Screen {
     // camera used for rendering the game world
     OrthographicCamera camera;
 
+    // playerData for getting max available levels
+    PlayerData playerData = PlayerData.obtainPlayerData();
+
     // UI
     Texture uiTexture;
     BitmapFont font;
     BitmapFont menuFont;
     BitmapFont headerFont;
+    BitmapFont smallHeaderFont;
     GlyphLayout layout = new GlyphLayout();
     OrthographicCamera uiCamera;
     Viewport uiViewport;
@@ -54,7 +57,7 @@ public class GameScreen implements Screen {
     // state variables
     boolean paused = false;
     boolean gameOver = false;
-    boolean won = false;
+    boolean gameWon = false;
 
     // menu textures
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
@@ -77,8 +80,20 @@ public class GameScreen implements Screen {
     MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70);
     MenuButton[] settingsButtons;
 
+    // game over buttons
+    private final MenuButton[] gameOverButtons = new MenuButton[] {
+            new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
+            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+    };
+
+    // game win buttons
+    private final MenuButton[] gameWonButtons = new MenuButton[] {
+            new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
+            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+    };
+
     private enum Layout {
-        MAIN, SETTINGS
+        MAIN, SETTINGS, WON, LOST
     }
     private GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
 
@@ -108,6 +123,8 @@ public class GameScreen implements Screen {
         menuButtons = switch (layout) {
             case MAIN -> mainButtons;
             case SETTINGS -> settingsButtons;
+            case WON -> gameWonButtons;
+            case LOST -> gameOverButtons;
         };
     }
 
@@ -143,6 +160,7 @@ public class GameScreen implements Screen {
         this.font = game.getFont();
         this.menuFont = game.getMenuFont();
         this.headerFont = game.getHeaderFont();
+        this.smallHeaderFont = game.getSmallHeaderFont();
         this.uiCamera = new OrthographicCamera();
         // 1920x1080 canvas for the HUD that stretches to fit the window
         this.uiViewport = new FitViewport(1920, 1080, uiCamera);
@@ -168,15 +186,25 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        if (!paused && !gameOver && !won) {
+        if (!paused && !gameOver && !gameWon) {
             // run update loops
             world.update(delta);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !gameOver && !gameWon) {
             // toggle pause
             paused = !paused;
             changeLayout(Layout.MAIN);
+        }
+
+        //TODO REMOVE DEBUG INPUTS
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            // lose game
+            gameEnd(false);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
+            // win game
+            gameEnd(true);
         }
 
         // follow with camera
@@ -252,7 +280,7 @@ public class GameScreen implements Screen {
         font.draw(batch, layout, (1920f - layout.width) / 2f, barY + 30f);
       
         // pause menu
-        if (paused) {
+        if (paused || gameOver || gameWon) {
             // transparent overlay
             batch.setColor(0, 0, 0, 0.7f);
             batch.draw(uiTexture, 0, 0, 1920, 1080);
@@ -260,8 +288,35 @@ public class GameScreen implements Screen {
 
             // create pause menu
             batch.draw(textBox, 1920/2 - 400, 1080/2 - 300, 800, 600);
-            layout.setText(headerFont, "PAUSED");
-            headerFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
+            if (paused) {
+                layout.setText(headerFont, "PAUSED");
+                headerFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
+            } else if (gameOver) {
+                layout.setText(headerFont, "GAME OVER");
+                headerFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
+
+                layout.setText(menuFont, "SCORE: " + world.getScore());
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 670);
+
+                layout.setText(menuFont, "TIME REMAINING: " + seconds);
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 620);
+
+                //TODO link plot points
+                layout.setText(menuFont, "PLOT POINTS: 5/12");
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 570);
+            } else if (gameWon) {
+                layout.setText(smallHeaderFont, "LEVEL COMPLETE!");
+                smallHeaderFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
+
+                layout.setText(menuFont, "LEVEL " + world.getId());
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 680);
+
+                layout.setText(menuFont, "SCORE: " + world.getScore());
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 630);
+
+                layout.setText(menuFont, "TIME REMAINING: " + seconds);
+                menuFont.draw(batch, layout, 1920 / 2 - 300, 580);
+            }
 
             // render buttons
             for (int i = 0; i < menuButtons.length; i++) {
@@ -327,6 +382,24 @@ public class GameScreen implements Screen {
                     game.setSfxPlaying(true);
                 }
             }
+        } else if (currentLayout == Layout.LOST) {
+            if (index == 0) {
+                screenManager.SetGameScreen(world.getId());
+            }
+            if (index == 1) {
+                screenManager.SetMenuScreen();
+            }
+        } else if (currentLayout == Layout.WON) {
+            if (index == 0) {
+                if (playerData.getLevelUnlocked() >= world.getId() + 1) {
+                    screenManager.SetGameScreen(world.getId() + 1);
+                } else {
+                    screenManager.SetMenuScreen();
+                }
+            }
+            if (index == 1) {
+                screenManager.SetMenuScreen();
+            }
         }
     }
 
@@ -365,17 +438,23 @@ public class GameScreen implements Screen {
     /**
      * Handles the event that the GameWorld is finished with it's operation.
      * 
-     * @param won true if the player won, false if not
+     * @param won true if the player gameWon, false if not
      */
     public void gameEnd(boolean won){
+        paused = false;
+        gameWon = false;
+        gameOver = false;
 
         // Updates the player save if won level
         if(won){
+            changeLayout(Layout.WON);
+            gameWon = true;
             PlayerData d = PlayerData.obtainPlayerData();
             d.completeLevel(world.getId(), world.getScore());
+        } else {
+            // show game over menu
+            changeLayout(Layout.LOST);
+            gameOver = true;
         }
-        // Load Main Menu
-        ScreenManager m = ScreenManager.getInstance(game);
-        m.SetMenuScreen();
     }
 }
