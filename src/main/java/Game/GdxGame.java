@@ -33,11 +33,10 @@ public class GdxGame extends Game {
     private OrthographicCamera camera;
     private Viewport viewport;
     private AssetService assetService;
+    private AudioManager audioManager;
 
     private boolean musicPlaying = true;
     private boolean sfxPlaying = true;
-
-
 
     @Override
     public void create() {
@@ -46,6 +45,7 @@ public class GdxGame extends Game {
         camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         assetService = new AssetService(new InternalFileHandleResolver());
+        audioManager = AudioManager.getInstance(this);
 
         // load default font
 
@@ -78,6 +78,7 @@ public class GdxGame extends Game {
 
         // set the initial screen
         screenManager.SetMenuScreen();
+        AudioManager.getInstance(this).startMusic();
     }
 
 
@@ -102,6 +103,7 @@ public class GdxGame extends Game {
         smallHeaderFont.dispose();
         assetService.debugDiagnostics();
         assetService.dispose();
+        audioManager.dispose();
     }
 
     public SpriteBatch getBatch() {

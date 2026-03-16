@@ -40,6 +40,8 @@ public class WhiteOut extends Nonplayer {
         if (damageCooldown <= 0) {
             player.modifyHealth(damageAmount);
             damageCooldown = 1.0f;
+            // trigger damage sound
+            Game.AudioManager.getInstance().playDamage();
         }
     }
 

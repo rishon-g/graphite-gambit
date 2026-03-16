@@ -1,6 +1,7 @@
 package Entities;
 
 import Components.Transform;
+import Game.AudioManager;
 import Game.GameWorld;
 import Pathfinding.AStar;
 import com.badlogic.gdx.graphics.Color;
@@ -286,6 +287,8 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void playerCollide(Player player) {
+        // play damage sound
+        AudioManager.getInstance().playDamage();
         // Respect cooldown and immunity states
         if (attackCooldownTimer > 0f || player.isStunned || player.isImmune) {
             return;

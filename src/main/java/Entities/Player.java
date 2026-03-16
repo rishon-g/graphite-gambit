@@ -186,6 +186,10 @@ public class Player extends Entity {
         left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
         right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
+        // update moving sound effect
+        boolean isMoving = up || down || left || right;
+        Game.AudioManager.getInstance().updateMoveSound(isMoving);
+
         int xinput = 0, yinput = 0;
         if(right)xinput++;
         if(left)xinput--;

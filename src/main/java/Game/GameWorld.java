@@ -106,6 +106,7 @@ public class GameWorld {
      */
     public void score(int p){
         this.points += p;
+        AudioManager.getInstance().playScore();
     }
 
     /**
