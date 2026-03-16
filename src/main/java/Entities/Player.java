@@ -173,12 +173,12 @@ public class Player extends Entity {
         batch.setColor(1,1,1,1);
 
         // how big the sprite should actually look on screen
-        float visualWidth = 256f;
+        float visualWidth = 200f;
         float visualHeight = 256f;
 
         // calculate the offset to center the 256x256 image over the 128x128 hitbox
         float offsetX = (visualWidth - this.transform.size.x) / 2f;
-        float offsetY = (visualHeight - this.transform.size.y) / 2f - 85; // tweaked to perfection
+        float offsetY = (visualHeight - this.transform.size.y) / 2f - 65; // tweaked to perfection
 
         // draw the sprite using the offset and the new visual dimensions
         batch.draw(frame,
