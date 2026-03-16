@@ -159,6 +159,17 @@ public class WorldLoader {
                             world.entities.add(exit);
                         }
                     }
+
+                    // ink
+                    else if (type != null && type.equals("Ink")) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
+
+                            Ink inkArea = new Ink(world);
+                            inkArea.transform.setPosition(tileObject.getX(), tileObject.getY());
+                            world.entities.add(inkArea);
+                        }
+                    }
                 }
             }
         }

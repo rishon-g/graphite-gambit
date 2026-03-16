@@ -38,7 +38,7 @@
             }
         },
         "maintiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
         },
         "updatedtiles.tsx": {
             "dynamicWrapping": false,

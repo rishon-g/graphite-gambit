@@ -408,9 +408,14 @@ private int drawWeight(int x, int y, int brushsize) {
             return true;
         }
 
+        if (other instanceof Entities.Ink) {
+            return false;
+        }
+
         if (other.transform == mover) {
             return false;
         }
+
 
         // Erasers block each other
         if (moverEntity instanceof Nonplayer && other instanceof Nonplayer) {

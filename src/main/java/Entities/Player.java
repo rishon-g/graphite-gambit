@@ -36,6 +36,10 @@ public class Player extends Entity {
     public float immunityTimer = 0f;
     private float time;
 
+    // ink slowdown
+    private float currentSpeedMultiplier = 1.0f;
+    private final float INK_SLOW_FACTOR = 0.4f;
+
     /**
      * Constructor for the Player class, initializes health and points to default values.
      */
@@ -107,6 +111,13 @@ public class Player extends Entity {
     }
 
     /**
+     * Called by the Ink entity when colliding.
+     */
+    public void applyInkSlowdown() {
+        this.currentSpeedMultiplier = INK_SLOW_FACTOR;
+    }
+
+    /**
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
@@ -132,7 +143,7 @@ public class Player extends Entity {
         }
 
 
-        // 1. Handle Immunity
+        // handle immunity
         if (isImmune) {
             immunityTimer -= delta;
             if (immunityTimer <= 0) {
@@ -159,6 +170,13 @@ public class Player extends Entity {
             // skip the rest of the update method so the player can't move
             return;
         }
+
+        // calculate this frame's actual speed based on the multiplier
+        float baseSpeed = 600f; //
+        speed = baseSpeed * currentSpeedMultiplier;
+
+        // 2. IMMEDIATELY reset the multiplier back to normal for the next frame
+        currentSpeedMultiplier = 1.0f;
 
         boolean up, down, left, right;
 
