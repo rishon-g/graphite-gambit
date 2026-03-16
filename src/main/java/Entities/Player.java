@@ -4,7 +4,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import Game.GameWorld;
 
@@ -21,10 +23,12 @@ public class Player extends Entity {
     // health (graphite) of the player
     private int health;
     private int maxHealth;
+    private float time;
     private float drainTimer = 0f;
     private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
     private int points;
+    private Animation<TextureRegion> front;
 
     /**
      * Constructor for the Player class, initializes health and points to default values.
@@ -33,15 +37,23 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
+        this.time = 0;
+        Texture png = new Texture("src/main/java/Entities/Assets/Pencil.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 64, 64);
+        TextureRegion[] sprites = new TextureRegion[4];
+        for(int i = 0; i < 4; i++){
+            sprites[i] = sheet[0][i];
+        }
+        front = new Animation<>(0.25f, sprites);
 
         // TODO CHANGE AS SOON AS A SPRITE IS READY
         // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.RED);
-        pixmap.fill();
-        this.dummyTexture = new Texture(pixmap);
-        pixmap.dispose();
-        this.transform.setScale(100, 100);
+        // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        // pixmap.setColor(Color.RED);
+        // pixmap.fill();
+        // this.dummyTexture = new Texture(pixmap);
+        // pixmap.dispose();
+        this.transform.setScale(128, 128);
     }
 
     /**
@@ -93,6 +105,7 @@ public class Player extends Entity {
                 drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
             }
         }
+        time += delta;
 
 
         boolean up, down, left, right;
@@ -148,10 +161,11 @@ public class Player extends Entity {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        // TODO change to actual sprite
         // draw the red square at the player's scaled position (by scaled we mean the pixel size)
-        batch.setColor(1, 0, 0, 1);
-        batch.draw(dummyTexture,
+        TextureRegion frame = front.getKeyFrame(time, true);
+        batch.setColor(1,1,1,1);
+
+        batch.draw(frame,
                 this.transform.position.x * Game.GdxGame.UNIT_SCALE,
                 this.transform.position.y * Game.GdxGame.UNIT_SCALE,
                 this.transform.size.x * Game.GdxGame.UNIT_SCALE,
