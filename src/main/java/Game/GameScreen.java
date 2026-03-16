@@ -177,6 +177,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        AudioManager.getInstance().setMusicFullVolume();
     }
 
     /**
@@ -189,11 +190,17 @@ public class GameScreen implements Screen {
         if (!paused && !gameOver && !gameWon) {
             // run update loops
             world.update(delta);
+        } else {
+            AudioManager.getInstance(game).stopMoveSound();
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !gameOver && !gameWon) {
             // toggle pause
-            paused = !paused;
+            if (paused) {
+                gameUnpause();
+            } else {
+                gamePause();
+            }
             changeLayout(Layout.MAIN);
         }
 
@@ -347,7 +354,7 @@ public class GameScreen implements Screen {
     private void activateButton(int index) {
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {
-                paused = false;
+                gameUnpause();
             }
             if (index == 1) {
                 screenManager.SetGameScreen(world.getId());
@@ -364,23 +371,15 @@ public class GameScreen implements Screen {
             }
             if (index == 1) {
                 // toggle music
-                if (game.isMusicPlaying()) {
-                    settingsButtons[1] = musicOffButton;
-                    game.setMusicPlaying(false);
-                } else {
-                    settingsButtons[1] = musicOnButton;
-                    game.setMusicPlaying(true);
-                }
+                boolean nowOn = !game.isMusicPlaying();
+                AudioManager.getInstance(game).setMusicEnabled(nowOn);
+                settingsButtons[1] = nowOn ? musicOnButton : musicOffButton;
             }
             if (index == 2) {
                 // toggle sfx
-                if (game.isSfxPlaying()) {
-                    settingsButtons[2] = sfxOffButton;
-                    game.setSfxPlaying(false);
-                } else {
-                    settingsButtons[2] = sfxOnButton;
-                    game.setSfxPlaying(true);
-                }
+                boolean nowOn = !game.isSfxPlaying();
+                AudioManager.getInstance(game).setSfxEnabled(nowOn);
+                settingsButtons[2] = nowOn ? sfxOnButton : sfxOffButton;
             }
         } else if (currentLayout == Layout.LOST) {
             if (index == 0) {
@@ -403,6 +402,15 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void gamePause() {
+        paused = true;
+        AudioManager.getInstance(game).setMusicHalfVolume();
+    }
+    private void gameUnpause() {
+        paused = false;
+        AudioManager.getInstance(game).setMusicFullVolume();
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -421,7 +429,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
     }
 
     /**
@@ -430,6 +437,7 @@ public class GameScreen implements Screen {
      */
     @Override
     public void dispose() {
+        AudioManager.getInstance(game).stopMusic();
         world.dispose();
         mapRenderer.dispose();
         uiTexture.dispose();
@@ -444,6 +452,7 @@ public class GameScreen implements Screen {
         paused = false;
         gameWon = false;
         gameOver = false;
+        AudioManager.getInstance(game).setMusicHalfVolume();
 
         // Updates the player save if won level
         if(won){

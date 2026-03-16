@@ -51,16 +51,7 @@ public class MainMenuScreen extends ScreenAdapter {
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
         this.playerData = PlayerData.obtainPlayerData();
-    }
-
-    private void changeLayout(Layout layout) {
-        currentLayout = layout;
-        buttons = switch (layout) {
-            case MAIN -> menuButtons;
-            case LEVEL_SELECT -> levelSelectButtons;
-            case SETTINGS -> settingsButtons;
-            case HOW_TO_PLAY -> howToPlayButtons;
-        };
+        AudioManager.getInstance(game).setMusicHalfVolume();
     }
 
     // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
@@ -122,15 +113,41 @@ public class MainMenuScreen extends ScreenAdapter {
     private final MenuButton musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
     private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
     private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
-    private final MenuButton[] settingsButtons = new MenuButton[]{
-            createCenteredButton("BACK", 0, false),
-            musicOnButton,
-            sfxOnButton,
-    };
+    private final MenuButton backButton = createCenteredButton("BACK", 0, false);
+    private MenuButton[] settingsButtons = new MenuButton[]{};
 
     private final MenuButton[] howToPlayButtons = new MenuButton[]{
             new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 300, 800, 80),
     };
+
+    private void changeLayout(Layout layout) {
+        currentLayout = layout;
+        MenuButton music;
+        MenuButton sfx;
+        // set settings buttons to match stored settings
+        if (game.isSfxPlaying()) {
+            sfx = sfxOnButton;
+        } else {
+            sfx = sfxOffButton;
+        }
+        if (game.isMusicPlaying()) {
+            music = musicOnButton;
+        } else {
+            music = musicOffButton;
+        }
+        settingsButtons = new MenuButton[] {
+                backButton,
+                music,
+                sfx,
+        };
+
+        buttons = switch (layout) {
+            case MAIN -> menuButtons;
+            case LEVEL_SELECT -> levelSelectButtons;
+            case SETTINGS -> settingsButtons;
+            case HOW_TO_PLAY -> howToPlayButtons;
+        };
+    }
 
     @Override
     public void render(float delta) {
@@ -239,24 +256,16 @@ public class MainMenuScreen extends ScreenAdapter {
                 changeLayout(Layout.MAIN);
             }
             if (index == 1) {
-                // toggle volume
-                if (musicOn) {
-                    settingsButtons[1] = musicOffButton;
-                    musicOn = false;
-                } else {
-                    settingsButtons[1] = musicOnButton;
-                    musicOn = true;
-                }
+                // toggle music
+                boolean nowOn = !game.isMusicPlaying();
+                AudioManager.getInstance(game).setMusicEnabled(nowOn);
+                settingsButtons[1] = nowOn ? musicOnButton : musicOffButton;
             }
             if (index == 2) {
-                // toggle volume
-                if (sfxOn) {
-                    settingsButtons[2] = sfxOffButton;
-                    sfxOn = false;
-                } else {
-                    settingsButtons[2] = sfxOnButton;
-                    sfxOn = true;
-                }
+                // toggle sfx
+                boolean nowOn = !game.isSfxPlaying();
+                AudioManager.getInstance(game).setSfxEnabled(nowOn);
+                settingsButtons[2] = nowOn ? sfxOnButton : sfxOffButton;
             }
         } else if (currentLayout == Layout.HOW_TO_PLAY) {
             if (index == 0) {
