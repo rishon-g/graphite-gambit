@@ -28,6 +28,7 @@ public class GdxGame extends Game {
     private BitmapFont font;
     private BitmapFont menuFont;
     private BitmapFont headerFont;
+    private BitmapFont smallHeaderFont;
     private ScreenManager screenManager;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -70,6 +71,9 @@ public class GdxGame extends Game {
         fontParams.size = 76;
         fontParams.spaceX = -8;
         headerFont = generator.generateFont(fontParams);
+        fontParams.size = 55;
+        fontParams.spaceX = -7;
+        smallHeaderFont = generator.generateFont(fontParams);
         generator.dispose();
 
         // set the initial screen
@@ -95,6 +99,7 @@ public class GdxGame extends Game {
         font.dispose();
         menuFont.dispose();
         headerFont.dispose();
+        smallHeaderFont.dispose();
         assetService.debugDiagnostics();
         assetService.dispose();
     }
@@ -109,6 +114,10 @@ public class GdxGame extends Game {
 
     public BitmapFont getHeaderFont() {
         return headerFont;
+    }
+
+    public BitmapFont getSmallHeaderFont() {
+        return smallHeaderFont;
     }
 
     public BitmapFont getMenuFont() {
