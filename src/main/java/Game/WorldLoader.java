@@ -122,11 +122,28 @@ public class WorldLoader {
                         }
                     }
 
+                    // white out puddles
+                    else if (type != null && (type.equals("WhiteOutSmall") || type.equals("WhiteOutLarge"))) {
+                        if (object instanceof TiledMapTileMapObject) {
+                            TiledMapTileMapObject tileObject = (TiledMapTileMapObject) object;
 
+                            // determine the size word based on what Tiled says
+                            String sizeWord = type.equals("WhiteOutLarge") ? "Large" : "Small";
 
+                            Entities.WhiteOut puddle = new Entities.WhiteOut(world, sizeWord);
+
+                            float spawnX = tileObject.getX();
+                            float spawnY = tileObject.getY();
+
+                            puddle.transform.setPosition(spawnX, spawnY);
+                            world.entities.add(puddle);
+                        }
+                    }
                 }
             }
         }
+
+
 
         // Load and spawn all entities
         Json json = new Json();

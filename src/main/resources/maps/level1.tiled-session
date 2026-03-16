@@ -17,10 +17,12 @@
             "dynamicWrapping": true
         },
         "maintiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
         },
         "updatedtiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 0.2419,
+            "scaleInEditor": 1
         }
     },
     "last.externalTilesetPath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/maps",
@@ -31,6 +33,7 @@
     ],
     "project": "level1.tiled-project",
     "recentFiles": [
+        "updatedtiles.tsx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1024" tileheight="1024" tilecount="15" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1024" tileheight="1024" tilecount="18" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="74">
   <image source="../images/hole4pixel.png" width="1024" height="1024"/>
@@ -45,5 +45,14 @@
  </tile>
  <tile id="91">
   <image source="../images/pixeledcorner.png" width="396" height="400"/>
+ </tile>
+ <tile id="93">
+  <image source="../images/whiteoutpuddle.png" width="256" height="192"/>
+ </tile>
+ <tile id="94">
+  <image source="../images/whiteoutpuddle2.png" width="256" height="114"/>
+ </tile>
+ <tile id="95">
+  <image source="../images/wpuddle.png" width="256" height="74"/>
  </tile>
 </tileset>
