@@ -65,7 +65,7 @@ public class GameScreen implements Screen {
     private final Texture textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
 
     // menu buttons
-    private MenuButton[] mainButtons = new MenuButton[] {
+    private final MenuButton[] mainButtons = new MenuButton[] {
             new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70),
             new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70),
             new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),

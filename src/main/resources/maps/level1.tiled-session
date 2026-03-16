@@ -11,13 +11,26 @@
             "scaleInDock": 1
         },
         "bigobjects.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
+        },
+        "level1.tmx": {
+            "expandedObjectLayers": [
+                8,
+                7,
+                2
+            ],
+            "scale": 0.2,
+            "selectedLayer": 6,
+            "viewCenter": {
+                "x": 1840,
+                "y": 1867.5
+            }
         },
         "level1.tmx#maintiles": {
             "dynamicWrapping": true
         },
         "maintiles.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "updatedtiles.tsx": {
             "dynamicWrapping": false,
@@ -29,6 +42,8 @@
     "last.imagePath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/images",
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "1",
+    "map.tileHeight": 128,
+    "map.tileWidth": 128,
     "openFiles": [
     ],
     "project": "level1.tiled-project",
