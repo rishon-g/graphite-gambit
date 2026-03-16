@@ -57,7 +57,7 @@ public class MainMenuScreen extends ScreenAdapter {
         currentLayout = layout;
         buttons = switch (layout) {
             case MAIN -> menuButtons;
-            case LEVEL_SELECT -> levelSelectButtons;
+            case LEVEL_SELECT -> levelButtons();
             case SETTINGS -> settingsButtons;
             case HOW_TO_PLAY -> howToPlayButtons;
         };
@@ -106,7 +106,12 @@ public class MainMenuScreen extends ScreenAdapter {
         for (int i = 1; i < 5; i++) {
             int highScore = 0;
             if (playerData != null) {
-                highScore = playerData.getScore(i);
+                try {
+                    highScore = playerData.getScore(i);
+                } catch (IndexOutOfBoundsException e) {
+                    // If the score doesn't exist yet, just leave it at 0!
+                    highScore = 0;
+                }
             }
             if (highestLevel >= i) {
                 buttons[i] = createCenteredButton("LEVEL " + (i) + "    Score: " + highScore, i, false);
