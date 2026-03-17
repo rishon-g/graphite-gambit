@@ -9,9 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import Game.DrawWeight;
 import Game.GameWorld;
-
 
 /**
  * The Player class represents the player character in the game, extending from Entity.
@@ -22,7 +20,7 @@ import Game.GameWorld;
  * @since 2026-2-26
  */
 public class Player extends Entity {
-    // stats and assets of the player
+    // health (graphite) of the player
     private int health;
     private int maxHealth;
     private float drainTimer = 0f;
@@ -31,23 +29,6 @@ public class Player extends Entity {
     private TextureRegion sprites[][];
     private int facing = 0;
 
-    // weight function for drawing
-    private DrawWeight weight = (x, y, brushsize) -> {
-        // Manhattan distance (fast, no sqrt)
-        float dist = Math.abs(x) + Math.abs(y);
-        
-        // Normalize distance
-        float t = Math.min(dist / brushsize, 1.0f);
-        
-        // Linearly degrade weight based on weight
-        return 5 + (int)(3 * (1.0f - t));
-    };
-
-    // constants for sprite rendering
-    private final int DOWN = 0;
-    private final int UP = 1;
-    private final int RIGHT = 2;
-    private final int LEFT = 3;
 
     // stun & immunity
     public boolean isStunned = false;
@@ -67,9 +48,8 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
-        this.transform.setScale(64, 128);
-        Texture png = new Texture("src/main/resources/sprites/PencilSheet.png");
         this.time = 0;
+        Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
         for(int i = 0; i < 4; i++){
@@ -77,6 +57,7 @@ public class Player extends Entity {
                 sprites[i][j] = sheet[i][j];
             }
         }
+
         this.transform.setScale(64, 128);
     }
 
@@ -140,7 +121,7 @@ public class Player extends Entity {
 
 
         // Draw on floor in the middle of the feet of the sprite
-        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2, weight);
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
 
         // Movement
         // graphite drain logic
@@ -218,13 +199,13 @@ public class Player extends Entity {
 
         // recalibrate animation direction
         if(yinput < 0){
-            facing = DOWN;
+            facing = 0;
         }else if(yinput > 0){
-            facing = UP;
+            facing = 1;
         }else if(xinput > 0){
-            facing = RIGHT;
+            facing = 2;
         }else if(xinput < 0){
-            facing = LEFT;
+            facing = 3;
         }
 
         int xclamp = 0, yclamp = 0;
