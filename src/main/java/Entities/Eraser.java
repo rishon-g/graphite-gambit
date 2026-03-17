@@ -23,7 +23,7 @@ public class Eraser extends MobileEnemy {
     /**
      * Movement speed in world units per second.
      */
-    private static final float MOVE_SPEED = 350f;
+    private static final float MOVE_SPEED = 400f;
 
     /**
      * Visual size of the eraser sprite in world units.
