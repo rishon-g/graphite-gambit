@@ -1,27 +1,20 @@
 package Entities;
 
 import Game.GameWorld;
-import Pathfinding.AStar;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.util.Collections;
-import java.util.List;
-
-public class PencilSharpener extends Nonplayer {
+/**
+ * The PencilSharpener enemy chases the player and traps them.
+ * When the player is caught, it stuns them and deals periodic damage.
+ */
+public class PencilSharpener extends MobileEnemy {
     private static final float MOVE_SPEED = 150f;
     private static final float DRAW_SIZE = 64f;
-    private static final float PATH_RECALC_TIME = 0.5f;
-    private static final float TARGET_DIF = 5f;
-    private static final int TARGET_SEARCH_RADIUS = 2;
 
     private static Texture TEXTURE;
-
-    private List<int[]> currentPath = Collections.emptyList();
-    private int pathIndex = 0;
-    private float pathTimer = 0f;
 
     private float damageTimer = 0f;
 
@@ -40,72 +33,18 @@ public class PencilSharpener extends Nonplayer {
     }
 
     @Override
-    public void updateInternal(float delta) {
-        Player player = world.getPlayer();
-        if (player == null) {
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        if (damageTimer > 0) {
+    protected void beforeMovementUpdate(float delta) {
+        if (damageTimer > 0f) {
             damageTimer -= delta;
-        }
-
-        pathTimer += delta;
-
-        // rebuild path logic
-        if (pathTimer >= PATH_RECALC_TIME || currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            rebuildPath(player);
-            pathTimer = 0f;
-        }
-
-        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        int[] nextTile = currentPath.get(pathIndex);
-        float targetX = (nextTile[0] * GameWorld.getTileSize()) + (GameWorld.getTileSize() - transform.size.x) / 2f;
-        float targetY = (nextTile[1] * GameWorld.getTileSize()) + (GameWorld.getTileSize() - transform.size.y) / 2f;
-
-        float dx = targetX - transform.position.x;
-        float dy = targetY - transform.position.y;
-        float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-        if (dist <= TARGET_DIF) {
-            transform.setPosition(targetX, targetY);
-            pathIndex++;
-            if (pathIndex >= currentPath.size()) {
-                transform.setVelocity(0, 0);
-                return;
+            if (damageTimer < 0f) {
+                damageTimer = 0f;
             }
-            nextTile = currentPath.get(pathIndex);
-            targetX = (nextTile[0] * GameWorld.getTileSize()) + (GameWorld.getTileSize() - transform.size.x) / 2f;
-            targetY = (nextTile[1] * GameWorld.getTileSize()) + (GameWorld.getTileSize() - transform.size.y) / 2f;
-            dx = targetX - transform.position.x;
-            dy = targetY - transform.position.y;
-            dist = (float) Math.sqrt(dx * dx + dy * dy);
-        }
-
-        if (dist > 0f) {
-            transform.setVelocity((dx / dist) * MOVE_SPEED, (dy / dist) * MOVE_SPEED);
-        } else {
-            transform.setVelocity(0, 0);
         }
     }
 
-    private void rebuildPath(Player player) {
-        int[][] map = world.getTilemap();
-        if (map == null) return;
-
-        int startX = (int)((transform.position.x + transform.size.x / 2f) / GameWorld.getTileSize());
-        int startY = (int)((transform.position.y + transform.size.y / 2f) / GameWorld.getTileSize());
-
-        int endX = (int)((player.transform.position.x + player.transform.size.x / 2f) / GameWorld.getTileSize());
-        int endY = (int)((player.transform.position.y + player.transform.size.y / 2f) / GameWorld.getTileSize());
-
-        currentPath = AStar.findPath(map, startX, startY, endX, endY);
-        pathIndex = 0;
+    @Override
+    protected float getMoveSpeed() {
+        return MOVE_SPEED;
     }
 
     @Override
