@@ -56,6 +56,7 @@ public class Eraser extends Nonplayer {
      * Creates testTexture for eraser.
      */
     private static void TestTexture() {
+        // TODO change texture
         if (TEXTURE == null) {
             Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             pixmap.setColor(Color.RED);

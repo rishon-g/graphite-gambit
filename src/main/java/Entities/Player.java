@@ -58,13 +58,6 @@ public class Player extends Entity {
             }
         }
 
-        // TODO CHANGE AS SOON AS A SPRITE IS READY
-        // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
-        // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        // pixmap.setColor(Color.RED);
-        // pixmap.fill();
-        // this.dummyTexture = new Texture(pixmap);
-        // pixmap.dispose();
         this.transform.setScale(64, 128);
     }
 

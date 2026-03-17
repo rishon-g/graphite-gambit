@@ -37,8 +37,8 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
     private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
 
-    private Texture eraserIcon;
-    private Texture sharpenerIcon;
+    private final Texture eraser = new Texture(Gdx.files.internal("sprites/eraser.png"));
+    private final Texture pencilsharpener = new Texture(Gdx.files.internal("sprites/pencilsharpener.png"));
     private final Texture ink = new Texture(Gdx.files.internal("sprites/ink.png"));
     private final Texture whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
     private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
@@ -233,7 +233,7 @@ public class MainMenuScreen extends ScreenAdapter {
             font.draw(batch, layout, startX, currentY);
             // Draw image exactly after the text ends! (Adjust the -35 offset to center it
             // vertically with the text)
-            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+            batch.draw(eraser, startX + layout.width, currentY - 35f, iconSize, iconSize);
 
             // Move down to the next line
             currentY -= lineSpacing;
@@ -256,7 +256,7 @@ public class MainMenuScreen extends ScreenAdapter {
             String line2 = "Don't get caught by PENCIL SHARPENERS!  ";
             layout.setText(font, line2);
             font.draw(batch, layout, startX, currentY);
-            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+            batch.draw(pencilsharpener, startX + layout.width, currentY - 35f, iconSize, iconSize);
 
             currentY -= lineSpacing;
 
@@ -394,8 +394,8 @@ public class MainMenuScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         // ... your other dispose code ...
-        eraserIcon.dispose();
-        sharpenerIcon.dispose();
+        eraser.dispose();
+        pencilsharpener.dispose();
         ink.dispose();
         whiteOut.dispose();
         graphite.dispose();
