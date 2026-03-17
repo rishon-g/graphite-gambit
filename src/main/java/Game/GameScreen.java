@@ -59,6 +59,9 @@ public class GameScreen implements Screen {
     boolean gameOver = false;
     boolean gameWon = false;
 
+    // tracked stats
+    public int plotPoints = 0;
+
     // menu textures
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
@@ -205,6 +208,7 @@ public class GameScreen implements Screen {
             world.update(delta);
         } else {
             AudioManager.getInstance(game).stopMoveSound();
+            AudioManager.getInstance(game).stopSharpenerSound();
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !gameOver && !gameWon) {
@@ -215,16 +219,6 @@ public class GameScreen implements Screen {
                 gamePause();
             }
             changeLayout(Layout.MAIN);
-        }
-
-        // TODO REMOVE DEBUG INPUTS
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            // lose game
-            gameEnd(false);
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
-            // win game
-            gameEnd(true);
         }
 
         // follow with camera
@@ -322,8 +316,7 @@ public class GameScreen implements Screen {
                 layout.setText(menuFont, "TIME REMAINING: " + seconds);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 620);
 
-                // TODO link plot points
-                layout.setText(menuFont, "PLOT POINTS: 5/12");
+                layout.setText(menuFont, "PLOT POINTS: " + plotPoints);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 570);
             } else if (gameWon) {
                 layout.setText(smallHeaderFont, "LEVEL COMPLETE!");
@@ -492,6 +485,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         AudioManager.getInstance(game).stopMusic();
+        AudioManager.getInstance(game).stopMoveSound();
+        AudioManager.getInstance(game).stopSharpenerSound();
         world.dispose();
         mapRenderer.dispose();
         uiTexture.dispose();
