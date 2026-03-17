@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import Game.DrawWeight;
 import Game.GameWorld;
+
 
 /**
  * The Player class represents the player character in the game, extending from Entity.
@@ -19,7 +21,7 @@ import Game.GameWorld;
  * @since 2026-2-26
  */
 public class Player extends Entity {
-    // health (graphite) of the player
+    // stats and assets of the player
     private int health;
     private int maxHealth;
     private float drainTimer = 0f;
@@ -28,6 +30,24 @@ public class Player extends Entity {
     private TextureRegion sprites[][];
     private int facing = 0;
 
+    // weight function for drawing
+    private DrawWeight weight = (x, y, brushsize) -> {
+        // Manhattan distance (fast, no sqrt)
+        float dist = Math.abs(x) + Math.abs(y);
+        
+        // Normalize distance
+        float t = Math.min(dist / brushsize, 1.0f);
+        
+        // Linearly degrade weight based on weight
+        return 5 + (int)(3 * (1.0f - t));
+    };
+
+    // constants for sprite rendering
+    private final int DOWN = 0;
+    private final int UP = 1;
+    private final int RIGHT = 2;
+    private final int LEFT = 3;
+
     /**
      * Constructor for the Player class, initializes health and points to default values.
      */
@@ -35,6 +55,7 @@ public class Player extends Entity {
         super(world);
         this.health = 100;
         this.maxHealth = 100;
+        this.transform.setScale(64, 128);
         Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
@@ -43,15 +64,6 @@ public class Player extends Entity {
                 sprites[i][j] = sheet[i][j];
             }
         }
-
-        // TODO CHANGE AS SOON AS A SPRITE IS READY
-        // generate a 1x1 red pixel STRICTLY for testing, stretches over the player's transform size
-        // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        // pixmap.setColor(Color.RED);
-        // pixmap.fill();
-        // this.dummyTexture = new Texture(pixmap);
-        // pixmap.dispose();
-        this.transform.setScale(64, 128);
     }
 
     /**
@@ -89,7 +101,7 @@ public class Player extends Entity {
     @Override
     public void updateInternal(float delta) {
         // Draw on floor in the middle of the feet of the sprite
-        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2, weight);
 
         // Movement
         // graphite drain logic
@@ -120,13 +132,13 @@ public class Player extends Entity {
 
         // recalibrate animation direction
         if(yinput < 0){
-            facing = 0;
+            facing = DOWN;
         }else if(yinput > 0){
-            facing = 1;
+            facing = UP;
         }else if(xinput > 0){
-            facing = 2;
+            facing = RIGHT;
         }else if(xinput < 0){
-            facing = 3;
+            facing = LEFT;
         }
 
         int xclamp = 0, yclamp = 0;

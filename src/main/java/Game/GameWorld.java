@@ -182,8 +182,8 @@ private int drawWeight(int x, int y, int brushsize) {
      * @param erase true if it should instead erase
      * @param brushsize width of drawing
      */
-    public void floorDraw(Vec2 position, boolean erase, int brushsize){
-        floorDraw(position.x, position.y, erase, brushsize);
+    public void floorDraw(Vec2 position, boolean erase, int brushsize, DrawWeight w){
+        floorDraw(position.x, position.y, erase, brushsize, w);
     }
 
     /**
@@ -193,7 +193,7 @@ private int drawWeight(int x, int y, int brushsize) {
      * @param erase true if it should instead erase
      * @param brushsize width of drawing
      */
-    public void floorDraw(float posx, float posy, boolean erase, int brushsize){
+    public void floorDraw(float posx, float posy, boolean erase, int brushsize, DrawWeight w){
         int tilex = (int)posx / DRAW_SIZE, tiley = (int)posy / DRAW_SIZE;
         for(int y = -brushsize; y <= brushsize; y++){
             int offset = brushsize - Math.abs(y);
@@ -210,8 +210,9 @@ private int drawWeight(int x, int y, int brushsize) {
                 }
 
                 // draw on position
-                if(erase)drawmap[yindex][xindex] = (short)Math.min(drawmap[yindex][xindex], 10 - drawWeight(x, y, brushsize));
-                else drawmap[yindex][xindex] = (short)Math.max(drawmap[yindex][xindex], drawWeight(x, y, brushsize));
+                int weight = w.weight(x, y, brushsize);
+                if(erase)drawmap[yindex][xindex] = (short)Math.min(drawmap[yindex][xindex], 10 - weight);
+                else drawmap[yindex][xindex] = (short)Math.max(drawmap[yindex][xindex], weight);
             }
         }
     }
@@ -230,7 +231,7 @@ private int drawWeight(int x, int y, int brushsize) {
                     continue;
 
                 if(value != last){
-                    batch.setColor(0.2f,0.2f,0.2f, (float)value/14);
+                    batch.setColor(0.2f,0.2f,0.2f, (float)value/10);
                     last = value;
                 }
 

@@ -1,12 +1,14 @@
 package Entities;
 
 import Components.Transform;
+import Game.DrawWeight;
 import Game.GameWorld;
 import Pathfinding.AStar;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,28 +29,40 @@ public class Eraser extends Nonplayer {
     /** Distance threshold used to decide whether the eraser reached the next tile target. */
     private static final float TARGET_DIF = 5f;
 
-    private static Texture TEXTURE;
+    // sprites for rendering
+    private TextureRegion sprites[];
+    int facing = 0;
+
+    // constants for sprite rendering
+    private final int DOWN = 0;
+    private final int UP = 1;
+    private final int RIGHT = 2;
+    private final int LEFT = 3;
 
     private List<int[]> currentPath = Collections.emptyList();
     private int pathIndex = 0;
     private float pathTimer = 0f;
 
+    // erase weighting
+    private DrawWeight weight = (x, y, brushsize) -> {
+        // Manhattan distance (diamond brush)
+        float dist = Math.abs(x) + Math.abs(y);
+
+        // Normalize distance
+        float t = Math.min(dist / brushsize, 1.0f);
+
+        // Weight calculation
+        return Math.min(5 + (int)(5 * (1.5f - t)), 10);
+    };
+
     public Eraser(GameWorld world) {
         super(world);
-        transform.setScale(DRAW_SIZE, DRAW_SIZE);
-        TestTexture();
-    }
-
-    /**
-     * Creates testTexture for eraser.
-     */
-    private static void TestTexture() {
-        if (TEXTURE == null) {
-            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.RED);
-            pixmap.fill();
-            TEXTURE = new Texture(pixmap);
-            pixmap.dispose();
+        transform.setScale(64, 128);
+        Texture png = new Texture("src/main/java/Entities/Assets/Eraser.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
+        sprites = new TextureRegion[4];
+        for(int i = 0; i < 4; i++){
+            sprites[i] = sheet[0][i];
         }
     }
 
@@ -58,6 +72,8 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void updateInternal(float delta) {
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, true, 7, weight);
+
         Player player = world.getPlayer();
         if (player == null) {
             transform.setVelocity(0, 0);
@@ -109,6 +125,21 @@ public class Eraser extends Nonplayer {
             float vx = (dx / dist) * MOVE_SPEED;
             float vy = (dy / dist) * MOVE_SPEED;
             transform.setVelocity(vx, vy);
+
+            // set new facing
+            if(Math.abs(dx) > Math.abs(dy)){
+                if(dx > 0){
+                    facing = RIGHT;
+                }else{
+                    facing = LEFT;
+                }
+            }else{
+                if(dy > 0){
+                    facing = UP;
+                }else{
+                    facing = DOWN;
+                }
+            }
         } else {
             transform.setVelocity(0, 0);
         }
@@ -180,8 +211,9 @@ public class Eraser extends Nonplayer {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
+        TextureRegion sprite = sprites[facing];
         batch.draw(
-                TEXTURE,
+                sprite,
                 transform.position.x * Game.GdxGame.UNIT_SCALE,
                 transform.position.y * Game.GdxGame.UNIT_SCALE,
                 transform.size.x * Game.GdxGame.UNIT_SCALE,
