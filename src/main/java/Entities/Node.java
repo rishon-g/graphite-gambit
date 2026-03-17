@@ -37,7 +37,6 @@ public class Node extends Nonplayer {
     @Override
     public void playerCollide(Player player) {
         world.plotPointCollected();
-        player.modifyHealth(100);
         dead = true;
     }
 }
