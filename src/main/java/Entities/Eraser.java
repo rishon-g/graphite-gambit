@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
  * Enemy that moves toward the player, erases drawn floor tiles while moving,
@@ -38,10 +39,16 @@ public class Eraser extends MobileEnemy {
      */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
+    private static final int DOWN = 0;
+    private static final int UP = 1;
+    private static final int LEFT = 2;
+    private static final int RIGHT = 3;
+
+
     /**
      * Shared texture used to render the eraser.
      */
-    private static Texture TEXTURE;
+    private TextureRegion sprites[];
 
     /**
      * Initial x-coordinate where the eraser spawned.
@@ -65,14 +72,12 @@ public class Eraser extends MobileEnemy {
      */
     public Eraser(GameWorld world) {
         super(world);
-        transform.setScale(DRAW_SIZE, DRAW_SIZE);
-        // TODO Temporary Red square until we add a real sprite
-        if (TEXTURE == null) {
-            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.RED);
-            pixmap.fill();
-            TEXTURE = new Texture(pixmap);
-            pixmap.dispose();
+        transform.setScale(DRAW_SIZE/2, DRAW_SIZE);
+        Texture png = new Texture("src/main/resources/sprites/EraserSheet.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
+        sprites = new TextureRegion[4];
+        for(int i = 0; i < 4; i++){
+            sprites[i] = sheet[0][i];
         }
     }
 
@@ -143,7 +148,7 @@ public class Eraser extends MobileEnemy {
     @Override
     public void render(SpriteBatch batch, float delta) {
         batch.draw(
-                TEXTURE,
+                sprites[DOWN],
                 transform.position.x * Game.GdxGame.UNIT_SCALE,
                 transform.position.y * Game.GdxGame.UNIT_SCALE,
                 transform.size.x * Game.GdxGame.UNIT_SCALE,
