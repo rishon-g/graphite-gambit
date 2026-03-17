@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
  * Enemy that moves toward the player and traps them.
@@ -22,12 +23,23 @@ public class PencilSharpener extends MobileEnemy {
     /**
      * Visual size of the sharpener sprite in world units.
      */
-    private static final float DRAW_SIZE = 64f;
+    private static final float DRAW_SIZE = 128f;
 
     /**
-     * Shared texture used to render the pencil sharpener.
+     * Indicators for the direction the player is facing for sprite rendering.
      */
-    private static Texture TEXTURE;
+    private static final int DOWN = 0;
+    private static final int UP = 1;
+    private static final int LEFT = 2;
+    private static final int RIGHT = 3;
+    private int facing = DOWN;
+    private float time = 0;
+
+    /**
+     * sprites for the sharpener
+     */
+    private TextureRegion sprites[];
+    private TextureRegion holdsprites[];
 
     /**
      * Timer controlling how often damage is applied while the player is trapped.
@@ -43,13 +55,15 @@ public class PencilSharpener extends MobileEnemy {
         super(world);
         transform.setScale(DRAW_SIZE, DRAW_SIZE);
 
-        // TODO Temporary Blue square until we add a real sprite
-        if (TEXTURE == null) {
-            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.BLUE);
-            pixmap.fill();
-            TEXTURE = new Texture(pixmap);
-            pixmap.dispose();
+        Texture png = new Texture("src/main/resources/sprites/SharpenerSheet.png");
+        Texture png2 = new Texture("src/main/resources/sprites/SharpenerHold.png");
+        TextureRegion[][] sheet = TextureRegion.split(png, 48, 48);
+        TextureRegion[][] sheet2 = TextureRegion.split(png2, 48, 72);
+        sprites = new TextureRegion[4];
+        holdsprites = new TextureRegion[4];
+        for(int i = 0; i < 4; i++){
+            sprites[i] = sheet[0][i];
+            holdsprites[i] = sheet2[0][i];
         }
     }
 
@@ -67,6 +81,21 @@ public class PencilSharpener extends MobileEnemy {
             damageTimer -= delta;
             if (damageTimer < 0f) {
                 damageTimer = 0f;
+            }
+        }
+        if(transform.velocity.x != 0 || transform.velocity.y != 0){
+            if(Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)){
+                if(transform.velocity.y > 0){
+                    facing = UP;
+                }else{
+                    facing = DOWN;
+                }
+            }else{
+                if(transform.velocity.x > 0){
+                    facing = RIGHT;
+                }else{
+                    facing = LEFT;
+                }
             }
         }
     }
@@ -89,7 +118,7 @@ public class PencilSharpener extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        batch.draw(TEXTURE,
+        batch.draw(sprites[facing],
                 transform.position.x * Game.GdxGame.UNIT_SCALE,
                 transform.position.y * Game.GdxGame.UNIT_SCALE,
                 transform.size.x * Game.GdxGame.UNIT_SCALE,

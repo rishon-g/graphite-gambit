@@ -189,34 +189,14 @@ public class GameWorld {
     }
 
     /**
-     * Determines the weight of the opacity to be drawn or erased within a given
-     * cell of a brush.
-     * 
-     * @param x         the x offset from the center of the brush
-     * @param y         the y offset from the center of the brush
-     * @param brushsize the size of the brush
-     * @return the weight to be drawn/erased at
-     */
-    private int drawWeight(int x, int y, int brushsize) {
-        // Manhattan distance (fast, no sqrt)
-        float dist = Math.abs(x) + Math.abs(y);
-
-        // Normalize distance
-        float t = Math.min(dist / brushsize, 1.0f);
-
-        // Linearly degrade weight based on distance
-        return 7 + (int) (3 * (1.0f - t));
-    }
-
-    /**
      * Draws in graphite around the location requested by the entity.
      * 
      * @param position  Position to draw at
      * @param erase     true if it should instead erase
      * @param brushsize width of drawing
      */
-    public void floorDraw(Vec2 position, boolean erase, int brushsize) {
-        floorDraw(position.x, position.y, erase, brushsize);
+    public void floorDraw(Vec2 position, boolean erase, int brushsize, DrawWeight w) {
+        floorDraw(position.x, position.y, erase, brushsize, w);
     }
 
     /**
@@ -227,7 +207,7 @@ public class GameWorld {
      * @param erase     true if it should instead erase
      * @param brushsize width of the brush to be used
      */
-    public void floorDraw(float posx, float posy, boolean erase, int brushsize) {
+    public void floorDraw(float posx, float posy, boolean erase, int brushsize, DrawWeight w) {
         int tilex = (int) posx / DRAW_SIZE, tiley = (int) posy / DRAW_SIZE;
         for (int y = -brushsize; y <= brushsize; y++) {
             int offset = brushsize - Math.abs(y);
@@ -246,9 +226,9 @@ public class GameWorld {
                 // draw on position
                 if (erase)
                     drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex],
-                            10 - drawWeight(x, y, brushsize));
+                            10 - w.getWeight(x, y, brushsize));
                 else
-                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], drawWeight(x, y, brushsize));
+                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], w.getWeight(x, y, brushsize));
             }
         }
     }
@@ -268,7 +248,7 @@ public class GameWorld {
                     continue;
 
                 if (value != last) {
-                    batch.setColor(0.2f, 0.2f, 0.2f, (float) value / 14);
+                    batch.setColor(0.2f, 0.2f, 0.2f, (float) value / 10);
                     last = value;
                 }
 

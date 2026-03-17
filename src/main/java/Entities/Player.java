@@ -1,5 +1,7 @@
 package Entities;
 import Game.AudioManager;
+import Game.DrawWeight;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -41,6 +43,17 @@ public class Player extends Entity {
     private float currentSpeedMultiplier = 1.0f;
     private final float INK_SLOW_FACTOR = 0.4f;
 
+    DrawWeight weight = (x, y, brushsize) -> {
+        // Manhattan distance (fast, no sqrt)
+        float dist = Math.abs(x) + Math.abs(y);
+
+        // Normalize distance
+        float t = Math.min(dist / brushsize, 1.0f);
+
+        // Linearly degrade weight based on distance
+        return 5 + (int) (3 * (1.0f - t));
+    };
+
     /**
      * Constructor for the Player class, initializes health and points to default values.
      */
@@ -49,7 +62,8 @@ public class Player extends Entity {
         this.health = 100;
         this.maxHealth = 100;
         this.time = 0;
-        Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
+        Texture png = new Texture("src/main/resources/sprites/PencilSheet.png");
+        Texture png2 = new Texture("src/main/resources/sprites/PencilSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
         for(int i = 0; i < 4; i++){
@@ -68,8 +82,6 @@ public class Player extends Entity {
     public int getHealth() {
         return health;
     }
-
-
 
     /**
      * Modifies the player's health by the given amount.
@@ -121,7 +133,7 @@ public class Player extends Entity {
 
 
         // Draw on floor in the middle of the feet of the sprite
-        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2);
+        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2, weight);
 
         // Movement
         // graphite drain logic

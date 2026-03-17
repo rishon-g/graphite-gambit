@@ -43,7 +43,7 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Texture whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
     private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
     private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
-    private final Texture plot = new Texture(Gdx.files.internal("src/main/java/Entities/Assets/Plot.png"));
+    private final Texture plot = new Texture(Gdx.files.internal("sprites/Plot.png"));
 
     public boolean musicOn = true;
     public boolean sfxOn = true;

@@ -1,6 +1,7 @@
 package Entities;
 
 import Game.AudioManager;
+import Game.DrawWeight;
 import Game.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -27,7 +28,7 @@ public class Eraser extends MobileEnemy {
     /**
      * Visual size of the eraser sprite in world units.
      */
-    private static final float DRAW_SIZE = 60f;
+    private static final float DRAW_SIZE = 120f;
 
     /**
      * Amount of damage dealt to the player on contact.
@@ -39,14 +40,17 @@ public class Eraser extends MobileEnemy {
      */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
+    /**
+     * Indicators for the direction the player is facing for sprite rendering.
+     */
     private static final int DOWN = 0;
     private static final int UP = 1;
     private static final int LEFT = 2;
     private static final int RIGHT = 3;
-
+    private int facing = DOWN;
 
     /**
-     * Shared texture used to render the eraser.
+     * sprites for the eraser
      */
     private TextureRegion sprites[];
 
@@ -64,6 +68,17 @@ public class Eraser extends MobileEnemy {
      * Remaining time until the eraser can attack again.
      */
     private float attackCooldownTimer = 0f;
+
+    DrawWeight weight = (x, y, brushsize) -> {
+        // Manhattan distance (fast, no sqrt)
+        float dist = Math.abs(x) + Math.abs(y);
+
+        // Normalize distance
+        float t = Math.min(dist / brushsize, 1.0f);
+
+        // Linearly degrade weight based on distance
+        return Math.min(5 + (int) (5 * (1.5f - t)), 10);
+    };
 
     /**
      * Creates a new eraser enemy.
@@ -103,8 +118,22 @@ public class Eraser extends MobileEnemy {
             }
         }
 
-        if (Math.abs(transform.velocity.x) > 1f || Math.abs(transform.velocity.y) > 1f) {
-            eraseWithHitbox();
+        if(transform.velocity.x != 0 || transform.velocity.y != 0){
+            if(Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)){
+                if(transform.velocity.y > 0){
+                    facing = UP;
+                }else{
+                    facing = DOWN;
+                }
+            }else{
+                if(transform.velocity.x > 0){
+                    facing = RIGHT;
+                }else{
+                    facing = LEFT;
+                }
+            }
+
+            world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y + transform.size.y/4, true, 10, weight);
         }
     }
 
@@ -119,27 +148,6 @@ public class Eraser extends MobileEnemy {
     }
 
     /**
-     * Erases player-drawn floor tiles across the eraser's whole hitbox.
-     */
-    private void eraseWithHitbox() {
-        float left = transform.position.x;
-        float bottom = transform.position.y;
-        float width = transform.size.x;
-        float height = transform.size.y;
-
-        int brushSize = 1;
-        float step = 8f;
-
-        for (float x = left; x <= left + width; x += step) {
-            for (float y = bottom; y <= bottom + height; y += step) {
-                world.floorDraw(x, y, true, brushSize);
-            }
-        }
-
-        world.floorDraw(left + width / 2f, bottom + height / 2f, true, brushSize);
-    }
-
-    /**
      * Renders the eraser on the screen.
      *
      * @param batch sprite batch used for drawing
@@ -148,7 +156,7 @@ public class Eraser extends MobileEnemy {
     @Override
     public void render(SpriteBatch batch, float delta) {
         batch.draw(
-                sprites[DOWN],
+                sprites[facing],
                 transform.position.x * Game.GdxGame.UNIT_SCALE,
                 transform.position.y * Game.GdxGame.UNIT_SCALE,
                 transform.size.x * Game.GdxGame.UNIT_SCALE,
