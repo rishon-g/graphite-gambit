@@ -22,7 +22,7 @@ public class GameScreen implements Screen {
     // reference to the main game class, used for switching screens.
     GdxGame game;
 
-    ScreenManager screenManager= ScreenManager.getInstance(game);
+    ScreenManager screenManager = ScreenManager.getInstance(game);
 
     // for camera
     Viewport viewport;
@@ -73,11 +73,16 @@ public class GameScreen implements Screen {
     };
 
     // settings buttons, instance for each toggled state to switch between
-    MenuButton musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70);
-    MenuButton musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70);
-    MenuButton sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70);
-    MenuButton sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70);
-    MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70);
+    MenuButton musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
+            510, 700, 70);
+    MenuButton musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
+            510, 700, 70);
+    MenuButton sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton,
+            (1920 >> 1) - (700 >> 1), 420, 700, 70);
+    MenuButton sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton,
+            (1920 >> 1) - (700 >> 1), 420, 700, 70);
+    MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700,
+            70);
     MenuButton[] settingsButtons;
 
     // game over buttons
@@ -95,10 +100,17 @@ public class GameScreen implements Screen {
     private enum Layout {
         MAIN, SETTINGS, WON, LOST
     }
+
     private GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
 
     // switch sets of buttons based on the current layout
     private MenuButton[] menuButtons = mainButtons;
+
+    /**
+     * Switches the current layout of the ui within the game.
+     * 
+     * @param layout the layout to swap to.
+     */
     private void changeLayout(GameScreen.Layout layout) {
         MenuButton music;
         MenuButton sfx;
@@ -129,7 +141,9 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Constructor for the GameScreen class. Initializes all resources and the GameWorld.
+     * Constructor for the GameScreen class. Initializes all resources and the
+     * GameWorld.
+     * 
      * @param game reference to the main game class.
      */
     public GameScreen(GdxGame game, int id) {
@@ -138,7 +152,6 @@ public class GameScreen implements Screen {
         this.batch = game.getBatch();
         this.viewport = game.getViewport();
         this.assetService = game.getAssetService();
-
 
         // determine which level asset to use based on the ID
         MapAsset currentLevel = MapAsset.getLevelAsset(id);
@@ -153,8 +166,7 @@ public class GameScreen implements Screen {
         this.mapRenderer = new OrthogonalTiledMapRenderer(
                 this.assetService.get(currentLevel),
                 GdxGame.UNIT_SCALE,
-                this.batch
-        );
+                this.batch);
 
         // UI: this handles everything overlayed on the screen
         this.font = game.getFont();
@@ -181,7 +193,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * The render method is called every frame, and is responsible for updating the game world and rendering all entities.
+     * The render method is called every frame, and is responsible for updating the
+     * game world and rendering all entities.
      * 
      * @param delta time since last frame (used for uniform movement and animations)
      */
@@ -192,7 +205,6 @@ public class GameScreen implements Screen {
             world.update(delta);
         } else {
             AudioManager.getInstance(game).stopMoveSound();
-            AudioManager.getInstance(game).stopSharpenerSound();
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !gameOver && !gameWon) {
@@ -205,9 +217,7 @@ public class GameScreen implements Screen {
             changeLayout(Layout.MAIN);
         }
 
-
-
-        //TODO REMOVE DEBUG INPUTS
+        // TODO REMOVE DEBUG INPUTS
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             // lose game
             gameEnd(false);
@@ -228,7 +238,8 @@ public class GameScreen implements Screen {
         // draw map
         this.batch.setColor(Color.WHITE);
 
-        // expand the camera's "culling box" by 5 world units such that big objects do not despawn
+        // expand the camera's "culling box" by 5 world units such that big objects do
+        // not despawn
         float bleed = 5f;
         float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
         float startY = this.camera.position.y - (this.camera.viewportHeight / 2f) - bleed;
@@ -283,27 +294,11 @@ public class GameScreen implements Screen {
 
         // reset batch color to white before drawing text
         batch.setColor(Color.WHITE);
-      
+
         // draw graphite text
         String graphiteText = "GRAPHITE";
         layout.setText(font, graphiteText);
         font.draw(batch, layout, (1920f - layout.width) / 2f, barY + 30f);
-
-        // draw stun
-        if (world.getPlayer().isStunned && !gameOver && !gameWon) {
-
-            font.getData().setScale(2.0f);
-
-            layout.setText(font, "MASH SPACE!");
-
-
-            // 3. Draw it dead center
-            font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
-
-            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
-            font.getData().setScale(1.0f);
-            font.setColor(Color.WHITE);
-        }
 
         // pause menu
         if (paused || gameOver || gameWon) {
@@ -313,7 +308,7 @@ public class GameScreen implements Screen {
             batch.setColor(Color.WHITE);
 
             // create pause menu
-            batch.draw(textBox, 1920/2 - 400, 1080/2 - 300, 800, 600);
+            batch.draw(textBox, 1920 / 2 - 400, 1080 / 2 - 300, 800, 600);
             if (paused) {
                 layout.setText(headerFont, "PAUSED");
                 headerFont.draw(batch, layout, 1920 / 2 - layout.width / 2, 780);
@@ -327,7 +322,7 @@ public class GameScreen implements Screen {
                 layout.setText(menuFont, "TIME REMAINING: " + seconds);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 620);
 
-                //TODO link plot points
+                // TODO link plot points
                 layout.setText(menuFont, "PLOT POINTS: 5/12");
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 570);
             } else if (gameWon) {
@@ -364,9 +359,26 @@ public class GameScreen implements Screen {
             }
             boolean buttonHovered = false;
             for (MenuButton button : menuButtons) {
-                if (button.isHovered(uiViewport)) buttonHovered = true;
+                if (button.isHovered(uiViewport))
+                    buttonHovered = true;
             }
-            if (!buttonHovered) selectedIndex = -1;
+            if (!buttonHovered)
+                selectedIndex = -1;
+        }
+
+        // draw stun
+        if (world.getPlayer().isStunned && !gameOver && !gameWon) {
+
+            font.getData().setScale(2.0f);
+
+            layout.setText(font, "MASH SPACE!");
+
+            // 3. Draw it dead center
+            font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
+
+            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
+            font.getData().setScale(1.0f);
+            font.setColor(Color.WHITE);
         }
 
         batch.end();
@@ -377,6 +389,7 @@ public class GameScreen implements Screen {
 
     /**
      * trigger code given the clicked button
+     * 
      * @param index index of the clicked button in its button array
      */
     private void activateButton(int index) {
@@ -430,15 +443,28 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Pauses the game when called, and reduces music volume.
+     */
     private void gamePause() {
         paused = true;
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
+
+    /**
+     * unpauses the game when called, and resets music volume.
+     */
     private void gameUnpause() {
         paused = false;
         AudioManager.getInstance(game).setMusicFullVolume();
     }
 
+    /**
+     * resizes the current viewport. called whenever the user resizes the window.
+     * 
+     * @param width  the new width of the window
+     * @param height the new height of the window
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -470,13 +496,13 @@ public class GameScreen implements Screen {
         mapRenderer.dispose();
         uiTexture.dispose();
     }
-    
+
     /**
      * Handles the event that the GameWorld is finished with it's operation.
      * 
      * @param won true if the player gameWon, false if not
      */
-    public void gameEnd(boolean won){
+    public void gameEnd(boolean won) {
         paused = false;
         gameWon = false;
         gameOver = false;
@@ -484,7 +510,7 @@ public class GameScreen implements Screen {
         int currentScore = world.getScore();
 
         // Updates the player save if won level
-        if(won){
+        if (won) {
             changeLayout(Layout.WON);
             gameWon = true;
 

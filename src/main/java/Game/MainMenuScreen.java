@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Main Menu, displays on game load and switches to game screen on input
+ * 
  * @author Luke McRae
  * @version 2.0
  * @since 2026-03-14
@@ -38,8 +39,8 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private Texture eraserIcon;
     private Texture sharpenerIcon;
-    private final Texture ink  = new Texture(Gdx.files.internal("sprites/ink.png"));
-    private final Texture whiteOut =  new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
+    private final Texture ink = new Texture(Gdx.files.internal("sprites/ink.png"));
+    private final Texture whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
     private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
     private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
     private final Texture plot = new Texture(Gdx.files.internal("src/main/java/Entities/Assets/Plot.png"));
@@ -50,8 +51,15 @@ public class MainMenuScreen extends ScreenAdapter {
     private enum Layout {
         MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
+
     private Layout currentLayout = Layout.MAIN;
 
+    /**
+     * Constructor for the main menu. retrieves rendering resources, save data, and
+     * audio.
+     * 
+     * @param game the game object of this main menu
+     */
     public MainMenuScreen(GdxGame game) {
         this.game = game;
         this.batch = game.getBatch();
@@ -62,11 +70,14 @@ public class MainMenuScreen extends ScreenAdapter {
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
 
-    // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+    // helper function to create uniform, centered buttons on the screen that are
+    // spaced out by deltaY automatically, in the order they are created
 
     /**
-     * helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+     * helper function to create uniform, centered buttons on the screen that are
+     * spaced out by deltaY automatically, in the order they are created
      * change variables as needed to adjust spacing and size
+     * 
      * @param text the text to display on the button
      * @return a new MenuButton object to add to the buttons array
      */
@@ -79,9 +90,11 @@ public class MainMenuScreen extends ScreenAdapter {
 
         int deltaY = -(height + spacing);
         if (isDisabled) {
-            return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+            return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height);
         } else {
-            return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+            return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height);
         }
     }
 
@@ -95,6 +108,12 @@ public class MainMenuScreen extends ScreenAdapter {
     };
     private MenuButton[] buttons = menuButtons;
 
+    /**
+     * Creates an array of MenuButton objects for the level select screen.
+     * Includes a back button and buttons for each level, with scores and disabled state based on unlocked levels.
+     *
+     * @return an array of MenuButton for level selection
+     */
     private MenuButton[] levelButtons() {
         MenuButton[] buttons = new MenuButton[5];
         buttons[0] = createCenteredButton("BACK", 0, false);
@@ -119,6 +138,7 @@ public class MainMenuScreen extends ScreenAdapter {
         }
         return buttons;
     }
+
     private final MenuButton[] levelSelectButtons = levelButtons();
 
     private final MenuButton musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
@@ -126,12 +146,17 @@ public class MainMenuScreen extends ScreenAdapter {
     private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
     private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
     private final MenuButton backButton = createCenteredButton("BACK", 0, false);
-    private MenuButton[] settingsButtons = new MenuButton[]{};
+    private MenuButton[] settingsButtons = new MenuButton[] {};
 
-    private final MenuButton[] howToPlayButtons = new MenuButton[]{
+    private final MenuButton[] howToPlayButtons = new MenuButton[] {
             new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80),
     };
 
+    /**
+     * Changes the current layout of the ui to the specified layout.
+     * 
+     * @param layout the layout to swap to
+     */
     private void changeLayout(Layout layout) {
         currentLayout = layout;
         MenuButton music;
@@ -161,6 +186,11 @@ public class MainMenuScreen extends ScreenAdapter {
         };
     }
 
+    /**
+     * Renders the ui and background of the main menu.
+     * 
+     * @param delta the time since the last update
+     */
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
@@ -201,7 +231,8 @@ public class MainMenuScreen extends ScreenAdapter {
             String line1 = "Avoid ERASERS!  ";
             layout.setText(font, line1);
             font.draw(batch, layout, startX, currentY);
-            // Draw image exactly after the text ends! (Adjust the -35 offset to center it vertically with the text)
+            // Draw image exactly after the text ends! (Adjust the -35 offset to center it
+            // vertically with the text)
             batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
 
             // Move down to the next line
@@ -218,9 +249,6 @@ public class MainMenuScreen extends ScreenAdapter {
             layout.setText(font, linec);
             font.draw(batch, layout, startX, currentY);
             batch.draw(ink, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-
-
 
             currentY -= lineSpacing;
 
@@ -278,16 +306,19 @@ public class MainMenuScreen extends ScreenAdapter {
                 buttonHovered = true;
             }
         }
-        if (!buttonHovered) selectedIndex = -1;
+        if (!buttonHovered)
+            selectedIndex = -1;
         batch.end();
     }
 
     /**
      * triggers a hardcoded action for each button based on index
+     * 
      * @param index clicked button index (index is based on time of creation)
      */
     private void activateButton(int index) {
-        if (buttons[index].textureIs(disabledButton)) return;
+        if (buttons[index].textureIs(disabledButton))
+            return;
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {
                 screenManager.SetGameScreen(1);
@@ -346,11 +377,20 @@ public class MainMenuScreen extends ScreenAdapter {
         }
     }
 
+    /**
+     * Called when the screen is resized. Updates the viewport to match the new dimensions.
+     *
+     * @param width the new width of the screen
+     * @param height the new height of the screen
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
 
+    /**
+     * Disposes of resources used by the main menu screen, including textures.
+     */
     @Override
     public void dispose() {
         // ... your other dispose code ...

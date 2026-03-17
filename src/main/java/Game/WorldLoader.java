@@ -21,7 +21,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 /**
- * The WorldLoader class is responsible for loading specific game worlds (or levels) based on an identifier.
+ * The WorldLoader class is responsible for loading specific game worlds (or
+ * levels) based on an identifier.
  *
  * @author Lane Jacobson
  * @version 1.0
@@ -30,12 +31,14 @@ public class WorldLoader {
 
     /**
      * Loads a game world based on the given identifier.
-     * parses level data from a json file, creates the tilemap and entities based on the data, and returns the initialized GameWorld object.
+     * parses level data from a json file, creates the tilemap and entities based on
+     * the data, and returns the initialized GameWorld object.
      *
      * @param id identifier for the world to load (e.g. level number)
-     * @return the loaded GameWorld object with tilemap and entities initialized according to the level data
+     * @return the loaded GameWorld object with tilemap and entities initialized
+     *         according to the level data
      */
-    public GameWorld loadWorld(GdxGame game, GameScreen screen, int id){
+    public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
 
         // get the map dynamically using the id
@@ -79,10 +82,10 @@ public class WorldLoader {
                     // also mark blocked tiles for pathfinding
                     int tileSize = GameWorld.getTileSize();
 
-                    int startX = (int)(wall.position.x / tileSize);
-                    int endX = (int)((wall.position.x + wall.size.x - 0.01f) / tileSize);
-                    int startY = (int)(wall.position.y / tileSize);
-                    int endY = (int)((wall.position.y + wall.size.y - 0.01f) / tileSize);
+                    int startX = (int) (wall.position.x / tileSize);
+                    int endX = (int) ((wall.position.x + wall.size.x - 0.01f) / tileSize);
+                    int startY = (int) (wall.position.y / tileSize);
+                    int endY = (int) ((wall.position.y + wall.size.y - 0.01f) / tileSize);
 
                     for (int tx = startX; tx <= endX; tx++) {
                         for (int ty = startY; ty <= endY; ty++) {
@@ -95,7 +98,6 @@ public class WorldLoader {
                 }
             }
         }
-
 
         // extract pickups from tiled
         MapLayer entitiesLayer = map.getLayers().get("entities");
@@ -174,19 +176,17 @@ public class WorldLoader {
             }
         }
 
-
-
         // Load and spawn all entities
         Json json = new Json();
         FileHandle file = Gdx.files.internal("src/main/java/Game/Worlds/level" + id + ".json");
         LevelData data = json.fromJson(LevelData.class, file);
 
-        for(EntityData entity : data.entities){
+        for (EntityData entity : data.entities) {
 
             // dynamically create entity of any type
             Entity newEntity;
             System.out.println("New entity: " + entity.type);
-            switch(entity.type){
+            switch (entity.type) {
                 case "Player":
                     newEntity = new Player(world);
                     world.player = (Player) newEntity;
@@ -205,7 +205,6 @@ public class WorldLoader {
                     continue;
             }
 
-
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
             world.entities.add(newEntity);
 
@@ -213,5 +212,4 @@ public class WorldLoader {
 
         return world;
     }
-
 }
