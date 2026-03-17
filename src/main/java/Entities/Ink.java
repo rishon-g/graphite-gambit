@@ -7,32 +7,57 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Non-player entity representing an ink obstacle that slows the player on contact.
+ *
+ * <p>This entity is rendered as a static ink sprite in the world. When the
+ * player collides with it, a slowdown effect is applied.</p>
+ */
 public class Ink extends Nonplayer {
 
-    private Texture texture;
+    /**
+     * Texture used to render the ink obstacle.
+     */
+    private final Texture texture;
 
-
+    /**
+     * Creates a new ink obstacle.
+     *
+     * @param world the game world
+     */
     public Ink(GameWorld world) {
         super(world);
         this.transform.setScale(468, 256);
         this.texture = new Texture(Gdx.files.internal("sprites/ink.png"));
     }
 
+    /**
+     * Updates the internal state of the ink object.
+     *
+     * <p>This entity is static, no update logic is required.</p>
+     *
+     * @param delta time since last update
+     */
     @Override
     public void updateInternal(float delta) {
     }
 
+    /**
+     * Renders the ink sprite.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
+     */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        batch.setColor(Color.WHITE);
-        batch.draw(texture,
-                this.transform.position.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.position.y * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.y * Game.GdxGame.UNIT_SCALE
-        );
+        renderTexture(batch, texture);
     }
 
+    /**
+     * Applies the slowdown effect when the player collides with this object.
+     *
+     * @param player the player colliding with the ink
+     */
     @Override
     public void playerCollide(Player player) {
         // Trigger the slowdown effect every frame the player is touching this box

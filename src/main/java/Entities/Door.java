@@ -6,9 +6,28 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Static world entity representing one half of a door.
+ *
+ * <p>A door is created as either the left or right part.</p>
+ */
 public class Door extends Entity {
+
+    /**
+     * Texture used to render this door half.
+     */
     private Texture texture;
 
+    /**
+     * Creates a door entity for the specified door part.
+     * <ul>
+     *     <li>"Left" loads the left-half door sprite</li>
+     *     <li>"Right" loads the right-half door sprite</li>
+     * </ul>
+     *
+     * @param world the game world
+     * @param part the door half
+     */
     public Door(GameWorld world, String part) {
         super(world);
         // Keep the standard 1-tile physical hitbox for each half!
@@ -21,19 +40,25 @@ public class Door extends Entity {
         }
     }
 
+    /**
+     * Updates the internal state of the door.
+     *
+     * <p>This entity is static, no update logic is required.</p>
+     *
+     * @param delta time since last update
+     */
     @Override
     public void updateInternal(float delta) {
-        // Doors don't need to do any math
     }
 
+    /**
+     * Renders the door.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
+     */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        batch.setColor(Color.WHITE);
-        batch.draw(texture,
-                this.transform.position.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.position.y * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.x * Game.GdxGame.UNIT_SCALE,
-                this.transform.size.y * Game.GdxGame.UNIT_SCALE
-        );
+        renderTexture(batch, texture);
     }
 }

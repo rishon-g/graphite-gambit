@@ -2,12 +2,14 @@ package Entities;
 
 import Components.Transform;
 import Game.GameWorld;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * The Entity class represents an object or character in the game world.
  * It contains a Transform component for position and scale, and abstract methods for updating and rendering the entity.
- * 
+ *
  * @author Lane Jacobson
  * @version 1.0
  * @since 2026-2-26
@@ -33,7 +35,7 @@ abstract public class Entity {
     /**
      * Updates the internal system of the entity, then requests the world to move.
      * Called every frame by the world this entity is contained within.
-     * 
+     *
      * @param delta time since last update
      */
     public void update(float delta){
@@ -52,7 +54,7 @@ abstract public class Entity {
     /**
      * Updates any internal systems of the entity such as velocity.
      * Called every frame, and abstracted for descendants to implement.
-     * 
+     *
      * @param delta time since last update
      */
     abstract public void updateInternal(float delta);
@@ -60,9 +62,20 @@ abstract public class Entity {
     /**
      * Adds the sprite, or animation frame of the entity to the spritebatch to be rendered.
      * Called every frame by the world this entity is contained within.
-     * 
+     *
      * @param batch spritebatch to be rendered
      * @param delta time since last update
      */
     abstract public void render(SpriteBatch batch, float delta);
+
+    protected void renderTexture(SpriteBatch batch, Texture texture) {
+        batch.setColor(Color.WHITE);
+        batch.draw(
+                texture,
+                transform.position.x * Game.GdxGame.UNIT_SCALE,
+                transform.position.y * Game.GdxGame.UNIT_SCALE,
+                transform.size.x * Game.GdxGame.UNIT_SCALE,
+                transform.size.y * Game.GdxGame.UNIT_SCALE
+        );
+    }
 }

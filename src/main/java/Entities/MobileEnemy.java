@@ -23,19 +23,19 @@ public abstract class MobileEnemy extends Nonplayer {
     /**
      * Time interval in seconds between path recalculations.
      */
-    protected static final float PATH_RECALC_TIME = 0.5f;
+    private static final float PATH_RECALC_TIME = 0.5f;
 
     /**
      * Distance threshold used to decide when the enemy has reached the current
      * target tile center.
      */
-    protected static final float TARGET_DIF = 5f;
+    private static final float TARGET_DIF = 5f;
 
     /**
      * Maximum radius, in tiles, around the player to search for an alternative
      * reachable target tile.
      */
-    protected static final int TARGET_SEARCH_RADIUS = 2;
+    private static final int TARGET_SEARCH_RADIUS = 2;
 
     /**
      * Current path represented as a list of tile coordinates.
@@ -234,7 +234,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param y tile y-coordinate
      * @return True if the tile is inside the map bounds; False otherwise
      */
-    protected boolean isInsideMap(int[][] map, int x, int y) {
+    private boolean isInsideMap(int[][] map, int x, int y) {
         return x >= 0 && y >= 0 && x < map.length && y < map[0].length;
     }
 
@@ -246,7 +246,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param y tile y-coordinate
      * @return True if the tile is blocked; False otherwise
      */
-    protected boolean isBlocked(int[][] map, int x, int y) {
+    private boolean isBlocked(int[][] map, int x, int y) {
         return map[x][y] == 1;
     }
 
@@ -256,7 +256,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param worldX x position in world units
      * @return tile x index
      */
-    protected int worldToTileX(float worldX) {
+    private int worldToTileX(float worldX) {
         return (int) (worldX / GameWorld.getTileSize());
     }
 
@@ -266,7 +266,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param worldY y position in world units
      * @return tile y index
      */
-    protected int worldToTileY(float worldY) {
+    private int worldToTileY(float worldY) {
         return (int) (worldY / GameWorld.getTileSize());
     }
 
@@ -276,7 +276,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param width sprite width
      * @return target world x position
      */
-    protected float tileToWorldCenterX(int tileX, float width) {
+    private float tileToWorldCenterX(int tileX, float width) {
         return tileX * GameWorld.getTileSize() + (GameWorld.getTileSize() - width) / 2f;
     }
 
@@ -286,7 +286,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * @param height sprite height
      * @return target world y position
      */
-    protected float tileToWorldCenterY(int tileY, float height) {
+    private float tileToWorldCenterY(int tileY, float height) {
         return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
     }
 }
