@@ -58,7 +58,7 @@ public class Eraser extends Nonplayer {
     public Eraser(GameWorld world) {
         super(world);
         transform.setScale(64, 128);
-        Texture png = new Texture("src/main/java/Entities/Assets/Eraser.png");
+        Texture png = new Texture("src/main/resources/sprites/EraserSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4];
         for(int i = 0; i < 4; i++){

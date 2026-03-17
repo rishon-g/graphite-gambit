@@ -210,7 +210,7 @@ private int drawWeight(int x, int y, int brushsize) {
                 }
 
                 // draw on position
-                int weight = w.weight(x, y, brushsize);
+                int weight = w.getWeight(x, y, brushsize);
                 if(erase)drawmap[yindex][xindex] = (short)Math.min(drawmap[yindex][xindex], 10 - weight);
                 else drawmap[yindex][xindex] = (short)Math.max(drawmap[yindex][xindex], weight);
             }

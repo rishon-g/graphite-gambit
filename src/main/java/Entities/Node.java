@@ -10,7 +10,7 @@ public class Node extends Nonplayer {
 
     public Node(GameWorld world){
         super(world);
-        texture = new Texture("src/main/java/Entities/Assets/Plot.png");
+        texture = new Texture("src/main/resources/sprites/Plot.png");
         transform.setScale(32, 32);
     }
 

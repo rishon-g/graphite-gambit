@@ -56,7 +56,7 @@ public class Player extends Entity {
         this.health = 100;
         this.maxHealth = 100;
         this.transform.setScale(64, 128);
-        Texture png = new Texture("src/main/java/Entities/Assets/PencilSheet.png");
+        Texture png = new Texture("src/main/resources/sprites/PencilSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
         for(int i = 0; i < 4; i++){
