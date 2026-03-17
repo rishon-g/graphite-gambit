@@ -119,6 +119,7 @@ public class GameWorld {
      * point counter.
      */
     public void plotPointCollected() {
+        screen.plotPoints++; // track number of collected points for death menu
         score(100);
         this.plotpoints--;
         if (plotpoints <= 0) {
