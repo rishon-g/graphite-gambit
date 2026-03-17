@@ -1,14 +1,11 @@
 package Entities;
 
-import Components.Transform;
-import Game.DrawWeight;
 import Game.AudioManager;
 import Game.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
  * Enemy that moves toward the player, erases drawn floor tiles while moving,
@@ -41,42 +38,41 @@ public class Eraser extends MobileEnemy {
      */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
-    // sprites for rendering
-    private TextureRegion sprites[];
-    int facing = 0;
-
-    // constants for sprite rendering
-    private final int DOWN = 0;
-    private final int UP = 1;
-    private final int RIGHT = 2;
-    private final int LEFT = 3;
+    /**
+     * Shared texture used to render the eraser.
+     */
+    private static Texture TEXTURE;
 
     /**
      * Initial x-coordinate where the eraser spawned.
      */
     private float startX = -1;
 
+    /**
+     * Initial y-coordinate where the eraser spawned.
+     */
+    private float startY = -1;
 
-    // erase weighting
-    private DrawWeight weight = (x, y, brushsize) -> {
-        // Manhattan distance (diamond brush)
-        float dist = Math.abs(x) + Math.abs(y);
+    /**
+     * Remaining time until the eraser can attack again.
+     */
+    private float attackCooldownTimer = 0f;
 
-        // Normalize distance
-        float t = Math.min(dist / brushsize, 1.0f);
-
-        // Weight calculation
-        return Math.min(5 + (int)(5 * (1.5f - t)), 10);
-    };
-
+    /**
+     * Creates a new eraser enemy.
+     *
+     * @param world the game world
+     */
     public Eraser(GameWorld world) {
         super(world);
-        transform.setScale(64, 128);
-        Texture png = new Texture("src/main/resources/sprites/EraserSheet.png");
-        TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
-        sprites = new TextureRegion[4];
-        for(int i = 0; i < 4; i++){
-            sprites[i] = sheet[0][i];
+        transform.setScale(DRAW_SIZE, DRAW_SIZE);
+        // TODO Temporary Red square until we add a real sprite
+        if (TEXTURE == null) {
+            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            pixmap.setColor(Color.RED);
+            pixmap.fill();
+            TEXTURE = new Texture(pixmap);
+            pixmap.dispose();
         }
     }
 
@@ -89,27 +85,6 @@ public class Eraser extends MobileEnemy {
      * @param delta time since last update
      */
     @Override
-
-    public void updateInternal(float delta) {
-        world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, true, 7, weight);
-
-        Player player = world.getPlayer();
-        if (player == null) {
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        pathTimer += delta;
-
-        if (pathTimer >= PATH_RECALC_TIME || currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            rebuildPath(player);
-            pathTimer = 0f;
-        }
-
-        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            transform.setVelocity(0, 0);
-            return;
-
     protected void beforeMovementUpdate(float delta) {
         if (startX == -1f) {
             startX = transform.position.x;
@@ -121,37 +96,6 @@ public class Eraser extends MobileEnemy {
             if (attackCooldownTimer < 0f) {
                 attackCooldownTimer = 0f;
             }
-
-            nextTile = currentPath.get(pathIndex);
-            targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
-            targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
-
-            dx = targetX - transform.position.x;
-            dy = targetY - transform.position.y;
-            dist = (float) Math.sqrt(dx * dx + dy * dy);
-        }
-
-        if (dist > 0f) {
-            float vx = (dx / dist) * MOVE_SPEED;
-            float vy = (dy / dist) * MOVE_SPEED;
-            transform.setVelocity(vx, vy);
-
-            // set new facing
-            if(Math.abs(dx) > Math.abs(dy)){
-                if(dx > 0){
-                    facing = RIGHT;
-                }else{
-                    facing = LEFT;
-                }
-            }else{
-                if(dy > 0){
-                    facing = UP;
-                }else{
-                    facing = DOWN;
-                }
-            }
-        } else {
-            transform.setVelocity(0, 0);
         }
 
         if (Math.abs(transform.velocity.x) > 1f || Math.abs(transform.velocity.y) > 1f) {
@@ -198,9 +142,8 @@ public class Eraser extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        TextureRegion sprite = sprites[facing];
         batch.draw(
-                sprite,
+                TEXTURE,
                 transform.position.x * Game.GdxGame.UNIT_SCALE,
                 transform.position.y * Game.GdxGame.UNIT_SCALE,
                 transform.size.x * Game.GdxGame.UNIT_SCALE,
