@@ -215,8 +215,8 @@ public class GameWorld {
      * @param erase     true if it should instead erase
      * @param brushsize width of drawing
      */
-    public void floorDraw(Vec2 position, boolean erase, int brushsize) {
-        floorDraw(position.x, position.y, erase, brushsize);
+    public void floorDraw(Vec2 position, boolean erase, int brushsize, DrawWeight w){
+        floorDraw(position.x, position.y, erase, brushsize, w);
     }
 
     /**
@@ -227,9 +227,11 @@ public class GameWorld {
      * @param erase     true if it should instead erase
      * @param brushsize width of the brush to be used
      */
-    public void floorDraw(float posx, float posy, boolean erase, int brushsize) {
-        int tilex = (int) posx / DRAW_SIZE, tiley = (int) posy / DRAW_SIZE;
-        for (int y = -brushsize; y <= brushsize; y++) {
+
+    public void floorDraw(float posx, float posy, boolean erase, int brushsize, DrawWeight w){
+        int tilex = (int)posx / DRAW_SIZE, tiley = (int)posy / DRAW_SIZE;
+        for(int y = -brushsize; y <= brushsize; y++){
+
             int offset = brushsize - Math.abs(y);
             for (int x = -offset; x <= offset; x++) {
 
@@ -244,11 +246,9 @@ public class GameWorld {
                 }
 
                 // draw on position
-                if (erase)
-                    drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex],
-                            10 - drawWeight(x, y, brushsize));
-                else
-                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], drawWeight(x, y, brushsize));
+                int weight = w.getWeight(x, y, brushsize);
+                if(erase)drawmap[yindex][xindex] = (short)Math.min(drawmap[yindex][xindex], 10 - weight);
+                else drawmap[yindex][xindex] = (short)Math.max(drawmap[yindex][xindex], weight);
             }
         }
     }
@@ -267,8 +267,9 @@ public class GameWorld {
                 if (value <= 0)
                     continue;
 
-                if (value != last) {
-                    batch.setColor(0.2f, 0.2f, 0.2f, (float) value / 14);
+                if(value != last){
+                    batch.setColor(0.2f,0.2f,0.2f, (float)value/10);
+
                     last = value;
                 }
 
