@@ -9,7 +9,7 @@ package Components;
  * @since 2026-2-26
  */
 public class Transform {
-    // x and y positions (using top left corner as origin)
+    // x and y positions
     public Vec2 position;
 
     // x and y pixel scales from the origin

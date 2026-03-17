@@ -2,32 +2,44 @@ package Entities;
 
 import Components.Transform;
 import Game.DrawWeight;
+import Game.AudioManager;
 import Game.GameWorld;
-import Pathfinding.AStar;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import java.util.Collections;
-import java.util.List;
 /**
- * The Eraser class represents an eraser entity in the game, extending from Entity.
- * The eraser moves toward the player, damaging them on contact, then is destroyed.
+ * Enemy that moves toward the player, erases drawn floor tiles while moving,
+ * and damages the player on contact.
+ *
+ * <p>The Eraser inherits shared pathfinding and movement behavior from
+ * {@link MobileEnemy}. In addition to movement, it stores its spawn position,
+ * removes player-drawn floor tiles, and
+ * respawns back at its starting location after a successful attack.</p>
  */
-public class Eraser extends Nonplayer {
-    /** Movement speed in world units per second. */
+public class Eraser extends MobileEnemy {
+
+    /**
+     * Movement speed in world units per second.
+     */
     private static final float MOVE_SPEED = 300f;
 
-    /** Visual size of the eraser sprite in world units. */
+    /**
+     * Visual size of the eraser sprite in world units.
+     */
     private static final float DRAW_SIZE = 60f;
 
-    /** How often the eraser rebuilds its path to the player, in seconds. */
-    private static final float PATH_RECALC_TIME = 0.5f;
+    /**
+     * Amount of damage dealt to the player on contact.
+     */
+    private static final int ATTACK_DAMAGE = 10;
 
-    /** Distance threshold used to decide whether the eraser reached the next tile target. */
-    private static final float TARGET_DIF = 5f;
+    /**
+     * Cooldown in seconds between attacks.
+     */
+    private static final float ATTACK_COOLDOWN = 1.0f;
 
     // sprites for rendering
     private TextureRegion sprites[];
@@ -39,9 +51,11 @@ public class Eraser extends Nonplayer {
     private final int RIGHT = 2;
     private final int LEFT = 3;
 
-    private List<int[]> currentPath = Collections.emptyList();
-    private int pathIndex = 0;
-    private float pathTimer = 0f;
+    /**
+     * Initial x-coordinate where the eraser spawned.
+     */
+    private float startX = -1;
+
 
     // erase weighting
     private DrawWeight weight = (x, y, brushsize) -> {
@@ -67,10 +81,15 @@ public class Eraser extends Nonplayer {
     }
 
     /**
-     * The update method is called every frame to update the state of the eraser entity.
-     * @param delta time since last update (used for movement and animations)
+     * Updates eraser-specific state before movement logic runs.
+     *
+     * <p>This includes saving the original spawn position, updating the attack
+     * cooldown timer, and erasing drawn floor tiles.</p>
+     *
+     * @param delta time since last update
      */
     @Override
+
     public void updateInternal(float delta) {
         world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, true, 7, weight);
 
@@ -90,26 +109,17 @@ public class Eraser extends Nonplayer {
         if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
             transform.setVelocity(0, 0);
             return;
+
+    protected void beforeMovementUpdate(float delta) {
+        if (startX == -1f) {
+            startX = transform.position.x;
+            startY = transform.position.y;
         }
 
-        // Getting the next tile that we want to go.
-        int[] nextTile = currentPath.get(pathIndex);
-
-        // Conversion tile coordinates into the center position of that tile in world space.
-        float targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
-        float targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
-
-        float dx = targetX - transform.position.x;
-        float dy = targetY - transform.position.y;
-        float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-        if (dist <= TARGET_DIF) {
-            transform.setPosition(targetX, targetY);
-            pathIndex++;
-
-            if (pathIndex >= currentPath.size()) {
-                transform.setVelocity(0, 0);
-                return;
+        if (attackCooldownTimer > 0f) {
+            attackCooldownTimer -= delta;
+            if (attackCooldownTimer < 0f) {
+                attackCooldownTimer = 0f;
             }
 
             nextTile = currentPath.get(pathIndex);
@@ -143,71 +153,48 @@ public class Eraser extends Nonplayer {
         } else {
             transform.setVelocity(0, 0);
         }
+
+        if (Math.abs(transform.velocity.x) > 1f || Math.abs(transform.velocity.y) > 1f) {
+            eraseWithHitbox();
+        }
     }
 
     /**
-     * Rebuilds the path from the eraser to the player's current tile.
-     * @param player the current player target
+     * Returns the eraser movement speed.
+     *
+     * @return movement speed in world units per second
      */
-    private void rebuildPath(Player player) {
-        int[][] map = world.getTilemap();
-        if (map == null || map.length == 0 || map[0].length == 0) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
-            return;
+    @Override
+    protected float getMoveSpeed() {
+        return MOVE_SPEED;
+    }
+
+    /**
+     * Erases player-drawn floor tiles across the eraser's whole hitbox.
+     */
+    private void eraseWithHitbox() {
+        float left = transform.position.x;
+        float bottom = transform.position.y;
+        float width = transform.size.x;
+        float height = transform.size.y;
+
+        int brushSize = 1;
+        float step = 8f;
+
+        for (float x = left; x <= left + width; x += step) {
+            for (float y = bottom; y <= bottom + height; y += step) {
+                world.floorDraw(x, y, true, brushSize);
+            }
         }
 
-        int startX = worldToTileX(transform.position.x);
-        int startY = worldToTileY(transform.position.y);
-        int endX = worldToTileX(player.transform.position.x);
-        int endY = worldToTileY(player.transform.position.y);
-
-        currentPath = AStar.findPath(map, startX, startY, endX, endY);
-        pathIndex = 0;
+        world.floorDraw(left + width / 2f, bottom + height / 2f, true, brushSize);
     }
 
     /**
-     * Conversion a world x-coordinate into a tile x-coordinate.
+     * Renders the eraser on the screen.
      *
-     * @param worldX x position in world units
-     * @return tile x index
-     */
-    private int worldToTileX(float worldX) {
-        return (int)(worldX / GameWorld.getTileSize());
-    }
-
-    /**
-     * Conversion a world y-coordinate into a tile y-coordinate.
-     *
-     * @param worldY y position in world units
-     * @return tile y index
-     */
-    private int worldToTileY(float worldY) {
-        return (int)(worldY / GameWorld.getTileSize());
-    }
-
-    /**
-     * Conversion a tile x-coordinate into the world x-coordinate of the centered sprite position.
-     * @param tileX tile x index
-     * @param width sprite width
-     * @return target world x position
-     */
-    private float tileToWorldCenterX(int tileX, float width) {
-        return tileX * GameWorld.getTileSize() + (GameWorld.getTileSize() - width) / 2f;
-    }
-
-    /**
-     * Conversion a tile y-coordinate into the world y-coordinate of the centered sprite position.
-     * @param tileY tile y index
-     * @param height sprite height
-     * @return target world y position
-     */
-    private float tileToWorldCenterY(int tileY, float height) {
-        return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
-    }
-
-    /**
-     * The render method is called every frame after update to render the eraser entity on the screen.
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
@@ -222,11 +209,36 @@ public class Eraser extends Nonplayer {
     }
 
     /**
-     * The attack method is called when the eraser attacks the player.
+     * Handles collision with the player.
+     *
+     * <p>If the eraser is not on cooldown and the player is neither stunned nor
+     * immune, it deals damage, plays a sound effect, teleports back to its spawn
+     * position, clears its current path, and starts its attack cooldown.</p>
+     *
+     * @param player the player that collided with this eraser
      */
     @Override
     public void playerCollide(Player player) {
-        player.modifyHealth(-10);
-        dead = true;
+        // Respect cooldown and immunity states
+        if (attackCooldownTimer > 0f || player.isStunned || player.isImmune) {
+            return;
+        }
+
+        // play damage sound
+        AudioManager.getInstance().playDamage();
+
+        player.modifyHealth(-ATTACK_DAMAGE);
+
+        // despawn: we teleport the eraser back to where it first appeared in the world
+        this.transform.setPosition(startX, startY);
+        this.transform.setVelocity(0, 0);
+
+        // reset: we clear the path so it has to re-calculate from the start position
+        this.currentPath = java.util.Collections.emptyList();
+        this.pathIndex = 0;
+        this.pathTimer = 0f;
+
+        // start the cooldown immediately so it doesn't double-attack if it respawns near the player
+        attackCooldownTimer = ATTACK_COOLDOWN;
     }
 }

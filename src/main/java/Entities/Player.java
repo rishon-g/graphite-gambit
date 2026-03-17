@@ -1,4 +1,5 @@
 package Entities;
+import Game.AudioManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -48,6 +49,17 @@ public class Player extends Entity {
     private final int RIGHT = 2;
     private final int LEFT = 3;
 
+    // stun & immunity
+    public boolean isStunned = false;
+    public float stunTimer = 0f;
+    public boolean isImmune = false;
+    public float immunityTimer = 0f;
+    private float time;
+
+    // ink slowdown
+    private float currentSpeedMultiplier = 1.0f;
+    private final float INK_SLOW_FACTOR = 0.4f;
+
     /**
      * Constructor for the Player class, initializes health and points to default values.
      */
@@ -57,6 +69,7 @@ public class Player extends Entity {
         this.maxHealth = 100;
         this.transform.setScale(64, 128);
         Texture png = new Texture("src/main/resources/sprites/PencilSheet.png");
+        this.time = 0;
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4][4];
         for(int i = 0; i < 4; i++){
@@ -64,6 +77,7 @@ public class Player extends Entity {
                 sprites[i][j] = sheet[i][j];
             }
         }
+        this.transform.setScale(64, 128);
     }
 
     /**
@@ -73,6 +87,8 @@ public class Player extends Entity {
     public int getHealth() {
         return health;
     }
+
+
 
     /**
      * Modifies the player's health by the given amount.
@@ -95,11 +111,34 @@ public class Player extends Entity {
         }
     }
 
+
+    /**
+     * Traps the player for a set duration.
+     */
+    public void stun(float duration) {
+        if (!isImmune && !isStunned) {
+            this.isStunned = true;
+            this.stunTimer = duration;
+            this.transform.velocity.set(0, 0); // Instantly stop movement
+        }
+    }
+
+    /**
+     * Called by the Ink entity when colliding.
+     */
+    public void applyInkSlowdown() {
+        this.currentSpeedMultiplier = INK_SLOW_FACTOR;
+    }
+
     /**
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
     public void updateInternal(float delta) {
+        // update time
+        time += delta;
+
+
         // Draw on floor in the middle of the feet of the sprite
         world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2, weight);
 
@@ -116,6 +155,42 @@ public class Player extends Entity {
             }
         }
 
+
+        // play sharpener sound
+        Game.AudioManager.getInstance().updateSharpenerSound(isStunned);
+
+        // handle immunity
+        if (isImmune) {
+            immunityTimer -= delta;
+            if (immunityTimer <= 0) {
+                isImmune = false;
+            }
+        }
+
+        // handle stun state
+        if (isStunned) {
+            stunTimer -= delta;
+
+            // player mashes space to escape faster
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                stunTimer -= 0.5f;
+            }
+
+            // did we escape
+            if (stunTimer <= 0) {
+                isStunned = false;
+                isImmune = true;
+                immunityTimer = 1.0f;
+            }
+
+            // skip the rest of the update method so the player can't move
+            return;
+        }
+
+        // calculate this frame's actual speed based on the multiplier
+        float baseSpeed = 600f; //
+        speed = baseSpeed * currentSpeedMultiplier;
+
         boolean up, down, left, right;
 
         // 1. Check Keyboard Input
@@ -123,6 +198,17 @@ public class Player extends Entity {
         down = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
         left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
         right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+
+        // update moving sound effect
+        boolean isMoving = up || down || left || right;
+        if (currentSpeedMultiplier == INK_SLOW_FACTOR) {
+            Game.AudioManager.getInstance().updateMoveSound(isMoving, true);
+        } else {
+            Game.AudioManager.getInstance().updateMoveSound(isMoving, false);
+        }
+
+        // 2. IMMEDIATELY reset the multiplier back to normal for the next frame
+        currentSpeedMultiplier = 1.0f;
 
         int xinput = 0, yinput = 0;
         if(right)xinput++;
@@ -184,13 +270,23 @@ public class Player extends Entity {
         TextureRegion frame = sprites[facing][healthIndex];
         batch.setColor(1,1,1,1);
 
+        if (isImmune) {
+            // Math.sin oscillates between -1 and 1.
+            // We scale it so the alpha (transparency) rapidly bounces between 0.3 (faint) and 1.0 (solid)!
+            float flashAlpha = 0.65f + (float)(Math.sin(time * 20f) * 0.35f);
+            batch.setColor(1, 1, 1, flashAlpha);
+        } else {
+            // Draw normally if not immune
+            batch.setColor(1, 1, 1, 1);
+        }
+
         // how big the sprite should actually look on screen
-        float visualWidth = 256f;
+        float visualWidth = 200f;
         float visualHeight = 256f;
 
         // calculate the offset to center the 256x256 image over the 128x128 hitbox
         float offsetX = (visualWidth - this.transform.size.x) / 2f;
-        float offsetY = (visualHeight - this.transform.size.y) / 2f - 85; // tweaked to perfection
+        float offsetY = (visualHeight - this.transform.size.y) / 2f - 65; // tweaked to perfection
 
         // draw the sprite using the offset and the new visual dimensions
         batch.draw(frame,
@@ -199,5 +295,10 @@ public class Player extends Entity {
                 visualWidth * Game.GdxGame.UNIT_SCALE,
                 visualHeight * Game.GdxGame.UNIT_SCALE
         );
+
+        batch.setColor(Color.WHITE);
     }
+
+
+
 }

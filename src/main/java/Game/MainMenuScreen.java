@@ -10,40 +10,56 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Main Menu, displays on game load and switches to game screen on input
+ * 
  * @author Luke McRae
- * @version 2.0
- * @since 2026-03-14
+ * @version 2.1
+ * @since 2026-03-16
  */
 public class MainMenuScreen extends ScreenAdapter {
     private final GdxGame game;
     private final Batch batch;
     private final BitmapFont font;
     private final BitmapFont header_font;
-    private final Viewport viewport = new ScreenViewport();
+    private final Viewport viewport = new FitViewport(1920, 1080);
     private final GlyphLayout layout = new GlyphLayout();
     private final ScreenManager screenManager;
     private final PlayerData playerData;
-    int screenWidth = Gdx.graphics.getWidth();
-    int screenHeight = Gdx.graphics.getHeight();
+    int screenWidth = 1920;
+    int screenHeight = 1080;
     private int selectedIndex = -1;
     private final Texture background = new Texture(Gdx.files.internal("images/menu-background.png"));
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
     private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
     private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
 
+    private final Texture eraser = new Texture(Gdx.files.internal("sprites/eraser.png"));
+    private final Texture pencilsharpener = new Texture(Gdx.files.internal("sprites/pencilsharpener.png"));
+    private final Texture ink = new Texture(Gdx.files.internal("sprites/ink.png"));
+    private final Texture whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
+    private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
+    private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
+    private final Texture plot = new Texture(Gdx.files.internal("src/main/java/Entities/Assets/Plot.png"));
+
     public boolean musicOn = true;
     public boolean sfxOn = true;
 
+    // Different sets of menu buttons that can be displayed
     private enum Layout {
         MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
     private Layout currentLayout = Layout.MAIN;
 
+    /**
+     * Constructor for the main menu. retrieves rendering resources, save data, and
+     * audio.
+     * 
+     * @param game the game object of this main menu
+     */
     public MainMenuScreen(GdxGame game) {
         this.game = game;
         this.batch = game.getBatch();
@@ -51,23 +67,14 @@ public class MainMenuScreen extends ScreenAdapter {
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
         this.playerData = PlayerData.obtainPlayerData();
+        AudioManager.getInstance(game).setMusicHalfVolume();
     }
-
-    private void changeLayout(Layout layout) {
-        currentLayout = layout;
-        buttons = switch (layout) {
-            case MAIN -> menuButtons;
-            case LEVEL_SELECT -> levelSelectButtons;
-            case SETTINGS -> settingsButtons;
-            case HOW_TO_PLAY -> howToPlayButtons;
-        };
-    }
-
-    // helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
 
     /**
-     * helper function to create uniform, centered buttons on the screen that are spaced out by deltaY automatically, in the order they are created
+     * helper function to create uniform, centered buttons on the screen that are
+     * spaced out by deltaY automatically, in the order they are created
      * change variables as needed to adjust spacing and size
+     * 
      * @param text the text to display on the button
      * @return a new MenuButton object to add to the buttons array
      */
@@ -80,9 +87,11 @@ public class MainMenuScreen extends ScreenAdapter {
 
         int deltaY = -(height + spacing);
         if (isDisabled) {
-            return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+            return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height);
         } else {
-            return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1), startingY + (deltaY * ID), width, height);
+            return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height);
         }
     }
 
@@ -96,17 +105,27 @@ public class MainMenuScreen extends ScreenAdapter {
     };
     private MenuButton[] buttons = menuButtons;
 
+    /**
+     * Creates an array of MenuButton objects for the level select screen.
+     * Includes a back button and buttons for each level, with scores and disabled state based on unlocked levels.
+     *
+     * @return an array of MenuButton for level selection
+     */
     private MenuButton[] levelButtons() {
         MenuButton[] buttons = new MenuButton[5];
         buttons[0] = createCenteredButton("BACK", 0, false);
         int highestLevel = 1;
-        if (playerData != null) {
-            highestLevel = playerData.getLevelUnlocked();
+        if (PlayerData.obtainPlayerData() != null) {
+            highestLevel = PlayerData.obtainPlayerData().getLevelUnlocked();
         }
         for (int i = 1; i < 5; i++) {
             int highScore = 0;
-            if (playerData != null) {
-                highScore = playerData.getScore(i);
+            if (PlayerData.obtainPlayerData() != null) {
+                try {
+                    highScore = PlayerData.obtainPlayerData().getScore(i);
+                } catch (IndexOutOfBoundsException e) {
+                    // If the score doesn't exist yet, just leave it at 0
+                }
             }
             if (highestLevel >= i) {
                 buttons[i] = createCenteredButton("LEVEL " + (i) + "    Score: " + highScore, i, false);
@@ -116,22 +135,60 @@ public class MainMenuScreen extends ScreenAdapter {
         }
         return buttons;
     }
+
     private final MenuButton[] levelSelectButtons = levelButtons();
 
     private final MenuButton musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
     private final MenuButton musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
     private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
     private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
-    private final MenuButton[] settingsButtons = new MenuButton[]{
-            createCenteredButton("BACK", 0, false),
-            musicOnButton,
-            sfxOnButton,
+    private final MenuButton backButton = createCenteredButton("BACK", 0, false);
+    private MenuButton[] settingsButtons = new MenuButton[] {};
+
+    private final MenuButton[] howToPlayButtons = new MenuButton[] {
+            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80),
     };
 
-    private final MenuButton[] howToPlayButtons = new MenuButton[]{
-            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 300, 800, 80),
-    };
+    /**
+     * Changes the current layout of the ui to the specified layout.
+     * 
+     * @param layout the layout to swap to
+     */
+    private void changeLayout(Layout layout) {
+        currentLayout = layout;
+        MenuButton music;
+        MenuButton sfx;
+        // set settings buttons to match stored settings
+        if (game.isSfxPlaying()) {
+            sfx = sfxOnButton;
+        } else {
+            sfx = sfxOffButton;
+        }
+        if (game.isMusicPlaying()) {
+            music = musicOnButton;
+        } else {
+            music = musicOffButton;
+        }
+        settingsButtons = new MenuButton[] {
+                backButton,
+                music,
+                sfx,
+        };
 
+        buttons = switch (layout) {
+            case MAIN -> menuButtons;
+            case LEVEL_SELECT -> levelSelectButtons;
+            case SETTINGS -> settingsButtons;
+            case HOW_TO_PLAY -> howToPlayButtons;
+        };
+    }
+
+    /**
+     * Renders the ui and background of the main menu.
+     * Varies what buttons are rendered based on the current layout.
+     * 
+     * @param delta the time since the last update
+     */
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
@@ -161,44 +218,105 @@ public class MainMenuScreen extends ScreenAdapter {
         if (currentLayout == Layout.HOW_TO_PLAY) {
             layout.setText(header_font, "HOW TO PLAY");
             header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
-            layout.setText(font, """
-                    This is the instructions of how to play
-                    Will fill in when game is completed
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    -
-                    """);
-            font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 820);
+
+            // layout
+            float startX = 300;
+            float currentY = 820f;
+            float lineSpacing = 70f;
+            float iconSize = 50f;
+
+            // --- LINE 1: ERASERS ---
+            String line1 = "Avoid ERASERS!  ";
+            layout.setText(font, line1);
+            font.draw(batch, layout, startX, currentY);
+            // Draw image exactly after the text ends! (Adjust the -35 offset to center it
+            // vertically with the text)
+            batch.draw(eraser, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            // Move down to the next line
+            currentY -= lineSpacing;
+
+            String line = "Watch out for WHITE-OUT  ";
+            layout.setText(font, line);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(whiteOut, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= 45;
+
+            String linec = "and INK SPILLS!  ";
+            layout.setText(font, linec);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(ink, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            // --- LINE 2: SHARPENERS ---
+            String line2 = "Don't get caught by PENCIL SHARPENERS!  ";
+            layout.setText(font, line2);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(pencilsharpener, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line3 = "Collect GRAPHITE!  ";
+            layout.setText(font, line3);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line4 = "Collect PLOT POINTS!  ";
+            layout.setText(font, line4);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(plot, startX + layout.width, currentY - 35f, iconSize, iconSize);
+
+            currentY -= lineSpacing;
+
+            String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
+            layout.setText(font, line5);
+            font.draw(batch, layout, startX, currentY);
+
+            currentY -= 45;
+            String line5c = "are collected to WIN!  ";
+            layout.setText(font, line5c);
+            font.draw(batch, layout, startX, currentY);
+            batch.draw(trophy, startX + layout.width, currentY - 35f, iconSize, iconSize);
         }
 
         // render buttons
         for (int i = 0; i < buttons.length; i++) {
             buttons[i].render(batch, font, i == selectedIndex);
-            if (buttons[i].isHovered(viewport)) selectedIndex = i;
+            if (buttons[i].isHovered(viewport)) {
+                if (selectedIndex != i) {
+                    selectedIndex = i;
+                    AudioManager.getInstance().playHover();
+                }
+            }
             if (buttons[i].isClicked(viewport)) {
+                AudioManager.getInstance().playClick();
                 activateButton(i);
                 break;
             }
         }
         boolean buttonHovered = false;
         for (MenuButton button : buttons) {
-            if (button.isHovered(viewport)) buttonHovered = true;
+            if (button.isHovered(viewport)) {
+                buttonHovered = true;
+            }
         }
-        if (!buttonHovered) selectedIndex = -1;
+        if (!buttonHovered)
+            selectedIndex = -1;
         batch.end();
     }
 
     /**
      * triggers a hardcoded action for each button based on index
+     * 
      * @param index clicked button index (index is based on time of creation)
      */
     private void activateButton(int index) {
-        if (buttons[index].textureIs(disabledButton)) return;
+        if (buttons[index].textureIs(disabledButton))
+            return;
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {
                 screenManager.SetGameScreen(1);
@@ -239,24 +357,16 @@ public class MainMenuScreen extends ScreenAdapter {
                 changeLayout(Layout.MAIN);
             }
             if (index == 1) {
-                // toggle volume
-                if (musicOn) {
-                    settingsButtons[1] = musicOffButton;
-                    musicOn = false;
-                } else {
-                    settingsButtons[1] = musicOnButton;
-                    musicOn = true;
-                }
+                // toggle music
+                boolean nowOn = !game.isMusicPlaying();
+                AudioManager.getInstance(game).setMusicEnabled(nowOn);
+                settingsButtons[1] = nowOn ? musicOnButton : musicOffButton;
             }
             if (index == 2) {
-                // toggle volume
-                if (sfxOn) {
-                    settingsButtons[2] = sfxOffButton;
-                    sfxOn = false;
-                } else {
-                    settingsButtons[2] = sfxOnButton;
-                    sfxOn = true;
-                }
+                // toggle sfx
+                boolean nowOn = !game.isSfxPlaying();
+                AudioManager.getInstance(game).setSfxEnabled(nowOn);
+                settingsButtons[2] = nowOn ? sfxOnButton : sfxOffButton;
             }
         } else if (currentLayout == Layout.HOW_TO_PLAY) {
             if (index == 0) {
@@ -265,8 +375,35 @@ public class MainMenuScreen extends ScreenAdapter {
         }
     }
 
+    /**
+     * Called when the screen is resized. Updates the viewport to match the new dimensions.
+     *
+     * @param width the new width of the screen
+     * @param height the new height of the screen
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+    }
+
+    /**
+     * Disposes of resources used by the main menu screen, including textures.
+     */
+    @Override
+    public void dispose() {
+        background.dispose();
+        normalButton.dispose();
+        highlightedButton.dispose();
+        disabledButton.dispose();
+        plot.dispose();
+        for (MenuButton button : buttons) {
+            button.dispose();
+        }
+        eraser.dispose();
+        pencilsharpener.dispose();
+        ink.dispose();
+        whiteOut.dispose();
+        graphite.dispose();
+        trophy.dispose();
     }
 }
