@@ -186,7 +186,6 @@ public class AudioManager implements Disposable {
             return;
         }
         if (isStunned && !sharpenerWasPlaying) {
-            playScore();
             sharpenerSoundId = sharpenerSound.loop(sharpenerVolume);
             sharpenerWasPlaying = true;
         } else if (!isStunned && sharpenerWasPlaying) {
