@@ -42,7 +42,7 @@ public class GameWorld {
     public Array<Vec2> spawnPoints = new Array<>();
     private float spawnTimer = 0f;
     private final float SPAWN_INTERVAL = 5.0f;
-    private final int MAX_PICKUPS = 3;
+    private final int MAX_PICKUPS = 5;
 
     int points;
     float time;

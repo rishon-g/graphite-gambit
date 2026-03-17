@@ -23,7 +23,7 @@ public class PencilSharpener extends MobileEnemy {
     /**
      * Visual size of the sharpener sprite in world units.
      */
-    private static final float DRAW_SIZE = 128f;
+    private static final float DRAW_SIZE = 256f;
 
     /**
      * Indicators for the direction the player is facing for sprite rendering.
@@ -53,7 +53,7 @@ public class PencilSharpener extends MobileEnemy {
      */
     public PencilSharpener(GameWorld world) {
         super(world);
-        transform.setScale(DRAW_SIZE, DRAW_SIZE);
+        transform.setScale(64, 64);
 
         Texture png = new Texture("src/main/resources/sprites/SharpenerSheet.png");
         Texture png2 = new Texture("src/main/resources/sprites/SharpenerHold.png");
@@ -118,12 +118,19 @@ public class PencilSharpener extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        batch.draw(sprites[facing],
-                transform.position.x * Game.GdxGame.UNIT_SCALE,
-                transform.position.y * Game.GdxGame.UNIT_SCALE,
-                transform.size.x * Game.GdxGame.UNIT_SCALE,
-                transform.size.y * Game.GdxGame.UNIT_SCALE
-        );
+            float offsetX = (DRAW_SIZE - transform.size.x) / 2f;
+            float offsetY = (DRAW_SIZE - transform.size.y) / 2f;
+
+            float drawX = transform.position.x - offsetX;
+            float drawY = transform.position.y - offsetY;
+
+            batch.draw(
+                    sprites[facing],
+                    drawX * Game.GdxGame.UNIT_SCALE,
+                    drawY * Game.GdxGame.UNIT_SCALE,
+                    DRAW_SIZE * Game.GdxGame.UNIT_SCALE,
+                    DRAW_SIZE * Game.GdxGame.UNIT_SCALE
+            );
     }
 
     /**

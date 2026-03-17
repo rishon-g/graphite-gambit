@@ -23,7 +23,7 @@ public class Eraser extends MobileEnemy {
     /**
      * Movement speed in world units per second.
      */
-    private static final float MOVE_SPEED = 300f;
+    private static final float MOVE_SPEED = 350f;
 
     /**
      * Visual size of the eraser sprite in world units.
@@ -69,6 +69,10 @@ public class Eraser extends MobileEnemy {
      */
     private float attackCooldownTimer = 0f;
 
+
+    private static final float DRAW_WIDTH = 128;
+    private static final float DRAW_HEIGHT = 192;
+
     DrawWeight weight = (x, y, brushsize) -> {
         // Manhattan distance (fast, no sqrt)
         float dist = Math.abs(x) + Math.abs(y);
@@ -87,7 +91,7 @@ public class Eraser extends MobileEnemy {
      */
     public Eraser(GameWorld world) {
         super(world);
-        transform.setScale(DRAW_SIZE/2, DRAW_SIZE);
+        transform.setScale(64, 128);
         Texture png = new Texture("src/main/resources/sprites/EraserSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4];
@@ -155,12 +159,20 @@ public class Eraser extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
+
+        float offsetX = (DRAW_WIDTH - transform.size.x) / 2f;
+
+        float offsetY = (DRAW_HEIGHT - transform.size.y) / 2f;
+
+        float drawX = transform.position.x - offsetX;
+        float drawY = transform.position.y - offsetY;
+
         batch.draw(
                 sprites[facing],
-                transform.position.x * Game.GdxGame.UNIT_SCALE,
-                transform.position.y * Game.GdxGame.UNIT_SCALE,
-                transform.size.x * Game.GdxGame.UNIT_SCALE,
-                transform.size.y * Game.GdxGame.UNIT_SCALE
+                drawX * Game.GdxGame.UNIT_SCALE,
+                drawY * Game.GdxGame.UNIT_SCALE,
+                DRAW_WIDTH * Game.GdxGame.UNIT_SCALE,
+                DRAW_HEIGHT * Game.GdxGame.UNIT_SCALE
         );
     }
 
