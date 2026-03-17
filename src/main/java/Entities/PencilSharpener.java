@@ -7,17 +7,38 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * The PencilSharpener enemy chases the player and traps them.
- * When the player is caught, it stuns them and deals periodic damage.
+ * Enemy that moves toward the player and traps them.
+ *
+ * <p>When the player collides with the pencil sharpener, the player is stunned.
+ * While the player remains trapped, this enemy periodically deals damage over time.</p>
  */
 public class PencilSharpener extends MobileEnemy {
+
+    /**
+     * Movement speed in world units per second.
+     */
     private static final float MOVE_SPEED = 150f;
+
+    /**
+     * Visual size of the sharpener sprite in world units.
+     */
     private static final float DRAW_SIZE = 64f;
 
+    /**
+     * Shared texture used to render the pencil sharpener.
+     */
     private static Texture TEXTURE;
 
+    /**
+     * Timer controlling how often damage is applied while the player is trapped.
+     */
     private float damageTimer = 0f;
 
+    /**
+     * Creates a new pencil sharpener enemy.
+     *
+     * @param world the game world
+     */
     public PencilSharpener(GameWorld world) {
         super(world);
         transform.setScale(DRAW_SIZE, DRAW_SIZE);
@@ -32,6 +53,14 @@ public class PencilSharpener extends MobileEnemy {
         }
     }
 
+    /**
+     * Updates sharpener-specific state before movement logic runs.
+     *
+     * <p>This reduces the damage timer used for periodic damage while
+     * the player is trapped.</p>
+     *
+     * @param delta time since last update
+     */
     @Override
     protected void beforeMovementUpdate(float delta) {
         if (damageTimer > 0f) {
@@ -42,11 +71,22 @@ public class PencilSharpener extends MobileEnemy {
         }
     }
 
+    /**
+     * Returns the pencil sharpener movement speed.
+     *
+     * @return movement speed in world units per second
+     */
     @Override
     protected float getMoveSpeed() {
         return MOVE_SPEED;
     }
 
+    /**
+     * Renders the pencil sharpener on the screen.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
+     */
     @Override
     public void render(SpriteBatch batch, float delta) {
         batch.draw(TEXTURE,
@@ -57,6 +97,16 @@ public class PencilSharpener extends MobileEnemy {
         );
     }
 
+    /**
+     * Handles collision with the player.
+     *
+     * <p>If the player is immune, nothing happens. If the player is not already
+     * stunned, the sharpener traps them by applying a stun. If the player is
+     * already stunned, the sharpener periodically drains health while the
+     * internal damage timer allows it.</p>
+     *
+     * @param player the player that collided with this sharpener
+     */
     @Override
     public void playerCollide(Player player) {
         // if the player is immune, the sharpener can't grab them!

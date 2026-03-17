@@ -8,37 +8,65 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * The Eraser class represents an eraser entity in the game, extending from Entity.
- * The eraser moves toward the player and damages them on contact.
+ * Enemy that moves toward the player, erases drawn floor tiles while moving,
+ * and damages the player on contact.
+ *
+ * <p>The Eraser inherits shared pathfinding and movement behavior from
+ * {@link MobileEnemy}. In addition to movement, it stores its spawn position,
+ * removes player-drawn floor tiles, and
+ * respawns back at its starting location after a successful attack.</p>
  */
 public class Eraser extends MobileEnemy {
-    /** Movement speed in world units per second. */
+
+    /**
+     * Movement speed in world units per second.
+     */
     private static final float MOVE_SPEED = 300f;
-    /** Visual size of the eraser sprite in world units. */
+
+    /**
+     * Visual size of the eraser sprite in world units.
+     */
     private static final float DRAW_SIZE = 60f;
 
+    /**
+     * Amount of damage dealt to the player on contact.
+     */
     private static final int ATTACK_DAMAGE = 10;
 
+    /**
+     * Cooldown in seconds between attacks.
+     */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
+    /**
+     * Shared texture used to render the eraser.
+     */
     private static Texture TEXTURE;
 
-    // respawning
+    /**
+     * Initial x-coordinate where the eraser spawned.
+     */
     private float startX = -1;
+
+    /**
+     * Initial y-coordinate where the eraser spawned.
+     */
     private float startY = -1;
 
+    /**
+     * Remaining time until the eraser can attack again.
+     */
     private float attackCooldownTimer = 0f;
 
+    /**
+     * Creates a new eraser enemy.
+     *
+     * @param world the game world
+     */
     public Eraser(GameWorld world) {
         super(world);
         transform.setScale(DRAW_SIZE, DRAW_SIZE);
-        TestTexture();
-    }
-
-    /**
-     * Creates testTexture for eraser.
-     */
-    private static void TestTexture() {
+        // TODO Temporary Red square until we add a real sprite
         if (TEXTURE == null) {
             Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             pixmap.setColor(Color.RED);
@@ -48,6 +76,14 @@ public class Eraser extends MobileEnemy {
         }
     }
 
+    /**
+     * Updates eraser-specific state before movement logic runs.
+     *
+     * <p>This includes saving the original spawn position, updating the attack
+     * cooldown timer, and erasing drawn floor tiles.</p>
+     *
+     * @param delta time since last update
+     */
     @Override
     protected void beforeMovementUpdate(float delta) {
         if (startX == -1f) {
@@ -67,6 +103,11 @@ public class Eraser extends MobileEnemy {
         }
     }
 
+    /**
+     * Returns the eraser movement speed.
+     *
+     * @return movement speed in world units per second
+     */
     @Override
     protected float getMoveSpeed() {
         return MOVE_SPEED;
@@ -94,7 +135,10 @@ public class Eraser extends MobileEnemy {
     }
 
     /**
-     * The render method is called every frame after update to render the eraser entity on the screen.
+     * Renders the eraser on the screen.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
@@ -108,7 +152,13 @@ public class Eraser extends MobileEnemy {
     }
 
     /**
-     * The attack method is called when the eraser attacks the player.
+     * Handles collision with the player.
+     *
+     * <p>If the eraser is not on cooldown and the player is neither stunned nor
+     * immune, it deals damage, plays a sound effect, teleports back to its spawn
+     * position, clears its current path, and starts its attack cooldown.</p>
+     *
+     * @param player the player that collided with this eraser
      */
     @Override
     public void playerCollide(Player player) {
@@ -134,6 +184,4 @@ public class Eraser extends MobileEnemy {
         // start the cooldown immediately so it doesn't double-attack if it respawns near the player
         attackCooldownTimer = ATTACK_COOLDOWN;
     }
-
-
 }
