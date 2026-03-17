@@ -17,8 +17,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * Main Menu, displays on game load and switches to game screen on input
  * 
  * @author Luke McRae
- * @version 2.0
- * @since 2026-03-14
+ * @version 2.1
+ * @since 2026-03-16
  */
 public class MainMenuScreen extends ScreenAdapter {
     private final GdxGame game;
@@ -48,10 +48,10 @@ public class MainMenuScreen extends ScreenAdapter {
     public boolean musicOn = true;
     public boolean sfxOn = true;
 
+    // Different sets of menu buttons that can be displayed
     private enum Layout {
         MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
-
     private Layout currentLayout = Layout.MAIN;
 
     /**
@@ -69,9 +69,6 @@ public class MainMenuScreen extends ScreenAdapter {
         this.playerData = PlayerData.obtainPlayerData();
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
-
-    // helper function to create uniform, centered buttons on the screen that are
-    // spaced out by deltaY automatically, in the order they are created
 
     /**
      * helper function to create uniform, centered buttons on the screen that are
@@ -188,6 +185,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
     /**
      * Renders the ui and background of the main menu.
+     * Varies what buttons are rendered based on the current layout.
      * 
      * @param delta the time since the last update
      */
@@ -393,7 +391,14 @@ public class MainMenuScreen extends ScreenAdapter {
      */
     @Override
     public void dispose() {
-        // ... your other dispose code ...
+        background.dispose();
+        normalButton.dispose();
+        highlightedButton.dispose();
+        disabledButton.dispose();
+        plot.dispose();
+        for (MenuButton button : buttons) {
+            button.dispose();
+        }
         eraser.dispose();
         pencilsharpener.dispose();
         ink.dispose();

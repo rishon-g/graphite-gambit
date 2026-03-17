@@ -17,6 +17,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
+/**
+ * The GameScreen class is responsible for managing what is displayed during gameplay, such as UI and world
+ */
 public class GameScreen implements Screen {
 
     // reference to the main game class, used for switching screens.
@@ -100,10 +103,10 @@ public class GameScreen implements Screen {
             new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
     };
 
+    // Different menu screens that can be displayed
     private enum Layout {
         MAIN, SETTINGS, WON, LOST
     }
-
     private GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
 
     // switch sets of buttons based on the current layout
@@ -134,6 +137,7 @@ public class GameScreen implements Screen {
                 sfx,
         };
 
+        // assign layout buttons
         currentLayout = layout;
         menuButtons = switch (layout) {
             case MAIN -> mainButtons;
@@ -198,6 +202,8 @@ public class GameScreen implements Screen {
     /**
      * The render method is called every frame, and is responsible for updating the
      * game world and rendering all entities.
+     * When paused, the game stops updates to the world and displays the pause menu
+     * When the player dies or completes the level, the appropriate menu is displayed and world updates stop
      * 
      * @param delta time since last frame (used for uniform movement and animations)
      */
@@ -381,7 +387,7 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * trigger code given the clicked button
+     * Trigger code given the clicked button based on the selected layout and position of the button
      * 
      * @param index index of the clicked button in its button array
      */

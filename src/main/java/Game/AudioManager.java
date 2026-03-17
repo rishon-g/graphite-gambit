@@ -8,6 +8,10 @@ import com.badlogic.gdx.utils.Disposable;
 /**
  * Singleton that manages all game audio
  * Each audio track requires its own Sound object and methods
+ *
+ * @author Luke McRae
+ * @version 1.2
+ * @since 2026-03-16
  */
 public class AudioManager implements Disposable {
 
@@ -44,12 +48,20 @@ public class AudioManager implements Disposable {
     private long sharpenerSoundId = -1;
     private boolean sharpenerWasPlaying = false;
 
+    /**
+     * Singleton constructor.
+     * @param game object of GdxGame
+     */
     private AudioManager(GdxGame game) {
         this.game = game;
         load();
     }
 
-    // Singleton
+    /**
+     * Singleton getter
+     * @param game object of GdxGame
+     * @return instance of AudioManager
+     */
     public static AudioManager getInstance(GdxGame game) {
         if (instance == null) {
             instance = new AudioManager(game);
@@ -57,11 +69,17 @@ public class AudioManager implements Disposable {
         return instance;
     }
 
-    // secondary getter w/o game
+    /**
+     * Getter for instance that can be used after initialization without needing game object
+     * @return instance of AudioManager
+     */
     public static AudioManager getInstance() {
         return instance;
     }
 
+    /**
+     * Loads all audio files into Sound objects
+     */
     private void load() {
         gameMusic  = Gdx.audio.newMusic(Gdx.files.internal("audio/music.mp3"));
         gameMusic.setLooping(true);
@@ -76,18 +94,26 @@ public class AudioManager implements Disposable {
         clickSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_click.mp3"));
     }
 
-    // music controls
+    /**
+     * Starts the music track if it is enabled and not already playing
+     */
     public void startMusic() {
         if (game.isMusicPlaying() && !gameMusic.isPlaying()) {
             gameMusic.play();
         }
     }
 
+    /**
+     * Reduces music volume for main menu and pause menus
+     */
     public void setMusicHalfVolume() {
         musicVolume = musicVolumeInit * 0.5f;
         gameMusic.setVolume(musicVolume);
     }
 
+    /**
+     * Return music to full volume
+     */
     public void setMusicFullVolume() {
         musicVolume = musicVolumeInit;
         gameMusic.setVolume(musicVolume);
@@ -97,7 +123,10 @@ public class AudioManager implements Disposable {
         gameMusic.stop();
     }
 
-    // handle music toggle in settings
+    /**
+     * Toggle music based on the game settings
+     * @param enabled true to enable music, false to disable
+     */
     public void setMusicEnabled(boolean enabled) {
         game.setMusicPlaying(enabled);
         if (enabled) {
@@ -134,6 +163,9 @@ public class AudioManager implements Disposable {
         }
     }
 
+    /**
+     * Triggered when the player stops moving. Stops the sound and resets the state.
+     */
     public void stopMoveSound() {
         if (moveSoundId != -1) {
             moveSound.stop(moveSoundId);
@@ -162,6 +194,9 @@ public class AudioManager implements Disposable {
         }
     }
 
+    /**
+     * Triggers when player exits sharpener
+     */
     public void stopSharpenerSound() {
         if (sharpenerSoundId != -1) {
             sharpenerSound.stop(sharpenerSoundId);
@@ -194,7 +229,10 @@ public class AudioManager implements Disposable {
         }
     }
 
-    // handle SFX toggle in settings
+    /**
+     * Toggles SFX based on the game settings
+     * @param enabled true to enable SFX, false to disable
+     */
     public void setSfxEnabled(boolean enabled) {
         game.setSfxPlaying(enabled);
         if (!enabled) {
