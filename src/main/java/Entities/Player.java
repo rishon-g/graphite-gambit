@@ -185,7 +185,7 @@ public class Player extends Entity {
 
         boolean up, down, left, right;
 
-        // 1. Check Keyboard Input
+        // check Keyboard Input
         up = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
         down = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
         left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
@@ -263,12 +263,11 @@ public class Player extends Entity {
         batch.setColor(1,1,1,1);
 
         if (isImmune) {
-            // Math.sin oscillates between -1 and 1.
-            // We scale it so the alpha (transparency) rapidly bounces between 0.3 (faint) and 1.0 (solid)!
+            //  scale it so the alpha (transparency) rapidly bounces between 0.3 (faint) and 1.0 (solid)
             float flashAlpha = 0.65f + (float)(Math.sin(time * 20f) * 0.35f);
             batch.setColor(1, 1, 1, flashAlpha);
         } else {
-            // Draw normally if not immune
+            // draw normally if not immune
             batch.setColor(1, 1, 1, 1);
         }
 
