@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
-
-import Entities.Player;
-
 import com.badlogic.gdx.files.FileHandle;
 
 /**
@@ -19,12 +16,17 @@ import com.badlogic.gdx.files.FileHandle;
 public class PlayerData {
     private int levelUnlocked;
     private ArrayList<Integer> highScores;
+    private static boolean testMode = false;
 
     private static PlayerData instance;
 
     public PlayerData() {
         levelUnlocked = 1;
         highScores = new ArrayList<>();
+    }
+
+    public static void setTestMode(){
+        testMode = true;
     }
 
     /**
@@ -81,6 +83,8 @@ public class PlayerData {
      * called internally upon first request of the save data.
      */
     private static void loadFromFile(){
+        if(testMode)
+            return;
         Json json = new Json();
         String path = "./Save/save.json";
 
@@ -99,6 +103,9 @@ public class PlayerData {
      * called internally when save data is updated.
      */
     private static void saveToFile(){
+        if(testMode)
+            return;
+
         Json json = new Json();
         String path = "./Save/save.json";
 
