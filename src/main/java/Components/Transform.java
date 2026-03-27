@@ -92,10 +92,10 @@ public class Transform {
      * @return true if the transforms collide, otherwise false
      */
     public boolean collides(Transform t) {
-        if (position.x >= t.position.x + t.size.x ||
-                position.x + size.x <= t.position.x ||
-                position.y >= t.position.y + t.size.y ||
-                position.y + size.y <= t.position.y) {
+        if (position.x > t.position.x + t.size.x ||
+                position.x + size.x < t.position.x ||
+                position.y > t.position.y + t.size.y ||
+                position.y + size.y < t.position.y) {
 
             return false;
         } else {
