@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
+
+import Entities.Player;
+
 import com.badlogic.gdx.files.FileHandle;
 
 /**
@@ -22,6 +25,44 @@ public class PlayerData {
     public PlayerData() {
         levelUnlocked = 1;
         highScores = new ArrayList<>();
+    }
+
+    /**
+     * Resets the player save data. 
+     * @param save true if the save should be reflected on file immediately.
+     */
+    public static void reset(boolean save){
+        instance = new PlayerData();
+        if(save)
+            saveToFile();
+    }
+
+    /**
+     * sets the current levels unlocked.
+     * @param level the level to set to
+     */
+    public void setLevel(int level){
+        levelUnlocked = level;
+    }
+
+    /**
+     * sets the highscore of a certain level.
+     * @param level the level to set
+     * @param score the new highscore to set
+     */
+    public void setHighScore(int level, int score){
+        while(highScores.size() < level){
+            highScores.add(0);
+        }
+        highScores.set(level-1, score);
+    }
+
+    /**
+     * Resets the global save data
+     */
+    public static void resetData(){
+        instance = new PlayerData();
+        saveToFile();
     }
 
     /**
@@ -91,6 +132,10 @@ public class PlayerData {
         }
     }
 
+    /**
+     * returns the current highest level that is unlocked.
+     * @return the highest level unlocked
+     */
     public int getLevelUnlocked() {
         return levelUnlocked;
     }
