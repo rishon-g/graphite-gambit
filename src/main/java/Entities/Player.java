@@ -199,7 +199,7 @@ public class Player extends Entity {
             Game.AudioManager.getInstance().updateMoveSound(isMoving, false);
         }
 
-        // 2. IMMEDIATELY reset the multiplier back to normal for the next frame
+        // immediately reset the multiplier back to normal for the next frame
         currentSpeedMultiplier = 1.0f;
 
         int xinput = 0, yinput = 0;

@@ -26,7 +26,7 @@ public class Pickup extends Entity {
 
     @Override
     public void updateInternal(float delta) {
-        // lock in the spawn floor height
+        // lock in the spawn floor height (placed in correct spot)
         if (baseY == -1f) {
             baseY = this.transform.position.y;
         }
