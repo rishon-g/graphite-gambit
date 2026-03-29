@@ -40,11 +40,12 @@ public class WhiteOut extends Nonplayer {
 
         // setup based on the requested size
         if (size.equals("Large")) {
-            this.texture = new Texture(Gdx.files.internal("sprites/whiteout_large.png")); // large graphic
+            // HAD TO CHANGE TO CONSISTENT FILE LOADING FOR TESTING TODO include on report!
+            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/whiteout_large.png")); // large graphic
             this.transform.setScale(384, 256); // larger hitbox
             this.damageAmount = -25;
         } else {
-            this.texture = new Texture(Gdx.files.internal("sprites/whiteout_small.png")); //  small graphic
+            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/whiteout_small.png")); //  small graphic
             this.transform.setScale(256, 74);
             this.damageAmount = -15;
         }

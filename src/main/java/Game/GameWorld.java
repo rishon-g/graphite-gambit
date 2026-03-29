@@ -316,8 +316,7 @@ public class GameWorld {
 
                         // successfully spawned, so we reset the time
                         // if the spot was taken, this time is not reset because it will instantly try
-                        // again
-                        // until it finds an empty spot
+                        // again until it finds an empty spot
                         spawnTimer = 0f;
                     }
 

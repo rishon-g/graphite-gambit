@@ -25,7 +25,7 @@ public class PlayerTest {
     private GameWorld mockWorld;
     private Player player;
 
-    // for mocking audio
+    // for mocking audio (static mocking for singleton)
     private MockedStatic<AudioManager> mockedAudioManager;
     private AudioManager mockAudio;
 
