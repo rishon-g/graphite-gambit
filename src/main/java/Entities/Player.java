@@ -96,9 +96,10 @@ public class Player extends Entity {
             int excess = this.health - maxHealth;
             this.health = maxHealth;
             world.score(excess);
-            
+
         // If health drops to 0 or below, handle game end logic
         }else if (this.health <= 0) {
+            this.health = 0; // Bug fix: prevent negative health values!! TODO mention in report
             dead = true;
         }
     }
@@ -170,6 +171,7 @@ public class Player extends Entity {
 
             // did we escape
             if (stunTimer <= 0) {
+                stunTimer = 0f; // Bug fix: PREVENT NEGATIVE TIMER TODO mention in report!
                 isStunned = false;
                 isImmune = true;
                 immunityTimer = 1.0f;
