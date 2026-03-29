@@ -74,8 +74,8 @@ public class WhiteOutTest {
         WhiteOut largeHazard = new WhiteOut(mockWorld, "Large");
 
         // check if the hitbox scales correctly
-        assertEquals(384f, largeHazard.transform.size.x, "Large whiteout should have an X scale of 384");
-        assertEquals(256f, largeHazard.transform.size.y, "Large whiteout should have a Y scale of 256");
+        assertEquals(WhiteOut.LARGE_DEFAULT_WIDTH, largeHazard.transform.size.x, "Wrong large whiteout X Scale" );
+        assertEquals(WhiteOut.LARGE_DEFAULT_HEIGHT, largeHazard.transform.size.y, "Wrong large whiteout Y Scale");
     }
 
     @Test
@@ -84,20 +84,20 @@ public class WhiteOutTest {
         WhiteOut smallHazard = new WhiteOut(mockWorld, "Small");
 
         // check if the hitbox scales correctly
-        assertEquals(256f, smallHazard.transform.size.x, "Small whiteout should have an X scale of 256");
-        assertEquals(74f, smallHazard.transform.size.y, "Small whiteout should have a Y scale of 74");
+        assertEquals(WhiteOut.SMALL_DEFAULT_WIDTH, smallHazard.transform.size.x, "Wrong small whiteout X Scale" );
+        assertEquals(WhiteOut.SMALL_DEFAULT_HEIGHT, smallHazard.transform.size.y, "Wrong small whiteout Y scale");
     }
 
     @Test
     public void testPlayerCollide_DealsDamageAndPlaysAudio() {
-        // new large whiteout
+        // new whiteout
         WhiteOut largeHazard = new WhiteOut(mockWorld, "Large");
 
         // collide with plater
         largeHazard.playerCollide(mockPlayer);
 
-        // verify the hazard called modifyHealth(-25) exactly 1 time
-        verify(mockPlayer, times(1)).modifyHealth(-25);
+        // verify the hazard called modifyHealth exactly 1 time
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.LARGE_DEFAULT_DAMAGE);
         // verify the hazard triggered the damage audio exactly 1 time
         verify(mockAudio, times(1)).playDamage();
     }
@@ -113,7 +113,7 @@ public class WhiteOutTest {
         smallHazard.playerCollide(mockPlayer);
 
         // the player should only have taken damage once, despite two collisions
-        verify(mockPlayer, times(1)).modifyHealth(-15);
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class WhiteOutTest {
         // attempt second hit (should fail b/c full second hasn't passed)
         smallHazard.playerCollide(mockPlayer);
         // still total of 1 hit registered
-        verify(mockPlayer, times(1)).modifyHealth(-15);
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
 
         // another 0.6 seconds goes by, so now, cooldown drops below zero
         smallHazard.updateInternal(0.6f);
@@ -137,6 +137,23 @@ public class WhiteOutTest {
         // attempt third hit, this time it should succeed
         smallHazard.playerCollide(mockPlayer);
         // total of 2 hits registered
-        verify(mockPlayer, times(2)).modifyHealth(-15);
+        verify(mockPlayer, times(2)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
+    }
+
+    @Test
+    public void testUpdateInternal_IdleStateIgnoresCooldown() {
+        // create a fresh hazard. its internal damageCooldown starts at 0
+        WhiteOut smallHazard = new WhiteOut(mockWorld, "Small");
+
+        // simulate some time passing
+        // because cooldown is 0, the 'if (damageCooldown > 0)' evaluates to false (branch hit)
+        smallHazard.updateInternal(0.5f);
+
+        // to ensure the timer didn't accidentally drop into the negatives (e.g., -0.5f),
+        // we hit the player. if the timer is cleanly at 0, the player will take damage immediately
+        smallHazard.playerCollide(mockPlayer);
+
+        // verify the player took exactly 1 hit of damage
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
     }
 }

@@ -25,9 +25,13 @@ public class Player extends Entity {
     // health (graphite) of the player
     private int health;
     private int maxHealth;
+    public final static int STARTING_HEALTH = 100; // pixels per second
+
+
     private float drainTimer = 0f;
-    private float speed = 600f; // pixels per second
     private float acceleration = 3200f;
+
+    // textures
     private TextureRegion sprites[][];
     private int facing = 0;
 
@@ -39,9 +43,17 @@ public class Player extends Entity {
     public float immunityTimer = 0f;
     private float time;
 
+    // speed
+    private float speed;
+    public final static float BASE_SPEED = 600f; // pixels per second
+
     // ink slowdown
     private float currentSpeedMultiplier = 1.0f;
     private final float INK_SLOW_FACTOR = 0.4f;
+
+    // how much does the graphite drain everytime there is movement?
+    public static final int MOVEMENT_HEALTH_LOSS = -2;
+
 
     DrawWeight weight = (x, y, brushsize) -> {
         // Manhattan distance (fast, no sqrt)
@@ -59,7 +71,9 @@ public class Player extends Entity {
      */
     public Player(GameWorld world) {
         super(world);
-        this.health = 100;
+        this.health = STARTING_HEALTH;
+        this.speed = BASE_SPEED;
+
         this.maxHealth = 100;
         this.time = 0;
         Texture png = new Texture("src/main/resources/sprites/PencilSheet.png");
@@ -97,8 +111,10 @@ public class Player extends Entity {
             this.health = maxHealth;
             world.score(excess);
 
+        }
+
         // If health drops to 0 or below, handle game end logic
-        }else if (this.health <= 0) {
+        if (this.health <= 0) {
             this.health = 0; // Bug fix: prevent negative health values!! TODO mention in report
             dead = true;
         }
@@ -141,9 +157,9 @@ public class Player extends Entity {
         if (Math.abs(this.transform.velocity.x) > 1f || Math.abs(this.transform.velocity.y) > 1f) {
             drainTimer += delta;
 
-            // every 1 second of MOVEMENT, lose 2 health TODO change accordingly
+            // every 1 second of movement, lose X health
             if (drainTimer >= 1.0f) {
-                modifyHealth(-2);
+                modifyHealth(MOVEMENT_HEALTH_LOSS);
                 drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
             }
         }

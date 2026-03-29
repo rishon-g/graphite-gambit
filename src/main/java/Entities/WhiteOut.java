@@ -29,6 +29,15 @@ public class WhiteOut extends Nonplayer {
      */
     private float damageCooldown = 0f;
 
+
+    public static final float LARGE_DEFAULT_WIDTH = 384f;
+    public static final float LARGE_DEFAULT_HEIGHT = 256f;
+    public static final int LARGE_DEFAULT_DAMAGE = -25;
+
+    public static final float SMALL_DEFAULT_WIDTH = 256f;
+    public static final float SMALL_DEFAULT_HEIGHT = 74f;
+    public static final int SMALL_DEFAULT_DAMAGE = -15;
+
     /**
      * Creates a white-out hazard with the requested size.
      *
@@ -42,12 +51,12 @@ public class WhiteOut extends Nonplayer {
         if (size.equals("Large")) {
             // HAD TO CHANGE TO CONSISTENT FILE LOADING FOR TESTING TODO include on report!
             this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/whiteout_large.png")); // large graphic
-            this.transform.setScale(384, 256); // larger hitbox
-            this.damageAmount = -25;
+            this.transform.setScale(LARGE_DEFAULT_WIDTH, LARGE_DEFAULT_HEIGHT); // larger hitbox
+            this.damageAmount = LARGE_DEFAULT_DAMAGE;
         } else {
             this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/whiteout_small.png")); //  small graphic
-            this.transform.setScale(256, 74);
-            this.damageAmount = -15;
+            this.transform.setScale(SMALL_DEFAULT_WIDTH, SMALL_DEFAULT_HEIGHT);
+            this.damageAmount = SMALL_DEFAULT_DAMAGE;
         }
     }
 

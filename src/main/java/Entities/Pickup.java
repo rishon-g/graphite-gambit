@@ -8,20 +8,23 @@ import Game.GameWorld;
 public class Pickup extends Entity {
     private Texture graphiteTexture;
     private Texture glowTexture;
-    private int healAmount = 20;
 
     private float stateTime = 0f;
     private float baseY = -1f;
+
+    public static final float DEFAULT_WIDTH = 64f;
+    public static final float DEFAULT_HEIGHT = 64f;
+    public static final int HEAL_AMOUNT = 20;
 
     public Pickup(GameWorld world) {
         super(world);
 
         // load textures
-        this.graphiteTexture = new Texture(Gdx.files.internal("sprites/graphite.png"));
-        this.glowTexture = new Texture(Gdx.files.internal("sprites/glow.png"));
+        this.graphiteTexture = new Texture(Gdx.files.internal("src/main/resources/sprites/graphite.png"));
+        this.glowTexture = new Texture(Gdx.files.internal("src/main/resources/sprites/glow.png"));
 
         // keep the 64x64 hitbox so the math and centering stays perfect
-        this.transform.setScale(64, 64);
+        this.transform.setScale(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     @Override
@@ -39,7 +42,7 @@ public class Pickup extends Entity {
 
         // collision Logic
         if (this.transform.collides(world.getPlayer().transform)) {
-            world.getPlayer().modifyHealth(healAmount);
+            world.getPlayer().modifyHealth(HEAL_AMOUNT);
             this.dead = true;
         }
     }
