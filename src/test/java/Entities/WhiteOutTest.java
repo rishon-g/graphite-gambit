@@ -1,71 +1,21 @@
 package Entities;
 
-import Game.AudioManager;
-import Game.GameWorld;
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import utils.GameTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class WhiteOutTest {
+public class WhiteOutTest extends GameTest {
 
-    private GameWorld mockWorld;
     private Player mockPlayer;
 
-    // static mocking for the audio singleton
-    private MockedStatic<AudioManager> mockedAudioManager;
-    private AudioManager mockAudio;
-
-    @BeforeAll
-    public static void initLibgdxNatives() {
-        // C++ libraries so LibGDC doesn't crash
-        GdxNativesLoader.load();
-    }
 
     @BeforeEach
     public void setUp() {
-        // mock the libGDX environment
-        Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
-        Gdx.graphics = mock(Graphics.class);
-        Gdx.app = mock(Application.class);
-        Gdx.files = mock(com.badlogic.gdx.Files.class);
-
-        // load the actual file
-        when(Gdx.files.internal(anyString())).thenAnswer(invocation -> {
-            String path = invocation.getArgument(0);
-            return new FileHandle(new File(path));
-        });
-
-        // mock the AudioManager
-        mockAudio = mock(AudioManager.class);
-        mockedAudioManager = mockStatic(AudioManager.class);
-        mockedAudioManager.when(AudioManager::getInstance).thenReturn(mockAudio);
-
         // mock the dependencies
-        mockWorld = mock(GameWorld.class);
         mockPlayer = mock(Player.class);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        //  close static mocks to prevent memory leaks
-        if (mockedAudioManager != null) {
-            mockedAudioManager.close();
-        }
     }
 
     @Test

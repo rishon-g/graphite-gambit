@@ -1,80 +1,25 @@
 package Entities;
 
-import Game.GameWorld;
-import com.badlogic.gdx.Application;
+import utils.GameTest;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.junit.jupiter.api.AfterEach;
-import org.mockito.MockedStatic;
-import Game.AudioManager;
-
-import java.io.File;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class PlayerTest {
+public class PlayerTest extends GameTest {
 
-    private GameWorld mockWorld;
     private Player player;
-
-    // for mocking audio (static mocking for singleton)
-    private MockedStatic<AudioManager> mockedAudioManager;
-    private AudioManager mockAudio;
-
-    @BeforeAll
-    public static void initLibgdxNatives() {
-        // we must load native C++ libraries so libGDX graphics don't crash
-        GdxNativesLoader.load();
-    }
 
     @BeforeEach
     public void setUp() {
-        // mock the libGDX environment
-        Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
-        Gdx.graphics = mock(Graphics.class);
-        Gdx.app = mock(Application.class);
-        Gdx.files = mock(com.badlogic.gdx.Files.class);
-        Gdx.input = mock(com.badlogic.gdx.Input.class);
-
-        // ensures the Player constructor can safely load PencilSheet.png
-        when(Gdx.files.internal(anyString())).thenAnswer(invocation -> {
-            String path = invocation.getArgument(0);
-            return new FileHandle(new File(path));
-        });
-
-        // mock audio
-        mockAudio = mock(AudioManager.class);
-        mockedAudioManager = mockStatic(AudioManager.class);
-        mockedAudioManager.when(AudioManager::getInstance).thenReturn(mockAudio);
-
-        // we mock the GameWorld because we only want to test the Player in isolation
-        mockWorld = mock(GameWorld.class);
-
-        // initialize the player
         player = new Player(mockWorld);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        // close the static mock after every test to prevent memory leaks and crashes in other tests
-        if (mockedAudioManager != null) {
-            mockedAudioManager.close();
-        }
     }
 
     @Test
     public void testModifyHealth_TakingDamage() {
         // player starts with 100 health from constructor
-
         // take 30 damage
         player.modifyHealth(-30);
 
