@@ -1,6 +1,7 @@
 package Entities;
 
 import Game.GameWorld;
+import Objects.Nonplayer;
 import Pathfinding.AStar;
 
 import java.util.Collections;

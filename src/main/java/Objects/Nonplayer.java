@@ -1,5 +1,7 @@
-package Entities;
+package Objects;
 
+import Entities.Entity;
+import Entities.Player;
 import Game.GameWorld;
 
 /**

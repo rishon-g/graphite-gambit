@@ -1,4 +1,6 @@
-package Game;
+package Screens;
+
+import Game.GdxGame;
 
 /**
  * The screen manager is a singleton that is responsible for initializing and

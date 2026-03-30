@@ -1,80 +1,25 @@
 package Entities;
 
-import Game.GameWorld;
-import com.badlogic.gdx.Application;
+import utils.GameTest;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.junit.jupiter.api.AfterEach;
-import org.mockito.MockedStatic;
-import Game.AudioManager;
-
-import java.io.File;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class PlayerTest {
+public class PlayerTest extends GameTest {
 
-    private GameWorld mockWorld;
     private Player player;
-
-    // for mocking audio
-    private MockedStatic<AudioManager> mockedAudioManager;
-    private AudioManager mockAudio;
-
-    @BeforeAll
-    public static void initLibgdxNatives() {
-        // we must load native C++ libraries so libGDX graphics don't crash
-        GdxNativesLoader.load();
-    }
 
     @BeforeEach
     public void setUp() {
-        // mock the libGDX environment
-        Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
-        Gdx.graphics = mock(Graphics.class);
-        Gdx.app = mock(Application.class);
-        Gdx.files = mock(com.badlogic.gdx.Files.class);
-        Gdx.input = mock(com.badlogic.gdx.Input.class);
-
-        // ensures the Player constructor can safely load PencilSheet.png
-        when(Gdx.files.internal(anyString())).thenAnswer(invocation -> {
-            String path = invocation.getArgument(0);
-            return new FileHandle(new File(path));
-        });
-
-        // mock audio
-        mockAudio = mock(AudioManager.class);
-        mockedAudioManager = mockStatic(AudioManager.class);
-        mockedAudioManager.when(AudioManager::getInstance).thenReturn(mockAudio);
-
-        // we mock the GameWorld because we only want to test the Player in isolation
-        mockWorld = mock(GameWorld.class);
-
-        // initialize the player
         player = new Player(mockWorld);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        // close the static mock after every test to prevent memory leaks and crashes in other tests
-        if (mockedAudioManager != null) {
-            mockedAudioManager.close();
-        }
     }
 
     @Test
     public void testModifyHealth_TakingDamage() {
         // player starts with 100 health from constructor
-
         // take 30 damage
         player.modifyHealth(-30);
 
@@ -169,4 +114,156 @@ public class PlayerTest {
         // the X velocity should now be positive
         assertTrue(player.transform.velocity.x > 0, "x velocity should be positive");
     }
+
+    @Test
+    public void testUpdate_MovementDrainsHealth() {
+        // player starts at 100 health.
+        // give them a velocity so the game thinks they are drawing
+        player.transform.velocity.set(100f, 0f);
+
+        // 1.0s goes by
+        player.update(1.0f);
+
+        // the player should have lost 2 health for moving 1 full second
+        assertEquals(100 + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "moving for 1 second does not drain health accordingly");
+    }
+
+    @Test
+    public void testUpdate_StationaryDoesNotDrainHealth() {
+        //player starts at 100 health. velocity is 0.
+        player.transform.velocity.set(0f, 0f);
+
+        // simulate 2.0 full seconds passing while standing still
+        player.update(2.0f);
+
+        // health should remain exactly at 100
+        assertEquals(100, player.getHealth(), "standing still should not drain graphite.");
+    }
+
+    @Test
+    public void testUpdate_ImmunityTimerDecays() {
+        // force the player into an immune state with a 1-second timer
+        player.isImmune = true;
+        player.immunityTimer = 1.0f;
+
+        // simulate 1.0 seconds passing
+        player.update(1.0f);
+
+        // immunity should wear off after the timer hits 0
+        assertFalse(player.isImmune, "player should lose immunity after the timer expires");
+        assertTrue(player.immunityTimer <= 0f, "immunity timer should be 0 or less");
+    }
+
+    @Test
+    public void testApplyInkSlowdown_ReducesSpeedAndPlaysSludgeSound() {
+        // tell the fake keyboard to hold D
+        when(Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.D)).thenReturn(true);
+
+        // apply the ink effect, then simulate 0.5 seconds of game time.
+        // With 3200 acceleration, 0.5 seconds is enough to hit max speed.
+        player.applyInkSlowdown();
+        player.update(0.5f);
+
+        // the max speed should be clamped to 240 (600 base * 0.4 multiplier)
+        assertEquals(240f, player.transform.velocity.x, 0.001f, "max speed should be clamped to 240 while in ink.");
+
+        // verify the AudioManager was told to play the ink moving sound
+        verify(mockAudio, times(1)).updateMoveSound(true, true);
+    }
+
+    @Test
+    public void testUpdate_VelocityClampsToMaxSpeed() {
+        // tell the keyboard to hold W
+        when(Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.W)).thenReturn(true);
+
+        // simulate a massive amount of time passing (10 seconds).
+        // with 3200 acceleration, 10 seconds would normally push velocity to 32k
+        player.update(10.0f);
+
+        // the bounding math in updateInternal should have clamped it to the max speed
+        assertEquals(Player.BASE_SPEED, player.transform.velocity.y, "Y velocity should not exceed BASE_SPEED");
+    }
+
+    @Test
+    public void testUpdate_SpacebarReducesStunTimer() {
+        // stun the player for 2.0 seconds
+        player.stun(2.0f);
+
+        // mock the keyboard to pretend the user just mashed space
+        when(Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)).thenReturn(true);
+
+        // simulate a very fast frame (0.1 seconds)
+        player.updateInternal(0.1f);
+
+        // the timer should lose 0.1s from time passing + 0.5s from the spacebar
+        // expected: 2.0 - 0.1 - 0.5 = 1.4
+        assertEquals(1.4f, player.stunTimer, 0.001f, "mashing space should is not reducing stun timer correctly");
+    }
+
+    @Test
+    public void testUpdate_MicroMovementsDoNotDrainHealth() {
+        // player is moving incredibly slowly (below the 1.0f threshold)
+        player.transform.velocity.set(0.5f, 0.5f);
+
+        // simulate 1 second
+        player.updateInternal(1.0f);
+
+        // no health should be lost
+        assertEquals(Player.STARTING_HEALTH, player.getHealth(), "velocity under threshold shouldn't drain health.");
+    }
+
+    @Test
+    public void testStun_IgnoredIfAlreadyStunned() {
+        // stun the player for 5 seconds initially
+        player.stun(5f);
+
+        // simulate 2 seconds of game time (timer drops to 3.0)
+        player.updateInternal(2.0f);
+
+        // attempt to apply a massive 10-second stun while they are still stunned
+        player.stun(10f);
+
+        // the second stun should be completely ignored, leaving the timer at 3.0
+        assertEquals(3.0f, player.stunTimer, 0.001f, "subsequent stuns should be ignored");
+    }
+
+    @Test
+    public void testUpdate_ImmunityTimerTicksWithoutExpiring() {
+        // 1s of immunity
+        player.isImmune = true;
+        player.immunityTimer = 1.0f; // (immunityTimer > 0) branch satisfied
+
+        // simulate only 0.5 seconds passing
+        player.updateInternal(0.5f);
+
+        // player should STILL be immune, and timer should be exactly 0.5
+        assertTrue(player.isImmune, "player should still be immune (timer didnt hit 0)");
+        assertEquals(0.5f, player.immunityTimer, 0.001f, "immunity timer should be at 0.5");
+    }
+
+    @Test
+    public void testUpdate_MovementUnderOneSecondDoesNotDrainHealth() {
+        // give the player velocity so the game thinks they are drawing
+        player.transform.velocity.set(100f, 0f);
+
+        // simulate only 0.8 seconds of movement (drainTimer < 1) branch satisfied
+        player.updateInternal(0.8f);
+
+        // health should still be exactly at maximum (no false drain)
+        assertEquals(Player.STARTING_HEALTH, player.getHealth(), "movement under 1 second should not trigger graphite drain");
+    }
+
+    @Test
+    public void testUpdate_YAxisMovementDrainsHealth() {
+        // player moves only on the Y-axis
+        player.transform.velocity.set(0f, 100f);
+
+        // simulate exactly 1 second of game time
+        player.updateInternal(1.0f);
+
+        // the player should lose health, hence we satisfy the Math.abs(velocity.y) > 1f branch
+        assertEquals(Player.STARTING_HEALTH + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "Moving on the Y axis should drain health.");
+    }
+
+
 }

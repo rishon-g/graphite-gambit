@@ -1,7 +1,8 @@
-package Game;
+package Screens;
 
-import Game.Worlds.Asset.AssetService;
-import Game.Worlds.Asset.MapAsset;
+import Game.*;
+import Asset.AssetService;
+import Asset.MapAsset;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -277,7 +278,7 @@ public class GameScreen implements Screen {
         float barY = 50f; //
 
         // calculate health percentage
-        float healthPct = (float) world.player.getHealth() / 100f;
+        float healthPct = (float) world.getPlayer().getHealth() / 100f;
 
         // draw the border
         batch.setColor(Color.BLACK);

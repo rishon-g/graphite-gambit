@@ -1,4 +1,4 @@
-package Game.Worlds.Asset;
+package Asset;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.maps.Map;

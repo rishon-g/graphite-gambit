@@ -1,8 +1,8 @@
-package Entities;
+package Objects;
 
+import Entities.Entity;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -18,6 +18,10 @@ public class Door extends Entity {
      */
     private Texture texture;
 
+
+    public static final float DEFAULT_WIDTH = 128f;
+    public static final float DEFAULT_HEIGHT = 128f;
+
     /**
      * Creates a door entity for the specified door part.
      * <ul>
@@ -30,13 +34,13 @@ public class Door extends Entity {
      */
     public Door(GameWorld world, String part) {
         super(world);
-        // Keep the standard 1-tile physical hitbox for each half!
-        this.transform.setScale(128, 128);
+        // 1-tile physical hitbox for each half
+        this.transform.setScale(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
         if (part.equals("Left")) {
-            this.texture = new Texture(Gdx.files.internal("sprites/keypixel1.png"));
+            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/keypixel1.png"));
         } else if (part.equals("Right")) {
-            this.texture = new Texture(Gdx.files.internal("sprites/keypixel2.png"));
+            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/keypixel2.png"));
         }
     }
 

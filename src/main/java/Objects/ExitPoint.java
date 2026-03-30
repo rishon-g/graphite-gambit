@@ -1,5 +1,6 @@
-package Entities;
+package Objects;
 
+import Entities.Player;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +14,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public class ExitPoint extends Nonplayer {
 
+    public final static int DEFAULT_WIDTH = 128;
+    public final static int DEFAULT_HEIGHT = 128;
+
     /**
      * Texture used to render the exit point.
      */
@@ -25,8 +29,8 @@ public class ExitPoint extends Nonplayer {
      */
     public ExitPoint(GameWorld world) {
         super(world);
-        this.transform.setScale(128, 128);
-        this.texture = new Texture(Gdx.files.internal("sprites/trophy.png"));
+        this.transform.setScale(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/trophy.png"));
     }
 
     /**

@@ -2,17 +2,18 @@ package Game;
 
 import Entities.Entity;
 import Entities.Player;
-import Entities.Nonplayer;
+import Objects.Nonplayer;
 
 import Components.Transform;
 import Components.Vec2;
-import Components.Corner;
 
 import java.util.Vector;
 
+import Objects.Door;
+import Objects.Ink;
+import Objects.Pickup;
+import Screens.GameScreen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
-import com.badlogic.gdx.math.MathUtils;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -21,8 +22,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * The GameWorld class is responsible for managing the world, it's entities, and
@@ -45,7 +44,7 @@ public class GameWorld {
     private final int MAX_PICKUPS = 5;
 
     int points;
-    float time;
+    public float time;
     int plotpoints;
 
     // list of all entities in the game world
@@ -124,7 +123,7 @@ public class GameWorld {
         this.plotpoints--;
         if (plotpoints <= 0) {
             for (Entity e : entities) {
-                if (e instanceof Entities.Door) {
+                if (e instanceof Door) {
                     e.dead = true; // This removes it from the world instantly
                 }
             }
@@ -284,7 +283,7 @@ public class GameWorld {
                 // count how many pickups concurrently are on the map
                 int currentPickups = 0;
                 for (Entity e : entities) {
-                    if (e instanceof Entities.Pickup) {
+                    if (e instanceof Pickup) {
                         currentPickups++;
                     }
                 }
@@ -298,7 +297,7 @@ public class GameWorld {
                     // occupancy check (making sure they don't spawn in the same location)
                     boolean spotTaken = false;
                     for (Entity e : entities) {
-                        if (e instanceof Entities.Pickup) {
+                        if (e instanceof Pickup) {
                             // if an existing pickup is extremely close to our chosen location
                             if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
                                     Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
@@ -310,14 +309,13 @@ public class GameWorld {
 
                     // we only spawn if the spot is completely empty
                     if (!spotTaken) {
-                        Entities.Pickup newPickup = new Entities.Pickup(this);
+                        Pickup newPickup = new Pickup(this);
                         newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
                         this.entities.add(newPickup);
 
                         // successfully spawned, so we reset the time
                         // if the spot was taken, this time is not reset because it will instantly try
-                        // again
-                        // until it finds an empty spot
+                        // again until it finds an empty spot
                         spawnTimer = 0f;
                     }
 
@@ -445,11 +443,11 @@ public class GameWorld {
             return false;
         }
 
-        if (other instanceof Entities.Door) {
+        if (other instanceof Door) {
             return true;
         }
 
-        if (other instanceof Entities.Ink) {
+        if (other instanceof Ink) {
             return false;
         }
 
