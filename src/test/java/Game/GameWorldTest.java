@@ -3,6 +3,8 @@ package Game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.badlogic.gdx.Audio;
+
 import Components.Transform;
 import Components.Vec2;
 import Objects.Door;
@@ -17,10 +19,12 @@ public class GameWorldTest extends GameTest {
     GameWorld world;
     GameScreen mockScreen;
     GdxGame game;
+    AudioManager mockAudio;
 
     @BeforeEach
     void init(){
         mockScreen = mock(GameScreen.class);
+        mockAudio = mock(AudioManager.class);
         world = new GameWorld(-1, mockScreen);
     }
     
@@ -214,7 +218,7 @@ public class GameWorldTest extends GameTest {
 
     @Test void allPlotPointsCollected(){
         world.plotpoints = 1; // No plot points to collect
-        world.addEntity(new Door(world, null));
+        world.addEntity(new Door(world, "left"));
         world.plotPointCollected();
         assert(world.plotpoints == 0);
         verify(mockScreen, times(1)).collectPlotPoint();

@@ -97,7 +97,6 @@ public class GameWorld {
      * @param height the height in tiles of the world
      */
     public void setDimensions(int width, int height) {
-        System.out.println(width + ", " + height);
         this.width = width;
         this.height = height;
         drawmap = new short[height / DRAW_SIZE][width / DRAW_SIZE];
@@ -240,12 +239,19 @@ public class GameWorld {
                     continue;
                 }
 
+                // get and clamp weight from function
+                short weight = (short) w.getWeight(x, y, brushsize);
+                if(weight < 0){
+                    weight = 0;
+                }else if (weight > 10){
+                    weight = 10;
+                }
+
                 // draw on position
                 if (erase)
-                    drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex],
-                            10 - w.getWeight(x, y, brushsize));
+                    drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex], 10 - weight);
                 else
-                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], w.getWeight(x, y, brushsize));
+                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], weight);
             }
         }
     }
