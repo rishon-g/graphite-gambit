@@ -12,6 +12,7 @@ import Game.GdxGame;
 public class ScreenManager {
     GdxGame game;
     private static ScreenManager instance;
+    private static boolean testMode = false;
 
     private ScreenManager() {
     }
@@ -35,7 +36,7 @@ public class ScreenManager {
      * Changes the active screen to the main menu.
      */
     public void SetMenuScreen() {
-        game.setScreen(new MainMenuScreen(game));
+        game.setScreen(testMode ? null : new MainMenuScreen(game));
     }
 
     /**
@@ -44,7 +45,14 @@ public class ScreenManager {
      * @param id the level of the world to spawn
      */
     public void SetGameScreen(int id) {
-        game.setScreen(new GameScreen(game, id));
+        game.setScreen(testMode ? null : new GameScreen(game, id));
+    }
+
+    /**
+     * For testing purposes
+     */
+    public static void SetTestMode() {
+        testMode = true;
     }
 
     public void dispose() {
