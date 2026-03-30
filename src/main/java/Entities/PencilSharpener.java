@@ -18,7 +18,7 @@ public class PencilSharpener extends MobileEnemy {
     /**
      * Movement speed in world units per second.
      */
-    private static final float MOVE_SPEED = 150f;
+    public static final float MOVE_SPEED = 150f;
 
     /**
      * Visual size of the sharpener sprite in world units.
@@ -32,8 +32,15 @@ public class PencilSharpener extends MobileEnemy {
     private static final int UP = 1;
     private static final int LEFT = 2;
     private static final int RIGHT = 3;
-    private int facing = DOWN;
+    int facing = DOWN;
     private float time = 0;
+
+    static final int HITBOX = 64;
+
+
+    public static final float STUN_DURATION = 8f;
+    public static final int DOT_DAMAGE = -5;
+    public static final float DAMAGE_TICK_RATE = 0.5f;
 
     /**
      * sprites for the sharpener
@@ -44,7 +51,7 @@ public class PencilSharpener extends MobileEnemy {
     /**
      * Timer controlling how often damage is applied while the player is trapped.
      */
-    private float damageTimer = 0f;
+    float damageTimer = 0f;
 
     /**
      * Creates a new pencil sharpener enemy.
@@ -53,7 +60,7 @@ public class PencilSharpener extends MobileEnemy {
      */
     public PencilSharpener(GameWorld world) {
         super(world);
-        transform.setScale(64, 64);
+        transform.setScale(HITBOX, HITBOX);
 
         Texture png = new Texture("src/main/resources/sprites/SharpenerSheet.png");
         Texture png2 = new Texture("src/main/resources/sprites/SharpenerHold.png");
@@ -152,14 +159,14 @@ public class PencilSharpener extends MobileEnemy {
 
         // if the player is NOT stunned yet, trap them
         if (!player.isStunned) {
-            player.stun(8f);
-            damageTimer = 0.5f; // Wait half a second before the first tick of damage
+            player.stun(STUN_DURATION);
+            damageTimer = DAMAGE_TICK_RATE; // Wait before the first tick of damage
         }
         // if they ARE trapped, grind away their health
         else {
             if (damageTimer <= 0) {
-                player.modifyHealth(-5); // Drain 5 graphite points
-                damageTimer = 0.5f;      // Reset the timer to wait another half-second
+                player.modifyHealth(DOT_DAMAGE); // Drain graphite points
+                damageTimer = DAMAGE_TICK_RATE;      // Reset the timer to wait
             }
         }
     }

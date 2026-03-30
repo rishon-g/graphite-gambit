@@ -20,6 +20,10 @@ public class Ink extends Nonplayer {
      */
     private final Texture texture;
 
+
+    public static final float DEFAULT_WIDTH = 468f;
+    public static final float DEFAULT_HEIGHT = 256f;
+
     /**
      * Creates a new ink obstacle.
      *
@@ -27,8 +31,8 @@ public class Ink extends Nonplayer {
      */
     public Ink(GameWorld world) {
         super(world);
-        this.transform.setScale(468, 256);
-        this.texture = new Texture(Gdx.files.internal("sprites/ink.png"));
+        this.transform.setScale(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/ink.png"));
     }
 
     /**

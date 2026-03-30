@@ -269,7 +269,7 @@ public class WorldLoaderTest extends GameTest {
 
         GameWorld world = worldLoader.loadWorld(mockGame, mockScreen, 1);
 
-        // If it doesn't crash, we successfully short-circuited all 4 directions!
+        // if it doesn't crash, we successfully short-circuited all 4 directions
         assertNotNull(world, "world should successfully load without crashing on out-of-bounds math");
     }
 
