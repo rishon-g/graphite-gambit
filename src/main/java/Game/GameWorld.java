@@ -463,7 +463,7 @@ public class GameWorld {
      * @param t the transform to search for
      * @return the entity that owns the transform, Null if not owned
      */
-    private Entity getEntityByTransform(Transform t) {
+    public Entity getEntityByTransform(Transform t) {
         if (t == null) {
             return null;
         }
@@ -518,7 +518,7 @@ public class GameWorld {
      * @param other transform of the other entity
      * @return true if the entity is close enough to count as contact
      */
-    private boolean isTouchingPlayer(Transform other) {
+    boolean isTouchingPlayer(Transform other) {
         float epsilon = 0.5f;
 
         float playerLeft = player.transform.position.x;
