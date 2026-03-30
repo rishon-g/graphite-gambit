@@ -1,8 +1,9 @@
-package Game;
+package Screens;
 
+import Game.AudioManager;
+import Game.GdxGame;
+import Game.PlayerData;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

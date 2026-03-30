@@ -67,6 +67,20 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-XstartOnFirstThread</argument>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>Game.Launcher</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>

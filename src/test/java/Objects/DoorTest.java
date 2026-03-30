@@ -1,4 +1,4 @@
-package Entities;
+package Objects;
 
 import utils.GameTest;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,6 @@
-package Entities;
+package Objects;
 
+import Entities.Player;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;

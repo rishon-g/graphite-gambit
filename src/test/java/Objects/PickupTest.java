@@ -1,5 +1,6 @@
-package Entities;
+package Objects;
 
+import Entities.Player;
 import utils.GameTest;
 
 import org.junit.jupiter.api.BeforeEach;

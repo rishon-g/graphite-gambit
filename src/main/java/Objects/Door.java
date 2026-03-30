@@ -1,8 +1,8 @@
-package Entities;
+package Objects;
 
+import Entities.Entity;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -40,7 +40,7 @@ public class Door extends Entity {
         if (part.equals("Left")) {
             this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/keypixel1.png"));
         } else if (part.equals("Right")) {
-            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/keypixel1.png"));
+            this.texture = new Texture(Gdx.files.internal("src/main/resources/sprites/keypixel2.png"));
         }
     }
 

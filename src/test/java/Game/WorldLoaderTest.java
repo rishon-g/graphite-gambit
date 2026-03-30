@@ -1,9 +1,9 @@
 package Game;
 
+import Screens.GameScreen;
 import utils.GameTest;
 
-import Entities.*;
-import Game.Worlds.Asset.AssetService;
+import Asset.AssetService;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.maps.MapLayers;

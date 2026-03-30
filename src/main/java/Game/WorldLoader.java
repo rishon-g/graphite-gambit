@@ -4,7 +4,9 @@ import Components.Transform;
 import Components.Vec2;
 import Entities.*;
 
-import Game.Worlds.Asset.MapAsset;
+import Asset.MapAsset;
+import Objects.*;
+import Screens.GameScreen;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -12,10 +14,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
-
-import java.security.DrbgParameters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -130,7 +129,7 @@ public class WorldLoader {
                             // determine the size word based on what Tiled says
                             String sizeWord = type.equals("WhiteOutLarge") ? "Large" : "Small";
 
-                            Entities.WhiteOut puddle = new Entities.WhiteOut(world, sizeWord);
+                            WhiteOut puddle = new WhiteOut(world, sizeWord);
 
                             float spawnX = tileObject.getX();
                             float spawnY = tileObject.getY();
@@ -178,7 +177,7 @@ public class WorldLoader {
 
         // Load and spawn all entities
         Json json = new Json();
-        FileHandle file = Gdx.files.internal("src/main/java/Game/Worlds/level" + id + ".json");
+        FileHandle file = Gdx.files.internal("src/main/java/Worlds/level" + id + ".json");
         LevelData data = json.fromJson(LevelData.class, file);
 
         for (EntityData entity : data.entities) {

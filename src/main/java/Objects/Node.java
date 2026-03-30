@@ -1,5 +1,6 @@
-package Entities;
+package Objects;
 
+import Entities.Player;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
