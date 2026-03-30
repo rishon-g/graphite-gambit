@@ -16,12 +16,55 @@ import com.badlogic.gdx.files.FileHandle;
 public class PlayerData {
     private int levelUnlocked;
     private ArrayList<Integer> highScores;
+    private static boolean testMode = false;
 
     private static PlayerData instance;
 
     public PlayerData() {
         levelUnlocked = 1;
         highScores = new ArrayList<>();
+    }
+
+    public static void setTestMode(){
+        testMode = true;
+    }
+
+    /**
+     * Resets the player save data. 
+     * @param save true if the save should be reflected on file immediately.
+     */
+    public static void reset(boolean save){
+        instance = new PlayerData();
+        if(save)
+            saveToFile();
+    }
+
+    /**
+     * sets the current levels unlocked.
+     * @param level the level to set to
+     */
+    public void setLevel(int level){
+        levelUnlocked = level;
+    }
+
+    /**
+     * sets the highscore of a certain level.
+     * @param level the level to set
+     * @param score the new highscore to set
+     */
+    public void setHighScore(int level, int score){
+        while(highScores.size() < level){
+            highScores.add(0);
+        }
+        highScores.set(level-1, score);
+    }
+
+    /**
+     * Resets the global save data
+     */
+    public static void resetData(){
+        instance = new PlayerData();
+        saveToFile();
     }
 
     /**
@@ -40,6 +83,8 @@ public class PlayerData {
      * called internally upon first request of the save data.
      */
     private static void loadFromFile(){
+        if(testMode)
+            return;
         Json json = new Json();
         String path = "./Save/save.json";
 
@@ -58,6 +103,9 @@ public class PlayerData {
      * called internally when save data is updated.
      */
     private static void saveToFile(){
+        if(testMode)
+            return;
+
         Json json = new Json();
         String path = "./Save/save.json";
 
@@ -91,6 +139,10 @@ public class PlayerData {
         }
     }
 
+    /**
+     * returns the current highest level that is unlocked.
+     * @return the highest level unlocked
+     */
     public int getLevelUnlocked() {
         return levelUnlocked;
     }
