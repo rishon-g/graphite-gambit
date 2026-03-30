@@ -65,6 +65,9 @@ public class GameScreen implements Screen {
 
     // tracked stats
     public int plotPoints = 0;
+    public void collectPlotPoint() {
+        plotPoints++;
+    }
 
     // menu textures
     private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));

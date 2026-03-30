@@ -118,7 +118,7 @@ public class GameWorld {
      * point counter.
      */
     public void plotPointCollected() {
-        screen.plotPoints++; // track number of collected points for death menu
+        screen.collectPlotPoint();
         score(100);
         this.plotpoints--;
         if (plotpoints <= 0) {
@@ -173,6 +173,24 @@ public class GameWorld {
      */
     public static int getTileSize() {
         return TILE_SIZE;
+    }
+
+    /**
+     * getter for the drawmap
+     * 
+     * @return drawmap
+     */
+    public int getDrawSize() {
+        return DRAW_SIZE;
+    }
+
+    /**
+     * getter for the drawmap
+     * 
+     * @return drawmap
+     */
+    public short[][] getDrawmap() {
+        return drawmap;
     }
 
     /**
@@ -260,6 +278,32 @@ public class GameWorld {
     }
 
     /**
+     * Adds an entity to the world. If the entity is a player, it sets the player
+     * reference to it.
+     * 
+     * @param e the entity to be added
+     */
+    public void addEntity(Entity e) {
+        // Set global player reference if this is a player entity
+        if (e instanceof Player) {
+            // If we already have a player, remove it before adding the new one
+            if(this.player != null){
+                entities.remove(this.player);
+            }
+            this.player = (Player) e;
+        }
+        entities.add(e);
+    }
+
+    /**
+     * Getter for the entities vector, used for testing purposes.
+     * @return the vector of entities in the world
+     */
+    public Vector<Entity> getEntities() {
+        return entities;
+    }
+
+    /**
      * Updates all entities in the game world.
      * 
      * @param delta time since last update (used for movement and animations)
@@ -271,7 +315,7 @@ public class GameWorld {
         // check for font.getData().setScale(1.0f);time over
         if (time <= 0) {
             time = 0;
-            screen.gameEnd(false); // Trigger game over if time hits zero
+            loseGame();
         }
 
         // random spawner logic (meant for graphite shards for now)
@@ -346,7 +390,7 @@ public class GameWorld {
 
                 // Handle game over
                 if (entities.get(i) instanceof Player) {
-                    screen.gameEnd(false);
+                    loseGame();
                 }
 
                 // Remove entity from list
@@ -488,10 +532,25 @@ public class GameWorld {
     }
 
     /**
-     * Public method for the ExitPoint to trigger the win condition
+     * Triggers the win condition for the game. Called when the player reaches the
+     * exit point.
      */
-    public void winGame() {
-        screen.gameEnd(true);
+    public void winGame(){
+        endGame(true);
+    }
+
+    /**
+     * Triggers the lose condition for the game. Called when the player dies or time
+     */
+    public void loseGame(){
+        endGame(false);
+    }
+
+    /**
+     * Ends the game and triggers the end screen. Called when the player wins or loses.
+     */
+    public void endGame(boolean won) {
+        screen.gameEnd(won);
     }
 
     /**

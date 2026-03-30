@@ -5,17 +5,23 @@ import org.junit.jupiter.api.Test;
 
 import Components.Transform;
 import Components.Vec2;
-import Entities.Door;
+import Objects.Door;
+import Screens.GameScreen;
+import utils.GameTest;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class GameWorldTest extends GameTest {
     GameWorld world;
     GameScreen mockScreen;
+    GdxGame game;
 
     @BeforeEach
     void init(){
-        handler = new MockScreenHandler();
-        world = new GameWorld(-1, handler);
-        world.enableTesting();
+        mockScreen = mock(GameScreen.class);
+        world = new GameWorld(-1, mockScreen);
     }
     
     @Test void testSetDimensions(){
@@ -195,23 +201,23 @@ public class GameWorldTest extends GameTest {
     }
 
     @Test void winGame(){
-        world.winGame(true);
-        assert(handler.gameWon);
+        world.winGame();
+        verify(mockScreen, times(1)).gameEnd(true);
     }
 
     @Test void plotPointCollected(){
         world.plotpoints = 2;
         world.plotPointCollected();
-        assert(handler.plotPoints == 1);
         assert(world.plotpoints == 1);
+        verify(mockScreen, times(1)).collectPlotPoint();
     }
 
     @Test void allPlotPointsCollected(){
         world.plotpoints = 1; // No plot points to collect
         world.addEntity(new Door(world, null));
         world.plotPointCollected();
-        assert(handler.plotPoints == 1);
         assert(world.plotpoints == 0);
+        verify(mockScreen, times(1)).collectPlotPoint();
         assert(world.getEntities().get(0).dead == true); // Door should be removed when all plot points are collected
     }
 
