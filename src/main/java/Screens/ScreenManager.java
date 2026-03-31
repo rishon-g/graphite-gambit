@@ -34,6 +34,14 @@ public class ScreenManager {
     }
 
     /**
+     * Set mock instance for testing purposes
+     * @param mock the mock instance
+     */
+    static void setMockInstance(ScreenManager mock){
+        instance = mock;
+    }
+
+    /**
      * Changes the active screen to the main menu.
      */
     public void SetMenuScreen() {

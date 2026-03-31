@@ -73,35 +73,35 @@ public class GameScreen implements Screen {
 
     // menu buttons
     private final MenuButton[] mainButtons = new MenuButton[] {
-            new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70),
-            new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70),
-            new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+            new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
+            new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),
+            new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+            new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
     };
 
     // settings buttons, instance for each toggled state to switch between
     MenuButton musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-            510, 700, 70);
+            510, 700, 70, false);
     MenuButton musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-            510, 700, 70);
+            510, 700, 70, false);
     MenuButton sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton,
-            (1920 >> 1) - (700 >> 1), 420, 700, 70);
+            (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
     MenuButton sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton,
-            (1920 >> 1) - (700 >> 1), 420, 700, 70);
+            (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
     MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700,
-            70);
+            70, false);
     MenuButton[] settingsButtons;
 
     // game over buttons
     private final MenuButton[] gameOverButtons = new MenuButton[] {
-            new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+            new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
     };
 
     // game win buttons
     private final MenuButton[] gameWonButtons = new MenuButton[] {
-            new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
+            new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
     };
 
     // Different menu screens that can be displayed

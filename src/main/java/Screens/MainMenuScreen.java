@@ -34,7 +34,7 @@ public class MainMenuScreen extends ScreenAdapter {
     int screenHeight = 1080;
     private int selectedIndex = -1;
     private Texture background;
-    private Texture normalButton;
+    Texture normalButton;
     private Texture highlightedButton;
     private Texture disabledButton;
 
@@ -81,25 +81,29 @@ public class MainMenuScreen extends ScreenAdapter {
             highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
             normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
             background = new Texture(Gdx.files.internal("images/menu-background.png"));
-            // buttons
-            menuButtons = new MenuButton[] {
-                    createCenteredButton("START GAME", 0, false),
-                    createCenteredButton("LEVEL SELECT", 1, false),
-                    createCenteredButton("HOW TO PLAY", 2, false),
-                    createCenteredButton("SETTINGS", 3, false),
-                    createCenteredButton("QUIT", 4, false),
-            };
-            musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
-            buttons = menuButtons;
-            musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
-            levelSelectButtons = levelButtons();
-            sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
-            sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
-            backButton = createCenteredButton("BACK", 0, false);
             howToPlayButtons = new MenuButton[] {
-                    new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80),
+                    new MenuButton("BACK", null, null, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
+            };
+        } else {
+            howToPlayButtons = new MenuButton[] {
+                    new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
             };
         }
+        // buttons
+        menuButtons = new MenuButton[] {
+                createCenteredButton("START GAME", 0, false),
+                createCenteredButton("LEVEL SELECT", 1, false),
+                createCenteredButton("HOW TO PLAY", 2, false),
+                createCenteredButton("SETTINGS", 3, false),
+                createCenteredButton("QUIT", 4, false),
+        };
+        musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
+        buttons = menuButtons;
+        musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
+        levelSelectButtons = levelButtons();
+        sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
+        sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
+        backButton = createCenteredButton("BACK", 0, false);
 
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
@@ -119,19 +123,25 @@ public class MainMenuScreen extends ScreenAdapter {
         int width = 800;
 
         int deltaY = -(height + spacing);
-        if (isDisabled) {
+        if (GdxGame.isTestMode() && isDisabled) {
+            return new MenuButton(text, null, null, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height, true);
+        } else if (GdxGame.isTestMode() && !isDisabled) {
+                return new MenuButton(text, null, null, (screenWidth >> 1) - (width >> 1),
+                        startingY + (deltaY * ID), width, height, false);
+        } else if (isDisabled) {
             return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1),
-                    startingY + (deltaY * ID), width, height);
+                    startingY + (deltaY * ID), width, height, true);
         } else {
             return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1),
-                    startingY + (deltaY * ID), width, height);
+                    startingY + (deltaY * ID), width, height, false);
         }
     }
 
     // create buttons
     private MenuButton[] menuButtons;
     private MenuButton[] buttons;
-    private MenuButton[] levelSelectButtons;
+    MenuButton[] levelSelectButtons;
     MenuButton[] settingsButtons = new MenuButton[] {};
     // togglable buttons
     MenuButton musicOnButton;
@@ -338,7 +348,7 @@ public class MainMenuScreen extends ScreenAdapter {
      * @param index clicked button index (index is based on time of creation)
      */
     void activateButton(int index) {
-        if (buttons[index].textureIs(disabledButton))
+        if (buttons[index].isDisabled())
             return;
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {

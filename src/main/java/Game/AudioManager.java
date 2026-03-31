@@ -1,5 +1,6 @@
 package Game;
 
+import Screens.ScreenManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -97,11 +98,20 @@ public class AudioManager implements Disposable {
     }
 
     /**
+     * Set mock instance for testing purposes
+     * @param mock the mock instance
+     */
+    public static void setMockInstance(AudioManager mock){
+        instance = mock;
+    }
+
+    /**
      * Starts the music track if it is enabled and not already playing
      */
     public void startMusic() {
+        if (gameMusic == null) return;
         if (game.isMusicPlaying() && !gameMusic.isPlaying()) {
-            if (gameMusic != null) gameMusic.play();
+            gameMusic.play();
         }
     }
 
