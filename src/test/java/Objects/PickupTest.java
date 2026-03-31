@@ -63,7 +63,7 @@ public class PickupTest extends GameTest {
         spiedPlayer.transform.position.set(100f, 100f);
 
         // simulate a single frame
-        pickup.updateInternal(0.1f);
+        pickup.playerCollide(spiedPlayer);
 
         // verify the pickup communicated with the player to heal graphite
         verify(spiedPlayer, times(1)).modifyHealth(Pickup.HEAL_AMOUNT);

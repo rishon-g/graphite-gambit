@@ -97,7 +97,6 @@ public class GameWorld {
      * @param height the height in tiles of the world
      */
     public void setDimensions(int width, int height) {
-        System.out.println(width + ", " + height);
         this.width = width;
         this.height = height;
         drawmap = new short[height / DRAW_SIZE][width / DRAW_SIZE];
@@ -118,7 +117,7 @@ public class GameWorld {
      * point counter.
      */
     public void plotPointCollected() {
-        screen.plotPoints++; // track number of collected points for death menu
+        screen.collectPlotPoint();
         score(100);
         this.plotpoints--;
         if (plotpoints <= 0) {
@@ -176,6 +175,24 @@ public class GameWorld {
     }
 
     /**
+     * getter for the drawmap
+     * 
+     * @return drawmap
+     */
+    public int getDrawSize() {
+        return DRAW_SIZE;
+    }
+
+    /**
+     * getter for the drawmap
+     * 
+     * @return drawmap
+     */
+    public short[][] getDrawmap() {
+        return drawmap;
+    }
+
+    /**
      * Initializes the pixel needed for floor drawing
      */
     private void createPixel() {
@@ -222,12 +239,19 @@ public class GameWorld {
                     continue;
                 }
 
+                // get and clamp weight from function
+                short weight = (short) w.getWeight(x, y, brushsize);
+                if(weight < 0){
+                    weight = 0;
+                }else if (weight > 10){
+                    weight = 10;
+                }
+
                 // draw on position
                 if (erase)
-                    drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex],
-                            10 - w.getWeight(x, y, brushsize));
+                    drawmap[yindex][xindex] = (short) Math.min(drawmap[yindex][xindex], 10 - weight);
                 else
-                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], w.getWeight(x, y, brushsize));
+                    drawmap[yindex][xindex] = (short) Math.max(drawmap[yindex][xindex], weight);
             }
         }
     }
@@ -260,6 +284,32 @@ public class GameWorld {
     }
 
     /**
+     * Adds an entity to the world. If the entity is a player, it sets the player
+     * reference to it.
+     * 
+     * @param e the entity to be added
+     */
+    public void addEntity(Entity e) {
+        // Set global player reference if this is a player entity
+        if (e instanceof Player) {
+            // If we already have a player, remove it before adding the new one
+            if(this.player != null){
+                entities.remove(this.player);
+            }
+            this.player = (Player) e;
+        }
+        entities.add(e);
+    }
+
+    /**
+     * Getter for the entities vector, used for testing purposes.
+     * @return the vector of entities in the world
+     */
+    public Vector<Entity> getEntities() {
+        return entities;
+    }
+
+    /**
      * Updates all entities in the game world.
      * 
      * @param delta time since last update (used for movement and animations)
@@ -271,7 +321,7 @@ public class GameWorld {
         // check for font.getData().setScale(1.0f);time over
         if (time <= 0) {
             time = 0;
-            screen.gameEnd(false); // Trigger game over if time hits zero
+            loseGame();
         }
 
         // random spawner logic (meant for graphite shards for now)
@@ -332,10 +382,12 @@ public class GameWorld {
         }
 
         // Resolve entity to player collisions
-        for (Entity entity : entities) {
-            if (entity instanceof Nonplayer) {
-                if (isTouchingPlayer(entity.transform)) {
-                    ((Nonplayer) entity).playerCollide(player);
+        if(this.player != null){
+            for (Entity entity : entities) {
+                if (entity instanceof Nonplayer) {
+                    if (isTouchingPlayer(entity.transform)) {
+                        ((Nonplayer) entity).playerCollide(player);
+                    }
                 }
             }
         }
@@ -346,7 +398,7 @@ public class GameWorld {
 
                 // Handle game over
                 if (entities.get(i) instanceof Player) {
-                    screen.gameEnd(false);
+                    loseGame();
                 }
 
                 // Remove entity from list
@@ -413,7 +465,7 @@ public class GameWorld {
      * @param t the transform to search for
      * @return the entity that owns the transform, Null if not owned
      */
-    private Entity getEntityByTransform(Transform t) {
+    public Entity getEntityByTransform(Transform t) {
         if (t == null) {
             return null;
         }
@@ -436,7 +488,7 @@ public class GameWorld {
      * @param other the entity that is coliding
      * @return true if the movement should be blocked, otherwise false.
      */
-    private boolean shouldBlockEntityMovement(Transform mover, Entity other) {
+    public boolean shouldBlockEntityMovement(Transform mover, Entity other) {
         Entity moverEntity = getEntityByTransform(mover);
 
         if (moverEntity == null || other == null) {
@@ -468,7 +520,7 @@ public class GameWorld {
      * @param other transform of the other entity
      * @return true if the entity is close enough to count as contact
      */
-    private boolean isTouchingPlayer(Transform other) {
+    boolean isTouchingPlayer(Transform other) {
         float epsilon = 0.5f;
 
         float playerLeft = player.transform.position.x;
@@ -488,10 +540,25 @@ public class GameWorld {
     }
 
     /**
-     * Public method for the ExitPoint to trigger the win condition
+     * Triggers the win condition for the game. Called when the player reaches the
+     * exit point.
      */
-    public void winGame() {
-        screen.gameEnd(true);
+    public void winGame(){
+        endGame(true);
+    }
+
+    /**
+     * Triggers the lose condition for the game. Called when the player dies or time
+     */
+    public void loseGame(){
+        endGame(false);
+    }
+
+    /**
+     * Ends the game and triggers the end screen. Called when the player wins or loses.
+     */
+    public void endGame(boolean won) {
+        screen.gameEnd(won);
     }
 
     /**
@@ -508,12 +575,12 @@ public class GameWorld {
         // grid boundary check, so we cant traverse outside of the map
         if (t.position.x + dx < 0)
             dx = -t.position.x;
-        if (t.position.x + t.size.x + dx > tilemap.length * TILE_SIZE)
-            dx = (tilemap.length * TILE_SIZE) - (t.position.x + t.size.x);
+        if (t.position.x + t.size.x + dx > height)
+            dx = (height) - (t.position.x + t.size.x);
         if (t.position.y + dy < 0)
             dy = -t.position.y;
-        if (t.position.y + t.size.y + dy > tilemap[0].length * TILE_SIZE)
-            dy = (tilemap[0].length * TILE_SIZE) - (t.position.y + t.size.y);
+        if (t.position.y + t.size.y + dy > width)
+            dy = (width) - (t.position.y + t.size.y);
 
         // phantom box to test movements before actually moving the player
         Transform testBox = new Transform();

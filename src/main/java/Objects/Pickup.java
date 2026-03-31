@@ -1,12 +1,14 @@
 package Objects;
 
 import Entities.Entity;
+import Entities.Player;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import Game.GameWorld;
 
-public class Pickup extends Entity {
+public class Pickup extends Nonplayer {
     private Texture graphiteTexture;
     private Texture glowTexture;
 
@@ -40,12 +42,12 @@ public class Pickup extends Entity {
         // the graphite oscillates up and down
         float newY = baseY + (float) Math.sin(stateTime * 5f) * 10f;
         this.transform.position.y = newY;
+    }
 
-        // collision Logic
-        if (this.transform.collides(world.getPlayer().transform)) {
-            world.getPlayer().modifyHealth(HEAL_AMOUNT);
-            this.dead = true;
-        }
+    @Override
+    public void playerCollide(Player player) {
+        world.getPlayer().modifyHealth(HEAL_AMOUNT);
+        this.dead = true;
     }
 
     @Override
