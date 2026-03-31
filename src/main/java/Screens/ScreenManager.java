@@ -15,6 +15,7 @@ public class ScreenManager {
     private static boolean testMode = false;
 
     private ScreenManager() {
+        testMode = GdxGame.isTestMode();
     }
 
     /**
@@ -46,13 +47,6 @@ public class ScreenManager {
      */
     public void SetGameScreen(int id) {
         game.setScreen(testMode ? null : new GameScreen(game, id));
-    }
-
-    /**
-     * For testing purposes
-     */
-    public static void SetTestMode() {
-        testMode = true;
     }
 
     public void dispose() {

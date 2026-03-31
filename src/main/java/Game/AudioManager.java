@@ -81,17 +81,19 @@ public class AudioManager implements Disposable {
      * Loads all audio files into Sound objects
      */
     private void load() {
-        gameMusic  = Gdx.audio.newMusic(Gdx.files.internal("audio/music.mp3"));
-        gameMusic.setLooping(true);
-        gameMusic.setVolume(musicVolume);
+        if (!GdxGame.isTestMode()) {
+            gameMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music.mp3"));
+            gameMusic.setLooping(true);
+            gameMusic.setVolume(musicVolume);
 
-        moveSound   = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_move.mp3"));
-        puddleSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_puddle.mp3"));
-        sharpenerSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_sharpener.mp3"));
-        damageSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_damage.mp3"));
-        scoreSound  = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_score.mp3"));
-        hoverSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_hover.mp3"));
-        clickSound  = Gdx.audio.newSound(Gdx.files.internal("audio/ui_click.mp3"));
+            moveSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_move.mp3"));
+            puddleSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_puddle.mp3"));
+            sharpenerSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_sharpener.mp3"));
+            damageSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_damage.mp3"));
+            scoreSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_score.mp3"));
+            hoverSound = Gdx.audio.newSound(Gdx.files.internal("audio/ui_hover.mp3"));
+            clickSound = Gdx.audio.newSound(Gdx.files.internal("audio/ui_click.mp3"));
+        }
     }
 
     /**
@@ -99,7 +101,7 @@ public class AudioManager implements Disposable {
      */
     public void startMusic() {
         if (game.isMusicPlaying() && !gameMusic.isPlaying()) {
-            gameMusic.play();
+            if (gameMusic != null) gameMusic.play();
         }
     }
 
@@ -108,7 +110,7 @@ public class AudioManager implements Disposable {
      */
     public void setMusicHalfVolume() {
         musicVolume = musicVolumeInit * 0.5f;
-        gameMusic.setVolume(musicVolume);
+        if (gameMusic != null) gameMusic.setVolume(musicVolume);
     }
 
     /**
@@ -116,11 +118,11 @@ public class AudioManager implements Disposable {
      */
     public void setMusicFullVolume() {
         musicVolume = musicVolumeInit;
-        gameMusic.setVolume(musicVolume);
+        if (gameMusic != null) gameMusic.setVolume(musicVolume);
     }
 
     public void stopMusic() {
-        gameMusic.stop();
+        if (gameMusic != null) gameMusic.stop();
     }
 
     /**
@@ -167,7 +169,7 @@ public class AudioManager implements Disposable {
      * Triggered when the player stops moving. Stops the sound and resets the state.
      */
     public void stopMoveSound() {
-        if (moveSoundId != -1) {
+        if (moveSoundId != -1 && moveSound != null) {
             moveSound.stop(moveSoundId);
             puddleSound.stop(moveSoundId);
             moveSoundId = -1;
@@ -185,7 +187,7 @@ public class AudioManager implements Disposable {
             stopSharpenerSound();
             return;
         }
-        if (isStunned && !sharpenerWasPlaying) {
+        if (isStunned && !sharpenerWasPlaying && sharpenerSound != null) {
             sharpenerSoundId = sharpenerSound.loop(sharpenerVolume);
             sharpenerWasPlaying = true;
         } else if (!isStunned && sharpenerWasPlaying) {
@@ -197,7 +199,7 @@ public class AudioManager implements Disposable {
      * Triggers when player exits sharpener
      */
     public void stopSharpenerSound() {
-        if (sharpenerSoundId != -1) {
+        if (sharpenerSoundId != -1 && sharpenerSound != null) {
             sharpenerSound.stop(sharpenerSoundId);
             sharpenerSoundId = -1;
         }
@@ -205,25 +207,25 @@ public class AudioManager implements Disposable {
     }
 
     public void playDamage() {
-        if (game.isSfxPlaying()) {
+        if (game.isSfxPlaying() && damageSound != null) {
             damageSound.play(damageVolume);
         }
     }
 
     public void playScore() {
-        if (game.isSfxPlaying()) {
+        if (game.isSfxPlaying() && scoreSound != null) {
             scoreSound.play(scoreVolume);
         }
     }
 
     public void playHover() {
-        if (game.isSfxPlaying()) {
+        if (game.isSfxPlaying() && hoverSound != null) {
             hoverSound.play(hoverVolume);
         }
     }
 
     public void playClick() {
-        if (game.isSfxPlaying()) {
+        if (game.isSfxPlaying() && clickSound != null) {
             clickSound.play(clickVolume);
         }
     }
@@ -242,12 +244,12 @@ public class AudioManager implements Disposable {
 
     @Override
     public void dispose() {
-        gameMusic.dispose();
-        moveSound.dispose();
-        puddleSound.dispose();
-        sharpenerSound.dispose();
-        damageSound.dispose();
-        scoreSound.dispose();
+        if (gameMusic != null) gameMusic.dispose();
+        if (moveSound != null) moveSound.dispose();
+        if (puddleSound != null) puddleSound.dispose();
+        if (sharpenerSound != null) sharpenerSound.dispose();
+        if (damageSound != null) damageSound.dispose();
+        if (scoreSound != null) scoreSound.dispose();
         instance = null;
     }
 }

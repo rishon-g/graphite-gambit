@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 public class ScreenManagerTest {
     @BeforeAll
     static void testMode(){
-        ScreenManager.SetTestMode();
+        GdxGame.setTestMode();
     }
 
     @BeforeEach
