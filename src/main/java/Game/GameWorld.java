@@ -382,10 +382,12 @@ public class GameWorld {
         }
 
         // Resolve entity to player collisions
-        for (Entity entity : entities) {
-            if (entity instanceof Nonplayer) {
-                if (isTouchingPlayer(entity.transform)) {
-                    ((Nonplayer) entity).playerCollide(player);
+        if(this.player != null){
+            for (Entity entity : entities) {
+                if (entity instanceof Nonplayer) {
+                    if (isTouchingPlayer(entity.transform)) {
+                        ((Nonplayer) entity).playerCollide(player);
+                    }
                 }
             }
         }
@@ -486,7 +488,7 @@ public class GameWorld {
      * @param other the entity that is coliding
      * @return true if the movement should be blocked, otherwise false.
      */
-    private boolean shouldBlockEntityMovement(Transform mover, Entity other) {
+    public boolean shouldBlockEntityMovement(Transform mover, Entity other) {
         Entity moverEntity = getEntityByTransform(mover);
 
         if (moverEntity == null || other == null) {

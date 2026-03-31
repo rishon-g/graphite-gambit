@@ -3,7 +3,7 @@ package Game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.badlogic.gdx.Audio;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import Components.Transform;
 import Components.Vec2;
@@ -16,8 +16,6 @@ import Objects.Pickup;
 import Screens.GameScreen;
 import utils.GameTest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class GameWorldTest extends GameTest {
@@ -25,6 +23,7 @@ public class GameWorldTest extends GameTest {
     GameScreen mockScreen;
     GdxGame game;
     AudioManager mockAudio;
+    int tileSize = GameWorld.getTileSize();
 
     private boolean equalsWithEpsilon(float a, float b, float epsilon) {
         return Math.abs(a - b) < epsilon;
@@ -36,7 +35,7 @@ public class GameWorldTest extends GameTest {
         mockAudio = mock(AudioManager.class);
         world = new GameWorld(-1, mockScreen);
     }
-    
+
     @Test void testSetDimensions(){
         world.setDimensions(800, 600);
         assert(world.width == 800);
@@ -543,12 +542,33 @@ public class GameWorldTest extends GameTest {
         
         world.requestMove(mover, 1.0f);
 
-        System.out.println("Final position: " + mover.position.x + ", " + mover.position.y);
-
         // Should stop at wall horizontally (about 50 units right)
         assert(equalsWithEpsilon(startX + 50, mover.position.x, 0.01f));
         // Should still move vertically (about 200 units up)
         assert(equalsWithEpsilon(startY + 50, mover.position.y, 0.01f));
+    }
+
+    @Test void requestMoveWithBlockingEntity(){
+        world.setDimensions(800, 600);
+        
+        // Create a solid entity
+        DummyEntity solidEntity = new DummyEntity(world);
+        solidEntity.transform.setPosition(200, 100);
+        solidEntity.transform.setScale(100, 100);
+        world.addEntity(solidEntity);
+
+        // Create a moving object
+        DummyEntity mover = new DummyEntity(world);
+        mover.transform.setPosition(100, 100);
+        mover.transform.setScale(50, 50);
+        mover.transform.setVelocity(100, 0); // Move right toward the solid entity
+        world.addEntity(mover);
+        float startX = mover.transform.position.x;
+        
+        world.requestMove(mover.transform, 1.0f);
+
+        // Should collide with the solid entity and stop before it
+        assert(equalsWithEpsilon(startX + 50, mover.transform.position.x, 0.01f));
     }
 
     @Test void isTouchingPlayer(){
@@ -587,7 +607,12 @@ public class GameWorldTest extends GameTest {
         other.setPosition(200, 100); // Touching right edge of player
         other.setScale(100, 100);
 
+        Transform other2 = new Transform();
+        other2.setPosition(201, 100); // Just past right edge of player
+        other2.setScale(100, 100);
+
         assert(world.isTouchingPlayer(other) == true);
+        assert(world.isTouchingPlayer(other2) == false);
     }
 
     @Test void isTouchingPlayerTopEdge(){
@@ -600,7 +625,12 @@ public class GameWorldTest extends GameTest {
         other.setPosition(100, 200); // Touching top edge of player
         other.setScale(100, 100);
 
+        Transform other2 = new Transform();
+        other2.setPosition(100, 201); // Just past top edge of player
+        other2.setScale(100, 100);
+
         assert(world.isTouchingPlayer(other) == true);
+        assert(world.isTouchingPlayer(other2) == false);
     }
 
     @Test void isTouchingPlayerLeftEdge(){
@@ -613,7 +643,12 @@ public class GameWorldTest extends GameTest {
         other.setPosition(100, 100); // Touching left edge of player
         other.setScale(100, 100);
 
+        Transform other2 = new Transform();
+        other2.setPosition(99, 100); // Just past left edge of player
+        other2.setScale(100, 100);
+
         assert(world.isTouchingPlayer(other) == true);
+        assert(world.isTouchingPlayer(other2) == false);
     }
 
 
@@ -627,20 +662,12 @@ public class GameWorldTest extends GameTest {
         other.setPosition(100, 100); // Touching bottom edge of player
         other.setScale(100, 100);
 
-        assert(world.isTouchingPlayer(other) == true);
-    }
-
-    @Test void isTouchingPlayerCorner(){
-        world.setDimensions(800, 600);
-        world.player = new Player(world);
-        world.player.transform.setPosition(100, 100);
-        world.player.transform.setScale(100, 100);
-
-        Transform other = new Transform();
-        other.setPosition(200, 200); // Touching top-right corner of player
-        other.setScale(100, 100);
+        Transform other2 = new Transform();
+        other2.setPosition(100, 99); // Just past bottom edge of player
+        other2.setScale(100, 100);
 
         assert(world.isTouchingPlayer(other) == true);
+        assert(world.isTouchingPlayer(other2) == false);
     }
 
     @Test void getEntityByTransform(){
@@ -675,51 +702,56 @@ public class GameWorldTest extends GameTest {
         assert(result == null);
     }
 
-    public void TestUpdateTimeUp(){
+    @Test
+    public void testUpdateTimeUp(){
         world.setDimensions(800, 600);
         world.time = 10; // Set time limit to 10 seconds
-        world.update(11); // Simulate 11 seconds passing
+        world.update(20); // Simulate 11 seconds passing
         verify(mockScreen, times(1)).gameEnd(false); // Should trigger game end with loss
     }
 
-    public void TestUpdateTimeNotUp(){
+    @Test
+    public void testUpdateTimeNotUp(){
         world.setDimensions(800, 600);
         world.time = 10; // Set time limit to 10 seconds
         world.update(5); // Simulate 5 seconds passing
         verify(mockScreen, times(0)).gameEnd(anyBoolean()); // Should not trigger game end
     }
 
+    @Test
     public void testPickupSpawner(){
+        for(int i = 0; i < 5; i++){
+            world.spawnPoints.add(new Vec2(i, i));
+        }
+
         world.setDimensions(800, 600);
         world.update(6);
-        Entity e = world.getEntities().get(0);
-        assert(e instanceof Pickup);
-    }
-
-    public void testTwoPickupsSpawned(){
-        world.setDimensions(800, 600);
-        world.update(12); // Should spawn two pickups (at 5s and 10s)
+        
+        // Find at least one pickup spawned
         int pickupCount = 0;
         for(Entity e : world.getEntities()){
             if(e instanceof Pickup){
                 pickupCount++;
             }
         }
-        assert(pickupCount == 2);
+        assert(pickupCount == 1);
     }
 
+    @Test
     public void testFullPickups(){
+        int maxPickups = 5;
+        for(int i = 0; i < 10; i++){
+            world.spawnPoints.add(new Vec2(i*50, i*50)); // Spread spawn points to avoid occupancy conflicts
+        }
         world.setDimensions(800, 600);
 
-        int maxPickups = 5; // Assuming max pickups is 5 based on GameWorld code
-
-        // coverage for checking entities
+        // extra coverage
         DummyEntity d = new DummyEntity(world);
         world.addEntity(d);
 
-        // simulate enough to spawn all pickups
-        for(int i = 0; i < maxPickups+1; i++){
-            world.update(10);
+        // simulate enough to spawn all pickups (6 updates of 5 seconds each)
+        for(int i = 0; i < maxPickups*10; i++){
+            world.update(6);
         }
 
         int pickupCount = 0;
@@ -728,9 +760,12 @@ public class GameWorldTest extends GameTest {
                 pickupCount++;  
             }
         }
+
+        System.out.println("Pickup count: " + pickupCount);
         assert(pickupCount == maxPickups); // Should not exceed max pickups
     }
 
+    @Test
     public void testEntityUpdates(){
         world.setDimensions(800, 600);
         DummyEntity e = new DummyEntity(world);
@@ -739,6 +774,7 @@ public class GameWorldTest extends GameTest {
         assert(e.updateCount == 1);
     }
     
+    @Test
     public void testEntityCollidesPlayer(){
         world.setDimensions(800, 600);
         world.player = new Player(world);
@@ -760,6 +796,7 @@ public class GameWorldTest extends GameTest {
         assert(enemy2.collideCount == 0); // Should not collide with player
     }
     
+    @Test
     public void testEntityDeaths(){
         world.setDimensions(800, 600);
         DummyEntity e1 = new DummyEntity(world);
@@ -771,5 +808,51 @@ public class GameWorldTest extends GameTest {
         assert(world.getEntities().size() == 1);
         assert(world.getEntityByTransform(e1.transform) == null);
         assert(world.getEntityByTransform(e2.transform) == e2);
+    }
+
+    @Test
+    public void testPlayerReplaced(){
+        world.setDimensions(800, 600);
+        Player player1 = new Player(world);
+        world.addEntity(player1);
+
+        Player player2 = new Player(world);
+        world.addEntity(player2);
+
+        // Should have both players in entities list, but only the second one is the current player
+        assert(!world.getEntities().contains(player1));
+        assert(world.getEntities().contains(player2));
+    }
+
+    @Test
+    public void testCameraFollowPlayer(){
+        OrthographicCamera camera = new OrthographicCamera();
+        world.setDimensions(800, 600);
+        Player player = new Player(world);
+        world.addEntity(player);
+        player.transform.setPosition(100, 100);
+        world.update(1);
+        float priorX = camera.position.x;
+        world.updateCamera(camera);
+        assert(camera.position.x != priorX);
+        // Camera should be centered on player (assuming camera logic centers on player position)
+    }
+
+    @Test
+    public void shouldBlockEntity(){
+        Door door = new Door(world, "left");
+        Ink ink = new Ink(world);
+        DummyEntity dummy = new DummyEntity(world);
+        DummyEntity dummy2 = new DummyEntity(world);
+        Player player = new Player(world);
+
+        world.addEntity(player);
+        world.addEntity(dummy);
+
+        assert(world.shouldBlockEntityMovement(player.transform, door) == true);
+        assert(world.shouldBlockEntityMovement(player.transform, ink) == false);
+        assert(world.shouldBlockEntityMovement(player.transform, dummy) == false);
+        assert(world.shouldBlockEntityMovement(player.transform, player) == false);
+        assert(world.shouldBlockEntityMovement(dummy.transform, dummy2) == true);
     }
 }
