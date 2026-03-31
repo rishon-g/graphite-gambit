@@ -575,12 +575,12 @@ public class GameWorld {
         // grid boundary check, so we cant traverse outside of the map
         if (t.position.x + dx < 0)
             dx = -t.position.x;
-        if (t.position.x + t.size.x + dx > height)
-            dx = (height) - (t.position.x + t.size.x);
+        if (t.position.x + t.size.x + dx > width)
+            dx = (width) - (t.position.x + t.size.x);
         if (t.position.y + dy < 0)
             dy = -t.position.y;
-        if (t.position.y + t.size.y + dy > width)
-            dy = (width) - (t.position.y + t.size.y);
+        if (t.position.y + t.size.y + dy > height)
+            dy = (height) - (t.position.y + t.size.y);
 
         // phantom box to test movements before actually moving the player
         Transform testBox = new Transform();
