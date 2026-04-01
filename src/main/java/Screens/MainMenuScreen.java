@@ -29,7 +29,6 @@ public class MainMenuScreen extends ScreenAdapter {
     private final Viewport viewport = new FitViewport(1920, 1080);
     private final GlyphLayout layout = new GlyphLayout();
     private final ScreenManager screenManager;
-    private final PlayerData playerData;
     int screenWidth = 1920;
     int screenHeight = 1080;
     private int selectedIndex = -1;
@@ -67,7 +66,6 @@ public class MainMenuScreen extends ScreenAdapter {
         this.font = game.getMenuFont();
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
-        this.playerData = PlayerData.obtainPlayerData();
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
 

@@ -512,7 +512,6 @@ public class GameScreen implements Screen {
         gameWon = false;
         gameOver = false;
         AudioManager.getInstance(game).setMusicHalfVolume();
-        int currentScore = world.getScore();
 
         // Updates the player save if won level
         if (won) {
