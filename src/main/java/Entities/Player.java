@@ -54,6 +54,9 @@ public class Player extends Entity {
     // how much does the graphite drain everytime there is movement?
     public static final int MOVEMENT_HEALTH_LOSS = -2;
 
+    // movement sound state
+    private boolean moveSoundSlowed = false;
+    private boolean shouldPlayMoveSound = false;
 
     DrawWeight weight = (x, y, brushsize) -> {
         // Manhattan distance (fast, no sqrt)
@@ -140,6 +143,36 @@ public class Player extends Entity {
     }
 
     /**
+     * Overrides the default entity update so we can detect whether the player
+     * actually moved after collision handling.
+     */
+    @Override
+    public void update(float delta) {
+        float oldX = transform.position.x;
+        float oldY = transform.position.y;
+
+        updateInternal(delta);
+        world.requestMove(transform, delta);
+
+        float movedX = transform.position.x - oldX;
+        float movedY = transform.position.y - oldY;
+
+        boolean actuallyMoved = Math.abs(movedX) > 0.01f || Math.abs(movedY) > 0.01f;
+
+        shouldPlayMoveSound = actuallyMoved;
+        AudioManager.getInstance().updateMoveSound(shouldPlayMoveSound, moveSoundSlowed);
+
+        if (actuallyMoved) {
+            drainTimer += delta;
+
+            if (drainTimer >= 1.0f) {
+                modifyHealth(MOVEMENT_HEALTH_LOSS);
+                drainTimer -= 1.0f;
+            }
+        }
+    }
+
+    /**
      * Updates the player's state, such as movement and health. This method is called every frame.
      */
     @Override
@@ -150,20 +183,6 @@ public class Player extends Entity {
 
         // Draw on floor in the middle of the feet of the sprite
         world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y, false, 2, weight);
-
-        // Movement
-        // graphite drain logic
-        // only tick if the player is moving (has velocity)
-        if (Math.abs(this.transform.velocity.x) > 1f || Math.abs(this.transform.velocity.y) > 1f) {
-            drainTimer += delta;
-
-            // every 1 second of movement, lose X health
-            if (drainTimer >= 1.0f) {
-                modifyHealth(MOVEMENT_HEALTH_LOSS);
-                drainTimer -= 1.0f; // reset the timer, but keep leftover fractions
-            }
-        }
-
 
         // play sharpener sound
         Game.AudioManager.getInstance().updateSharpenerSound(isStunned);
@@ -193,6 +212,8 @@ public class Player extends Entity {
                 immunityTimer = 1.0f;
             }
 
+            shouldPlayMoveSound = false;
+            moveSoundSlowed = false;
             // skip the rest of the update method so the player can't move
             return;
         }
@@ -209,13 +230,7 @@ public class Player extends Entity {
         left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
         right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        // update moving sound effect
-        boolean isMoving = up || down || left || right;
-        if (currentSpeedMultiplier == INK_SLOW_FACTOR) {
-            Game.AudioManager.getInstance().updateMoveSound(isMoving, true);
-        } else {
-            Game.AudioManager.getInstance().updateMoveSound(isMoving, false);
-        }
+        moveSoundSlowed = (currentSpeedMultiplier == INK_SLOW_FACTOR);
 
         // immediately reset the multiplier back to normal for the next frame
         currentSpeedMultiplier = 1.0f;

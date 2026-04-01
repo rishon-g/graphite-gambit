@@ -40,7 +40,7 @@ public class Eraser extends MobileEnemy {
      */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
-    private static final float ATTACK_RANGE = 72f;
+    private static final float ATTACK_RANGE = 45f;
     /**
      * Indicators for the direction the player is facing for sprite rendering.
      */
