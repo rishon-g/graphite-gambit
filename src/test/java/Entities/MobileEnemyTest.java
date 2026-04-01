@@ -189,8 +189,8 @@ public class MobileEnemyTest {
         int[] result = realEnemy.findBestTargetTile(player, map, 0, 0);
 
         assertNotNull(result);
-        assertEquals(2, result[0]);
-        assertEquals(2, result[1]);
+        assertEquals(1, result[0]);
+        assertEquals(1, result[1]);
     }
 
     @Test
@@ -252,6 +252,11 @@ public class MobileEnemyTest {
         }
 
         @Override
+        protected float getAttackRange() {
+            return 0f;
+        }
+
+        @Override
         protected void rebuildPath(Player player) {
             rebuildCalls++;
             currentPath = rebuildResult;
@@ -275,6 +280,11 @@ public class MobileEnemyTest {
         @Override
         protected float getMoveSpeed() {
             return 200f;
+        }
+
+        @Override
+        protected float getAttackRange() {
+            return 0f;
         }
 
         @Override

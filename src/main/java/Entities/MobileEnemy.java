@@ -36,7 +36,7 @@ public abstract class MobileEnemy extends Nonplayer {
      * Maximum radius, in tiles, around the player to search for an alternative
      * reachable target tile.
      */
-    private static final int TARGET_SEARCH_RADIUS = 2;
+    private static final int TARGET_SEARCH_RADIUS = 3;
 
     /**
      * Current path represented as a list of tile coordinates.
@@ -87,7 +87,7 @@ public abstract class MobileEnemy extends Nonplayer {
         }
 
         beforeMovementUpdate(delta);
-
+        tryAttackPlayer(player);
         pathTimer += delta;
 
         if (pathTimer >= PATH_RECALC_TIME || currentPath.isEmpty() || pathIndex >= currentPath.size()) {
@@ -115,12 +115,13 @@ public abstract class MobileEnemy extends Nonplayer {
                 pathIndex++;
                 continue;
             }
-
             transform.setVelocity((dx / dist) * getMoveSpeed(), (dy / dist) * getMoveSpeed());
+            tryAttackPlayer(player);
             return;
         }
 
         transform.setVelocity(0, 0);
+        tryAttackPlayer(player);
     }
 
     /**
@@ -188,27 +189,44 @@ public abstract class MobileEnemy extends Nonplayer {
      * @return the chosen target tile or null if no target is reachable
      */
     protected int[] findBestTargetTile(Player player, int[][] map, int startX, int startY) {
-        float playerCenterX = player.transform.position.x + player.transform.size.x / 2f;
-        float playerCenterY = player.transform.position.y + player.transform.size.y / 2f;
-        int baseX = worldToTileX(playerCenterX);
-        int baseY = worldToTileY(playerCenterY);
+        float minX = player.transform.position.x;
+        float maxX = player.transform.position.x + player.transform.size.x - 0.01f;
+        float minY = player.transform.position.y;
+        float maxY = player.transform.position.y + player.transform.size.y - 0.01f;
+
+        int playerMinTileX = worldToTileX(minX);
+        int playerMaxTileX = worldToTileX(maxX);
+        int playerMinTileY = worldToTileY(minY);
+        int playerMaxTileY = worldToTileY(maxY);
 
         List<int[]> bestPath = Collections.emptyList();
         int[] bestTile = null;
 
         for (int radius = 0; radius <= TARGET_SEARCH_RADIUS; radius++) {
-            for (int targetX = baseX - radius; targetX <= baseX + radius; targetX++) {
-                for (int targetY = baseY - radius; targetY <= baseY + radius; targetY++) {
+            int searchMinX = playerMinTileX - radius;
+            int searchMaxX = playerMaxTileX + radius;
+            int searchMinY = playerMinTileY - radius;
+            int searchMaxY = playerMaxTileY + radius;
+
+            for (int targetX = searchMinX; targetX <= searchMaxX; targetX++) {
+                for (int targetY = searchMinY; targetY <= searchMaxY; targetY++) {
                     if (!isInsideMap(map, targetX, targetY) || isBlocked(map, targetX, targetY)) {
                         continue;
                     }
 
-                    if (Math.max(Math.abs(targetX - baseX), Math.abs(targetY - baseY)) != radius) {
+                    boolean onBorder =
+                            targetX == searchMinX || targetX == searchMaxX ||
+                                    targetY == searchMinY || targetY == searchMaxY;
+
+                    if (!onBorder) {
                         continue;
                     }
 
                     if (targetX == startX && targetY == startY) {
-                        return new int[]{targetX, targetY};
+                        if (isPlayerWithinAttackRange(player)) {
+                            return new int[]{targetX, targetY};
+                        }
+                        continue;
                     }
 
                     List<int[]> path = AStar.findPath(map, startX, startY, targetX, targetY);
@@ -289,6 +307,82 @@ public abstract class MobileEnemy extends Nonplayer {
      */
     private float tileToWorldCenterY(int tileY, float height) {
         return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
+    }
+
+    protected abstract float getAttackRange();
+
+    /**
+     * Attempts to attack the player if they are within this enemy's attack range.
+     *
+     * @param player the player target
+     */
+    protected void tryAttackPlayer(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        float enemyLeft = transform.position.x;
+        float enemyRight = transform.position.x + transform.size.x;
+        float enemyBottom = transform.position.y;
+        float enemyTop = transform.position.y + transform.size.y;
+
+        float playerLeft = player.transform.position.x;
+        float playerRight = player.transform.position.x + player.transform.size.x;
+        float playerBottom = player.transform.position.y;
+        float playerTop = player.transform.position.y + player.transform.size.y;
+
+        float gapX = 0f;
+        if (enemyRight < playerLeft) {
+            gapX = playerLeft - enemyRight;
+        } else if (playerRight < enemyLeft) {
+            gapX = enemyLeft - playerRight;
+        }
+
+        float gapY = 0f;
+        if (enemyTop < playerBottom) {
+            gapY = playerBottom - enemyTop;
+        } else if (playerTop < enemyBottom) {
+            gapY = enemyBottom - playerTop;
+        }
+
+        float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
+
+        if (edgeDistance <= getAttackRange()) {
+            playerCollide(player);
+        }
+    }
+
+    protected boolean isPlayerWithinAttackRange(Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        float enemyLeft = transform.position.x;
+        float enemyRight = transform.position.x + transform.size.x;
+        float enemyBottom = transform.position.y;
+        float enemyTop = transform.position.y + transform.size.y;
+
+        float playerLeft = player.transform.position.x;
+        float playerRight = player.transform.position.x + player.transform.size.x;
+        float playerBottom = player.transform.position.y;
+        float playerTop = player.transform.position.y + player.transform.size.y;
+
+        float gapX = 0f;
+        if (enemyRight < playerLeft) {
+            gapX = playerLeft - enemyRight;
+        } else if (playerRight < enemyLeft) {
+            gapX = enemyLeft - playerRight;
+        }
+
+        float gapY = 0f;
+        if (enemyTop < playerBottom) {
+            gapY = playerBottom - enemyTop;
+        } else if (playerTop < enemyBottom) {
+            gapY = enemyBottom - playerTop;
+        }
+
+        float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
+        return edgeDistance <= getAttackRange();
     }
 }
 

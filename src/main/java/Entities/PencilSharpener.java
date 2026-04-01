@@ -41,7 +41,7 @@ public class PencilSharpener extends MobileEnemy {
     public static final float STUN_DURATION = 8f;
     public static final int DOT_DAMAGE = -5;
     public static final float DAMAGE_TICK_RATE = 0.5f;
-
+    private static final float ATTACK_RANGE = 72f;
     /**
      * sprites for the sharpener
      */
@@ -73,7 +73,10 @@ public class PencilSharpener extends MobileEnemy {
             holdsprites[i] = sheet2[0][i];
         }
     }
-
+    @Override
+    protected float getAttackRange() {
+        return ATTACK_RANGE;
+    }
     /**
      * Updates sharpener-specific state before movement logic runs.
      *

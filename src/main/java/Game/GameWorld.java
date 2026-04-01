@@ -375,7 +375,6 @@ public class GameWorld {
                 }
             }
         }
-
         // Entity updates
         for (Entity entity : entities) {
             entity.update(delta);
@@ -408,7 +407,6 @@ public class GameWorld {
             }
         }
     }
-
     /**
      * Renders all entities in the game world. This method is called every frame
      * after update.
