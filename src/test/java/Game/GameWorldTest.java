@@ -292,7 +292,7 @@ public class GameWorldTest extends GameTest {
         
         // Should be clamped at the right boundary (x + size.x = height)
         // Note: requestMove uses height for x boundary check (likely a bug, but we test current behavior)
-        assert(testTransform.position.x + testTransform.size.x <= world.height);
+        assert(equalsWithEpsilon(world.width - testTransform.size.x, testTransform.position.x, 0.01f));
     }
 
     @Test void requestMoveBottomBound(){
@@ -321,7 +321,7 @@ public class GameWorldTest extends GameTest {
         
         // Should be clamped at top boundary (y + size.y = width)
         // Note: requestMove uses width for y boundary check (likely a bug, but we test current behavior)
-        assert(testTransform.position.y + testTransform.size.y <= world.width);
+        assert(equalsWithEpsilon(world.height - testTransform.size.y, testTransform.position.y, 0.01f));
     }
 
     @Test void requestMoveCollideFromLeft(){
