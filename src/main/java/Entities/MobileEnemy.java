@@ -61,6 +61,12 @@ public abstract class MobileEnemy extends Nonplayer {
     private static final float CHASE_LOSE_RADIUS = 1000f;
 
     /**
+     * Range within which the enemy can attack the player.
+     * set by subclasses in their constructors.
+     */
+    protected float ATTACK_RANGE;
+
+    /**
      * Enemy movement state.
      */
     protected enum MovementState {
@@ -463,8 +469,6 @@ public abstract class MobileEnemy extends Nonplayer {
         return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
     }
 
-    protected abstract float getAttackRange();
-
     /**
      * Attempts to attack the player if they are within this enemy's attack range.
      *
@@ -501,7 +505,7 @@ public abstract class MobileEnemy extends Nonplayer {
 
         float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
 
-        if (edgeDistance <= getAttackRange()) {
+        if (edgeDistance <= ATTACK_RANGE) {
             playerCollide(player);
         }
     }
@@ -536,6 +540,6 @@ public abstract class MobileEnemy extends Nonplayer {
         }
 
         float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
-        return edgeDistance <= getAttackRange();
+        return edgeDistance <= ATTACK_RANGE;
     }
 }

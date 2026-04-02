@@ -644,7 +644,7 @@ public class MobileEnemyTest extends GameTest {
 
         player.transform.setScale(64, 64);
 
-        float playerX = 100 + 64 + enemy.getAttackRange();
+        float playerX = 100 + 64 + enemy.ATTACK_RANGE;
         player.transform.setPosition(playerX, 100);
 
         assertTrue(enemy.isPlayerWithinAttackRange(player));
@@ -678,7 +678,7 @@ public class MobileEnemyTest extends GameTest {
         player.transform.setScale(64, 64);
 
         float enemyRight = enemy.transform.position.x + enemy.transform.size.x;
-        float playerX = enemyRight + enemy.getAttackRange();
+        float playerX = enemyRight + enemy.ATTACK_RANGE;
         player.transform.setPosition(playerX, 32);
 
         enemy.tryAttackPlayer(player);
@@ -736,6 +736,7 @@ public class MobileEnemyTest extends GameTest {
 
         TestMobileEnemy(GameWorld world) {
             super(world);
+            ATTACK_RANGE = 50f;
         }
 
         @Override
@@ -746,11 +747,6 @@ public class MobileEnemyTest extends GameTest {
         @Override
         protected float getMoveSpeed() {
             return 200f;
-        }
-
-        @Override
-        protected float getAttackRange() {
-            return 50f;
         }
 
         @Override
@@ -780,16 +776,12 @@ public class MobileEnemyTest extends GameTest {
     static class RealPathMobileEnemy extends MobileEnemy {
         RealPathMobileEnemy(GameWorld world) {
             super(world);
+            ATTACK_RANGE = 0f;
         }
 
         @Override
         protected float getMoveSpeed() {
             return 200f;
-        }
-
-        @Override
-        protected float getAttackRange() {
-            return 0f;
         }
 
         @Override
