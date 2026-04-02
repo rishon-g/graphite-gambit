@@ -33,27 +33,27 @@ public class MainMenuScreen extends ScreenAdapter {
     int screenWidth = 1920;
     int screenHeight = 1080;
     private int selectedIndex = -1;
-    private final Texture background = new Texture(Gdx.files.internal("images/menu-background.png"));
-    private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
-    private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
-    private final Texture disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
+    private Texture background;
+    Texture normalButton;
+    private Texture highlightedButton;
+    private Texture disabledButton;
 
-    private final Texture eraser = new Texture(Gdx.files.internal("sprites/eraser.png"));
-    private final Texture pencilsharpener = new Texture(Gdx.files.internal("sprites/pencilsharpener.png"));
-    private final Texture ink = new Texture(Gdx.files.internal("sprites/ink.png"));
-    private final Texture whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
-    private final Texture trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
-    private final Texture graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
-    private final Texture plot = new Texture(Gdx.files.internal("sprites/Plot.png"));
+    private Texture eraser;
+    private Texture pencilsharpener;
+    private Texture ink;
+    private Texture whiteOut;
+    private Texture trophy;
+    private Texture graphite;
+    private Texture plot;
 
     public boolean musicOn = true;
     public boolean sfxOn = true;
 
     // Different sets of menu buttons that can be displayed
-    private enum Layout {
+    enum Layout {
         MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
     }
-    private Layout currentLayout = Layout.MAIN;
+    Layout currentLayout = Layout.MAIN;
 
     /**
      * Constructor for the main menu. retrieves rendering resources, save data, and
@@ -68,9 +68,45 @@ public class MainMenuScreen extends ScreenAdapter {
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
         this.playerData = PlayerData.obtainPlayerData();
+        // only load textures if not testing
+        if (!GdxGame.isTestMode()) {
+            plot = new Texture(Gdx.files.internal("sprites/Plot.png"));
+            graphite = new Texture(Gdx.files.internal("sprites/graphite.png"));
+            trophy = new Texture(Gdx.files.internal("sprites/trophy.png"));
+            whiteOut = new Texture(Gdx.files.internal("sprites/whiteout_large.png"));
+            ink = new Texture(Gdx.files.internal("sprites/ink.png"));
+            pencilsharpener = new Texture(Gdx.files.internal("sprites/pencilsharpener.png"));
+            eraser = new Texture(Gdx.files.internal("sprites/eraser.png"));
+            disabledButton = new Texture(Gdx.files.internal("images/menu-button-disabled.png"));
+            highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
+            normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
+            background = new Texture(Gdx.files.internal("images/menu-background.png"));
+            howToPlayButtons = new MenuButton[] {
+                    new MenuButton("BACK", null, null, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
+            };
+        } else {
+            howToPlayButtons = new MenuButton[] {
+                    new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
+            };
+        }
+        // buttons
+        menuButtons = new MenuButton[] {
+                createCenteredButton("START GAME", 0, false),
+                createCenteredButton("LEVEL SELECT", 1, false),
+                createCenteredButton("HOW TO PLAY", 2, false),
+                createCenteredButton("SETTINGS", 3, false),
+                createCenteredButton("QUIT", 4, false),
+        };
+        musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
+        buttons = menuButtons;
+        musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
+        levelSelectButtons = levelButtons();
+        sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
+        sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
+        backButton = createCenteredButton("BACK", 0, false);
+
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
-
     /**
      * helper function to create uniform, centered buttons on the screen that are
      * spaced out by deltaY automatically, in the order they are created
@@ -87,25 +123,34 @@ public class MainMenuScreen extends ScreenAdapter {
         int width = 800;
 
         int deltaY = -(height + spacing);
-        if (isDisabled) {
+        if (GdxGame.isTestMode() && isDisabled) {
+            return new MenuButton(text, null, null, (screenWidth >> 1) - (width >> 1),
+                    startingY + (deltaY * ID), width, height, true);
+        } else if (GdxGame.isTestMode() && !isDisabled) {
+                return new MenuButton(text, null, null, (screenWidth >> 1) - (width >> 1),
+                        startingY + (deltaY * ID), width, height, false);
+        } else if (isDisabled) {
             return new MenuButton(text, disabledButton, disabledButton, (screenWidth >> 1) - (width >> 1),
-                    startingY + (deltaY * ID), width, height);
+                    startingY + (deltaY * ID), width, height, true);
         } else {
             return new MenuButton(text, normalButton, highlightedButton, (screenWidth >> 1) - (width >> 1),
-                    startingY + (deltaY * ID), width, height);
+                    startingY + (deltaY * ID), width, height, false);
         }
     }
 
     // create buttons
-    private final MenuButton[] menuButtons = new MenuButton[] {
-            createCenteredButton("START GAME", 0, false),
-            createCenteredButton("LEVEL SELECT", 1, false),
-            createCenteredButton("HOW TO PLAY", 2, false),
-            createCenteredButton("SETTINGS", 3, false),
-            createCenteredButton("QUIT", 4, false),
-    };
-    private MenuButton[] buttons = menuButtons;
+    private MenuButton[] menuButtons;
+    private MenuButton[] buttons;
+    MenuButton[] levelSelectButtons;
+    MenuButton[] settingsButtons = new MenuButton[] {};
+    // togglable buttons
+    MenuButton musicOnButton;
+    MenuButton musicOffButton;
+    MenuButton sfxOnButton;
+    MenuButton sfxOffButton;
+    private MenuButton backButton;
 
+    private MenuButton[] howToPlayButtons;
     /**
      * Creates an array of MenuButton objects for the level select screen.
      * Includes a back button and buttons for each level, with scores and disabled state based on unlocked levels.
@@ -137,25 +182,12 @@ public class MainMenuScreen extends ScreenAdapter {
         return buttons;
     }
 
-    private final MenuButton[] levelSelectButtons = levelButtons();
-
-    private final MenuButton musicOnButton = createCenteredButton("MUSIC: ON", 1, false);
-    private final MenuButton musicOffButton = createCenteredButton("MUSIC: OFF", 1, false);
-    private final MenuButton sfxOnButton = createCenteredButton("SOUND EFFECTS: ON", 2, false);
-    private final MenuButton sfxOffButton = createCenteredButton("SOUND EFFECTS: OFF", 2, false);
-    private final MenuButton backButton = createCenteredButton("BACK", 0, false);
-    private MenuButton[] settingsButtons = new MenuButton[] {};
-
-    private final MenuButton[] howToPlayButtons = new MenuButton[] {
-            new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80),
-    };
-
     /**
      * Changes the current layout of the ui to the specified layout.
      * 
      * @param layout the layout to swap to
      */
-    private void changeLayout(Layout layout) {
+    void changeLayout(Layout layout) {
         currentLayout = layout;
         MenuButton music;
         MenuButton sfx;
@@ -315,8 +347,8 @@ public class MainMenuScreen extends ScreenAdapter {
      * 
      * @param index clicked button index (index is based on time of creation)
      */
-    private void activateButton(int index) {
-        if (buttons[index].textureIs(disabledButton))
+    void activateButton(int index) {
+        if (buttons[index].isDisabled())
             return;
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {

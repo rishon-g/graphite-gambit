@@ -15,6 +15,7 @@ public class ScreenManager {
     private static boolean testMode = false;
 
     private ScreenManager() {
+        testMode = GdxGame.isTestMode();
     }
 
     /**
@@ -33,6 +34,14 @@ public class ScreenManager {
     }
 
     /**
+     * Set mock instance for testing purposes
+     * @param mock the mock instance
+     */
+    static void setMockInstance(ScreenManager mock){
+        instance = mock;
+    }
+
+    /**
      * Changes the active screen to the main menu.
      */
     public void SetMenuScreen() {
@@ -46,13 +55,6 @@ public class ScreenManager {
      */
     public void SetGameScreen(int id) {
         game.setScreen(testMode ? null : new GameScreen(game, id));
-    }
-
-    /**
-     * For testing purposes
-     */
-    public static void SetTestMode() {
-        testMode = true;
     }
 
     public void dispose() {
