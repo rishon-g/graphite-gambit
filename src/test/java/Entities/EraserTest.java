@@ -44,20 +44,6 @@ public class EraserTest extends GameTest {
         assertEquals(220f, getPrivateFloat(eraser, "startY"));
     }
 
-    @Test
-    void testBeforeMovementUpdate_ErasesFloorOnlyWhileMoving() {
-        eraser.transform.setPosition(100, 100);
-
-        eraser.transform.setVelocity(0, 0);
-        eraser.beforeMovementUpdate(0.1f);
-
-        verify(mockWorld, never()).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
-
-        eraser.transform.setVelocity(50, 0);
-        eraser.beforeMovementUpdate(0.1f);
-
-        verify(mockWorld, times(1)).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
-    }
 
     @Test
     void testBeforeMovementUpdate_CooldownDecreases() throws Exception {
@@ -76,6 +62,31 @@ public class EraserTest extends GameTest {
 
         assertEquals(0f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
     }
+
+    @Test
+    void testBeforeMovementUpdate_ZeroDelta_DoesNotChangeCooldown() throws Exception {
+        setPrivateFloat(eraser, "attackCooldownTimer", 0.6f);
+
+        eraser.beforeMovementUpdate(0.0f);
+
+        assertEquals(0.6f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+    }
+
+    @Test
+    void testBeforeMovementUpdate_ErasesFloorOnlyWhileMoving() {
+        eraser.transform.setPosition(100, 100);
+
+        eraser.transform.setVelocity(0, 0);
+        eraser.beforeMovementUpdate(0.1f);
+
+        verify(mockWorld, never()).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
+
+        eraser.transform.setVelocity(50, 0);
+        eraser.beforeMovementUpdate(0.1f);
+
+        verify(mockWorld, times(1)).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
+    }
+
 
     @Test
     void testBeforeMovementUpdate_FacingRight() throws Exception {
@@ -118,6 +129,46 @@ public class EraserTest extends GameTest {
     }
 
     @Test
+    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesRight() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(80, 20);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(2, getFacingValue(eraser)); // RIGHT
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesLeft() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(-80, 20);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(3, getFacingValue(eraser)); // LEFT
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesUp() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(20, 80);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(1, getFacingValue(eraser)); // UP
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesDown() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(20, -80);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(0, getFacingValue(eraser)); // DOWN
+    }
+
+    @Test
     void testGetMoveSpeed_ReturnsCorrectValue() {
         assertEquals(400f, eraser.getMoveSpeed(), 0.0001f);
     }
@@ -126,6 +177,7 @@ public class EraserTest extends GameTest {
     void testGetAttackRange_ReturnsCorrectValue() {
         assertEquals(45f, eraser.getAttackRange(), 0.0001f);
     }
+
 
     @Test
     void testPlayerCollide_DamagesPlayerRespawnsAndStartsCooldown() throws Exception {
@@ -155,6 +207,33 @@ public class EraserTest extends GameTest {
 
         verify(mockAudio, times(1)).playDamage();
     }
+
+    @Test
+    void testPlayerCollide_WithAlreadyEmptyPath_StillRespawnsAndResetsState() throws Exception {
+        eraser.transform.setPosition(250, 350);
+        eraser.beforeMovementUpdate(0.1f);
+
+        eraser.transform.setPosition(600, 700);
+        eraser.transform.setVelocity(30, 40);
+        eraser.currentPath = List.of();
+        eraser.pathIndex = 0;
+        eraser.pathTimer = 0.9f;
+
+        int healthBefore = player.getHealth();
+
+        eraser.playerCollide(player);
+
+        assertEquals(healthBefore - 10, player.getHealth());
+        assertEquals(250f, eraser.transform.position.x);
+        assertEquals(350f, eraser.transform.position.y);
+        assertEquals(0f, eraser.transform.velocity.x, 0.0001f);
+        assertEquals(0f, eraser.transform.velocity.y, 0.0001f);
+        assertTrue(eraser.currentPath.isEmpty());
+        assertEquals(0, eraser.pathIndex);
+        assertEquals(0f, eraser.pathTimer, 0.0001f);
+        verify(mockAudio, times(1)).playDamage();
+    }
+
 
     @Test
     void testPlayerCollide_DuringCooldown_DoesNothing() throws Exception {
@@ -201,6 +280,7 @@ public class EraserTest extends GameTest {
         verify(mockAudio, never()).playDamage();
     }
 
+
     @Test
     void testPlayerCollide_CooldownPreventsSecondHit() {
         eraser.transform.setPosition(100, 100);
@@ -230,80 +310,6 @@ public class EraserTest extends GameTest {
         verify(mockAudio, times(2)).playDamage();
     }
 
-    @Test
-    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesRight() throws Exception {
-        eraser.transform.setPosition(100, 100);
-        eraser.transform.setVelocity(80, 20);
-
-        eraser.beforeMovementUpdate(0.1f);
-
-        assertEquals(2, getFacingValue(eraser)); // RIGHT
-    }
-
-    @Test
-    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesLeft() throws Exception {
-        eraser.transform.setPosition(100, 100);
-        eraser.transform.setVelocity(-80, 20);
-
-        eraser.beforeMovementUpdate(0.1f);
-
-        assertEquals(3, getFacingValue(eraser)); // LEFT
-    }
-
-    @Test
-    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesUp() throws Exception {
-        eraser.transform.setPosition(100, 100);
-        eraser.transform.setVelocity(20, 80);
-
-        eraser.beforeMovementUpdate(0.1f);
-
-        assertEquals(1, getFacingValue(eraser)); // UP
-    }
-
-    @Test
-    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesDown() throws Exception {
-        eraser.transform.setPosition(100, 100);
-        eraser.transform.setVelocity(20, -80);
-
-        eraser.beforeMovementUpdate(0.1f);
-
-        assertEquals(0, getFacingValue(eraser)); // DOWN
-    }
-
-    @Test
-    void testBeforeMovementUpdate_ZeroDelta_DoesNotChangeCooldown() throws Exception {
-        setPrivateFloat(eraser, "attackCooldownTimer", 0.6f);
-
-        eraser.beforeMovementUpdate(0.0f);
-
-        assertEquals(0.6f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
-    }
-
-    @Test
-    void testPlayerCollide_WithAlreadyEmptyPath_StillRespawnsAndResetsState() throws Exception {
-        eraser.transform.setPosition(250, 350);
-        eraser.beforeMovementUpdate(0.1f);
-
-        eraser.transform.setPosition(600, 700);
-        eraser.transform.setVelocity(30, 40);
-        eraser.currentPath = List.of();
-        eraser.pathIndex = 0;
-        eraser.pathTimer = 0.9f;
-
-        int healthBefore = player.getHealth();
-
-        eraser.playerCollide(player);
-
-        assertEquals(healthBefore - 10, player.getHealth());
-        assertEquals(250f, eraser.transform.position.x);
-        assertEquals(350f, eraser.transform.position.y);
-        assertEquals(0f, eraser.transform.velocity.x, 0.0001f);
-        assertEquals(0f, eraser.transform.velocity.y, 0.0001f);
-        assertTrue(eraser.currentPath.isEmpty());
-        assertEquals(0, eraser.pathIndex);
-        assertEquals(0f, eraser.pathTimer, 0.0001f);
-        verify(mockAudio, times(1)).playDamage();
-    }
 
     private float getPrivateFloat(Object target, String fieldName) throws Exception {
         Field field = target.getClass().getDeclaredField(fieldName);

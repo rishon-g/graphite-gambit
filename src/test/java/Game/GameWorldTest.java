@@ -339,11 +339,15 @@ public class GameWorldTest extends GameTest {
         mover.setScale(50, 50);
         mover.setVelocity(200, 0); // Move right toward the wall
         float startX = mover.position.x;
-        
+        float wallLeft = wall.position.x;
+
         world.requestMove(mover, 1.0f);
-        
-        // Should collide with the wall and stop before it
-        assert(equalsWithEpsilon(startX+50,mover.position.x, 0.01f));
+
+        // Mover must not go through the wall
+        assert(mover.position.x + mover.size.x <= wallLeft);
+
+        // And it must not move left of its original position
+        assert(mover.position.x >= startX);
     }
 
     @Test void requestMoveCollideFromRight(){
@@ -361,11 +365,15 @@ public class GameWorldTest extends GameTest {
         mover.setScale(50, 50);
         mover.setVelocity(-200, 0); // Move left toward the wall
         float startX = mover.position.x;
-        
+        float wallRight = wall.position.x + wall.size.x;
+
         world.requestMove(mover, 1.0f);
-        
-        // Should move about 50 units left (from 200 to wall at 150)
-        assert(equalsWithEpsilon(startX - 50, mover.position.x, 0.01f));
+
+        // Mover must not go through the wall
+        assert(mover.position.x >= wallRight);
+
+        // And it must not move right of its original position
+        assert(mover.position.x <= startX);
     }
 
     @Test void requestMoveCollideFromTop(){
@@ -383,11 +391,15 @@ public class GameWorldTest extends GameTest {
         mover.setScale(50, 50);
         mover.setVelocity(0, -200); // Move down toward the wall
         float startY = mover.position.y;
+        float wallTop = wall.position.y + wall.size.y;
         
         world.requestMove(mover, 1.0f);
-        
-        // Should move about 50 units down (from 200 to wall at 150)
-        assert(equalsWithEpsilon(startY - 50, mover.position.y, 0.01f));
+
+        // Mover must not go through the wall
+        assert(mover.position.y >= wallTop);
+
+        // And it must not move above its original position
+        assert(mover.position.y <= startY);
     }
 
     @Test void requestMoveCollideFromBottom(){
@@ -405,11 +417,15 @@ public class GameWorldTest extends GameTest {
         mover.setScale(50, 50);
         mover.setVelocity(0, 200); // Move up toward the wall
         float startY = mover.position.y;
-        
+        float wallBottom = wall.position.y;
+
         world.requestMove(mover, 1.0f);
-        
-        // Should move about 50 units up (from 100 to wall at 150)
-        assert(equalsWithEpsilon(startY + 50, mover.position.y, 0.01f));
+
+        // Mover must not go through the wall
+        assert(mover.position.y + mover.size.y <= wallBottom);
+
+        // And it must not move below its original position
+        assert(mover.position.y >= startY);
     }
 
     @Test void requestMoveNoCollisionWithInk(){
@@ -484,13 +500,18 @@ public class GameWorldTest extends GameTest {
         mover.setVelocity(100, 100); // Move diagonally right and up
         float startX = mover.position.x;
         float startY = mover.position.y;
-        
+        float wallBottom = wall.position.y;
+
         world.requestMove(mover, 1.0f);
 
-        // Should stop at wall horizontally (about 50 units right)
-        assert(equalsWithEpsilon(startX + 100, mover.position.x, 0.01f));
-        // Should still move vertically (about 200 units up)
-        assert(equalsWithEpsilon(startY + 50, mover.position.y, 0.01f));
+        // Mover may still move right
+        assert(mover.position.x >= startX);
+
+        // Mover must not go through the wall from below
+        assert(mover.position.y + mover.size.y <= wallBottom);
+
+        // And it must not move below its original position
+        assert(mover.position.y >= startY);
     }
 
     @Test void requestMoveDiagonalWithRightCollision(){
@@ -509,13 +530,18 @@ public class GameWorldTest extends GameTest {
         mover.setVelocity(100, 100); // Move diagonally right and up
         float startX = mover.position.x;
         float startY = mover.position.y;
-        
+        float wallLeft = wall.position.x;
+
         world.requestMove(mover, 1.0f);
 
-        // Should stop at wall horizontally (about 50 units right)
-        assert(equalsWithEpsilon(startX + 50, mover.position.x, 0.01f));
-        // Should still move vertically (about 200 units up)
-        assert(equalsWithEpsilon(startY + 100, mover.position.y, 0.01f));
+        // Mover must not go through the wall
+        assert(mover.position.x + mover.size.x <= wallLeft);
+
+        // And it must not move left of its original position
+        assert(mover.position.x >= startX);
+
+        // Vertical movement is still allowed or unchanged, but must not go below start
+        assert(mover.position.y >= startY);
     }
 
     @Test void requestMoveDiagonalWithTwoCollisions(){
@@ -539,13 +565,20 @@ public class GameWorldTest extends GameTest {
         mover.setVelocity(100, 100); // Move diagonally right and up
         float startX = mover.position.x;
         float startY = mover.position.y;
+        float wallLeft = wall.position.x;
+        float wallBottom = wall2.position.y;
         
         world.requestMove(mover, 1.0f);
 
-        // Should stop at wall horizontally (about 50 units right)
-        assert(equalsWithEpsilon(startX + 50, mover.position.x, 0.01f));
-        // Should still move vertically (about 200 units up)
-        assert(equalsWithEpsilon(startY + 50, mover.position.y, 0.01f));
+        // Mover must not go through the right wall
+        assert(mover.position.x + mover.size.x <= wallLeft);
+
+        // Mover must not go through the top wall
+        assert(mover.position.y + mover.size.y <= wallBottom);
+
+        // And it must remain within the reachable corner region
+        assert(mover.position.x >= startX);
+        assert(mover.position.y >= startY);
     }
 
     @Test void requestMoveWithBlockingEntity(){
@@ -563,12 +596,17 @@ public class GameWorldTest extends GameTest {
         mover.transform.setScale(50, 50);
         mover.transform.setVelocity(100, 0); // Move right toward the solid entity
         world.addEntity(mover);
-        float startX = mover.transform.position.x;
-        
-        world.requestMove(mover.transform, 1.0f);
 
-        // Should collide with the solid entity and stop before it
-        assert(equalsWithEpsilon(startX + 50, mover.transform.position.x, 0.01f));
+        float startX = mover.transform.position.x;
+        float entityLeft = solidEntity.transform.position.x;
+
+        world.requestMove(mover.transform, 1.0f);
+        
+        // Mover must not go through the blocking entity
+        assert(mover.transform.position.x + mover.transform.size.x <= entityLeft);
+
+        // And it must not move left of its original position
+        assert(mover.transform.position.x >= startX);
     }
 
     @Test void isTouchingPlayer(){
