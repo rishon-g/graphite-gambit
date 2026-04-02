@@ -82,11 +82,11 @@ public class MainMenuScreen extends ScreenAdapter {
             normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
             background = new Texture(Gdx.files.internal("images/menu-background.png"));
             howToPlayButtons = new MenuButton[] {
-                    new MenuButton("BACK", null, null, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
+                    new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
             };
         } else {
             howToPlayButtons = new MenuButton[] {
-                    new MenuButton("BACK", normalButton, highlightedButton, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
+                    new MenuButton("BACK", null, null, (screenWidth >> 1) - (800 >> 1), 100, 800, 80, false),
             };
         }
         // buttons
