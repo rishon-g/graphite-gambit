@@ -46,6 +46,9 @@ public class MainMenuScreen extends ScreenAdapter {
     private Texture graphite;
     private Texture plot;
 
+    float howToPlayStartX = 300;
+    float howToPlayIconSize = 50f;
+
     public boolean musicOn = true;
     public boolean sfxOn = true;
 
@@ -115,6 +118,7 @@ public class MainMenuScreen extends ScreenAdapter {
      * @param text the text to display on the button
      * @return a new MenuButton object to add to the buttons array
      */
+    //TODO make global
     private MenuButton createCenteredButton(String text, int ID, boolean isDisabled) {
         // global parameters for buttons
         int startingY = 700;
@@ -216,6 +220,19 @@ public class MainMenuScreen extends ScreenAdapter {
         };
     }
 
+    private void setHeader(String text) {
+        layout.setText(header_font, text);
+        header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+    }
+
+    private void setHowToPlayText(String text, Texture texture, float y) {
+        layout.setText(font, text);
+        font.draw(batch, layout, howToPlayStartX, y);
+        // Draw image exactly after the text ends! (Adjust the -35 offset to center it
+        // vertically with the text)
+        batch.draw(texture, howToPlayStartX + layout.width, y - 35f, howToPlayIconSize, howToPlayIconSize);
+    }
+
     /**
      * Renders the ui and background of the main menu.
      * Varies what buttons are rendered based on the current layout.
@@ -232,88 +249,44 @@ public class MainMenuScreen extends ScreenAdapter {
         // draw background
         batch.draw(background, 0, 0, screenWidth, screenHeight);
 
-        if (currentLayout == Layout.MAIN) {
-            // render title
-            layout.setText(header_font, "GRAPHITE GAMBIT");
-            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
-        }
+        //TODO switch case or reduce somehow FIXED
+        // only difference is text
+        //TODO add test
 
-        if (currentLayout == Layout.LEVEL_SELECT) {
-            layout.setText(header_font, "LEVEL SELECT");
-            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
-        }
+        switch (currentLayout) {
+            case MAIN:
+                setHeader("GRAPHITE GAMBIT");
+                break;
 
-        if (currentLayout == Layout.SETTINGS) {
-            layout.setText(header_font, "SETTINGS");
-            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
-        }
+            case LEVEL_SELECT:
+                setHeader("LEVEL SELECT");
+                break;
 
-        if (currentLayout == Layout.HOW_TO_PLAY) {
-            layout.setText(header_font, "HOW TO PLAY");
-            header_font.draw(batch, layout, viewport.getWorldWidth() / 2 - layout.width / 2, 950);
+            case SETTINGS:
+                setHeader("SETTINGS");
+                break;
 
+            case HOW_TO_PLAY:
+                setHeader("HOW TO PLAY");
             // layout
-            float startX = 300;
             float currentY = 820f;
             float lineSpacing = 70f;
-            float iconSize = 50f;
 
+            //TODO repeated code, make new mehod FIXED
             // --- LINE 1: ERASERS ---
-            String line1 = "Avoid ERASERS!  ";
-            layout.setText(font, line1);
-            font.draw(batch, layout, startX, currentY);
-            // Draw image exactly after the text ends! (Adjust the -35 offset to center it
-            // vertically with the text)
-            batch.draw(eraser, startX + layout.width, currentY - 35f, iconSize, iconSize);
 
+            setHowToPlayText("Avoid ERASERS!  ", eraser, currentY);
             // Move down to the next line
-            currentY -= lineSpacing;
-
-            String line = "Watch out for WHITE-OUT  ";
-            layout.setText(font, line);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(whiteOut, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-            currentY -= 45;
-
-            String linec = "and INK SPILLS!  ";
-            layout.setText(font, linec);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(ink, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-            currentY -= lineSpacing;
-
-            // --- LINE 2: SHARPENERS ---
-            String line2 = "Don't get caught by PENCIL SHARPENERS!  ";
-            layout.setText(font, line2);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(pencilsharpener, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-            currentY -= lineSpacing;
-
-            String line3 = "Collect GRAPHITE!  ";
-            layout.setText(font, line3);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(graphite, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-            currentY -= lineSpacing;
-
-            String line4 = "Collect PLOT POINTS!  ";
-            layout.setText(font, line4);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(plot, startX + layout.width, currentY - 35f, iconSize, iconSize);
-
-            currentY -= lineSpacing;
-
+            setHowToPlayText("Watch out for WHITE-OUT  ", whiteOut, currentY -= lineSpacing);
+            setHowToPlayText("and INK SPILLS!  ", ink, currentY -= 45);
+            setHowToPlayText("Don't get caught by PENCIL SHARPENERS!  ", pencilsharpener, currentY -= lineSpacing);
+            setHowToPlayText("Collect GRAPHITE!  ", graphite, currentY -= lineSpacing);
+            setHowToPlayText("Collect PLOT POINTS!  ", plot, currentY -= lineSpacing);
             String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
             layout.setText(font, line5);
-            font.draw(batch, layout, startX, currentY);
-
-            currentY -= 45;
-            String line5c = "are collected to WIN!  ";
-            layout.setText(font, line5c);
-            font.draw(batch, layout, startX, currentY);
-            batch.draw(trophy, startX + layout.width, currentY - 35f, iconSize, iconSize);
+            font.draw(batch, layout, howToPlayStartX, currentY -= lineSpacing);
+            setHowToPlayText("are collected to WIN!  ", trophy, currentY - 45);
+            break;
         }
 
         // render buttons
@@ -344,10 +317,11 @@ public class MainMenuScreen extends ScreenAdapter {
 
     /**
      * triggers a hardcoded action for each button based on index
-     * 
+     *
      * @param index clicked button index (index is based on time of creation)
      */
     void activateButton(int index) {
+        //TODO switch case, maybe more
         if (buttons[index].isDisabled())
             return;
         if (currentLayout == Layout.MAIN) {
@@ -370,20 +344,11 @@ public class MainMenuScreen extends ScreenAdapter {
                 Gdx.app.exit();
             }
         } else if (currentLayout == Layout.LEVEL_SELECT) {
+            //TODO setgamescreen(index) FIXED
             if (index == 0) {
                 changeLayout(Layout.MAIN);
-            }
-            if (index == 1) {
-                screenManager.SetGameScreen(1);
-            }
-            if (index == 2) {
-                screenManager.SetGameScreen(2);
-            }
-            if (index == 3) {
-                screenManager.SetGameScreen(3);
-            }
-            if (index == 4) {
-                screenManager.SetGameScreen(4);
+            } else {
+                screenManager.SetGameScreen(index);
             }
         } else if (currentLayout == Layout.SETTINGS) {
             if (index == 0) {

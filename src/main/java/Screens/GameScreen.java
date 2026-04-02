@@ -205,7 +205,6 @@ public class GameScreen implements Screen {
         };
 
         // generate a 1x1 white pixel texture for drawing the health bar shapes
-        // TODO we need to add a nicer looking texture
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
@@ -225,6 +224,7 @@ public class GameScreen implements Screen {
         textBox = null;
 
         // Buttons
+        //TODO function with texture parameters
         MenuButton[] mainButtons = new MenuButton[] {
                 new MenuButton("RESUME", null, null, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
                 new MenuButton("RESTART", null, null, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),

@@ -53,6 +53,7 @@ public class GameWorld {
     // separate reference to the player entity
     Player player;
 
+    //TODO data clump
     // the size of the map
     int width, height;
 
@@ -486,6 +487,7 @@ public class GameWorld {
     public boolean shouldBlockEntityMovement(Transform mover, Entity other) {
         Entity moverEntity = getEntityByTransform(mover);
 
+        //TODO switch case
         if (moverEntity == null || other == null) {
             return false;
         }
@@ -572,6 +574,7 @@ public class GameWorld {
         float dy = t.velocity.y * delta;
 
         // grid boundary check, so we cant traverse outside of the map
+        //TODO make into helper function
         if (t.position.x + dx < 0)
             dx = -t.position.x;
         if (t.position.x + t.size.x + dx > width)
@@ -640,6 +643,7 @@ public class GameWorld {
             testBox.setPosition(t.position.x, t.position.y + dy); // test y move
 
             // collide with walls
+            //TODO Refactor into collision method with direction as parameter
             for (Transform wall : solidObjects) {
                 if (testBox.collides(wall)) {
                     // snap exactly to the edge of the custom rectangle
