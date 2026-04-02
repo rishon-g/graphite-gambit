@@ -30,8 +30,8 @@ public class AudioManager implements Disposable {
     private Sound clickSound;
 
     // Volume variables
-    private final float musicVolumeInit = 0.1f;
-    private float musicVolume = 0.1f;
+    final float musicVolumeInit = 0.1f;
+    float musicVolume = 0.1f;
     private float moveVolume = 0.4f;
     private float puddleVolume = 1f;
     private float sharpenerVolume = 0.8f;
@@ -41,13 +41,13 @@ public class AudioManager implements Disposable {
     private float clickVolume = 0.5f;
 
     // track looping state
-    private long moveSoundId = -1;
-    private boolean moveWasPlaying = false;
-    private boolean moveWasSlowed = false;
+    long moveSoundId = -1;
+    boolean moveWasPlaying = false;
+    boolean moveWasSlowed = false;
 
     // sharpener looping state
-    private long sharpenerSoundId = -1;
-    private boolean sharpenerWasPlaying = false;
+    long sharpenerSoundId = -1;
+    boolean sharpenerWasPlaying = false;
 
     /**
      * Singleton constructor.
@@ -161,11 +161,13 @@ public class AudioManager implements Disposable {
         if (isMoving) {
             // Start sound, or swap if slowed state changed
             if (!moveWasPlaying || slowed != moveWasSlowed) {
-                stopMoveSound(); // stop whichever sound is active
-                if (slowed) {
-                    moveSoundId = puddleSound.loop(puddleVolume);
-                } else {
-                    moveSoundId = moveSound.loop(moveVolume);
+                if (moveSound != null && puddleSound != null) {
+                    stopMoveSound(); // stop whichever sound is active
+                    if (slowed) {
+                        moveSoundId = puddleSound.loop(puddleVolume);
+                    } else {
+                        moveSoundId = moveSound.loop(moveVolume);
+                    }
                 }
                 moveWasPlaying = true;
                 moveWasSlowed = slowed;
@@ -179,7 +181,7 @@ public class AudioManager implements Disposable {
      * Triggered when the player stops moving. Stops the sound and resets the state.
      */
     public void stopMoveSound() {
-        if (moveSoundId != -1 && moveSound != null) {
+        if (moveSoundId != -1 && moveSound != null && puddleSound != null) {
             moveSound.stop(moveSoundId);
             puddleSound.stop(moveSoundId);
             moveSoundId = -1;
@@ -197,8 +199,10 @@ public class AudioManager implements Disposable {
             stopSharpenerSound();
             return;
         }
-        if (isStunned && !sharpenerWasPlaying && sharpenerSound != null) {
-            sharpenerSoundId = sharpenerSound.loop(sharpenerVolume);
+        if (isStunned && !sharpenerWasPlaying) {
+            if (sharpenerSound != null) {
+                sharpenerSoundId = sharpenerSound.loop(sharpenerVolume);
+            }
             sharpenerWasPlaying = true;
         } else if (!isStunned && sharpenerWasPlaying) {
             stopSharpenerSound();

@@ -93,16 +93,6 @@ public class MenuButton {
         hoverTexture.dispose();
     }
 
-    /**
-     * Checks if the normal texture matches the given texture.
-     *
-     * @param texture the texture to compare
-     * @return true if the normal texture is the same as the given texture, false otherwise
-     */
-    public boolean textureIs(Texture texture) {
-        return (normalTexture == texture);
-    }
-
     public String getLabel() {
         return label;
     }
