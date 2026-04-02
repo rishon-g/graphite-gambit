@@ -1,55 +1,25 @@
 package Entities;
 
-import Game.AudioManager;
 import Game.GameWorld;
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.GameTest;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class EraserTest {
+public class EraserTest extends GameTest {
 
-    private GameWorld world;
     private Eraser eraser;
-
-    @BeforeAll
-    static void initLibgdx() {
-        GdxNativesLoader.load();
-    }
+    private Player player;
 
     @BeforeEach
-    void setUp() throws Exception {
-        Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
-        Gdx.graphics = mock(Graphics.class);
-        Gdx.app = mock(Application.class);
-        Gdx.files = mock(com.badlogic.gdx.Files.class);
-
-        when(Gdx.files.internal(anyString())).thenAnswer(invocation -> {
-            String path = invocation.getArgument(0);
-            return new FileHandle(new File(path));
-        });
-
-        world = mock(GameWorld.class);
-        eraser = new Eraser(world);
-
-        AudioManager audioManager = mock(AudioManager.class);
-        Field instanceField = AudioManager.class.getDeclaredField("instance");
-        instanceField.setAccessible(true);
-        instanceField.set(null, audioManager);
+    public void setUp() {
+        eraser = new Eraser(mockWorld);
+        player = new Player(mockWorld);
     }
 
     @Test
@@ -63,18 +33,88 @@ public class EraserTest {
     }
 
     @Test
+    void testBeforeMovementUpdate_DoesNotOverwriteInitialSpawnPosition() throws Exception {
+        eraser.transform.setPosition(150, 220);
+        eraser.beforeMovementUpdate(0.1f);
+
+        eraser.transform.setPosition(700, 900);
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(150f, getPrivateFloat(eraser, "startX"));
+        assertEquals(220f, getPrivateFloat(eraser, "startY"));
+    }
+
+    @Test
     void testBeforeMovementUpdate_ErasesFloorOnlyWhileMoving() {
         eraser.transform.setPosition(100, 100);
 
         eraser.transform.setVelocity(0, 0);
         eraser.beforeMovementUpdate(0.1f);
 
-        verify(world, never()).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
+        verify(mockWorld, never()).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
 
         eraser.transform.setVelocity(50, 0);
         eraser.beforeMovementUpdate(0.1f);
 
-        verify(world, times(1)).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
+        verify(mockWorld, times(1)).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
+    }
+
+    @Test
+    void testBeforeMovementUpdate_CooldownDecreases() throws Exception {
+        setPrivateFloat(eraser, "attackCooldownTimer", 1.0f);
+
+        eraser.beforeMovementUpdate(0.25f);
+
+        assertEquals(0.75f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+    }
+
+    @Test
+    void testBeforeMovementUpdate_CooldownClampsToZero() throws Exception {
+        setPrivateFloat(eraser, "attackCooldownTimer", 0.2f);
+
+        eraser.beforeMovementUpdate(0.5f);
+
+        assertEquals(0f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+    }
+
+    @Test
+    void testBeforeMovementUpdate_FacingRight() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(50, 0);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(2, getFacingValue(eraser));
+    }
+
+    @Test
+    void testBeforeMovementUpdate_FacingLeft() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(-50, 0);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(3, getFacingValue(eraser));
+    }
+
+    @Test
+    void testBeforeMovementUpdate_FacingUp() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(0, 50);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(1, getFacingValue(eraser));
+    }
+
+    @Test
+    void testBeforeMovementUpdate_FacingDown() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(0, -50);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(0, getFacingValue(eraser));
     }
 
     @Test
@@ -83,11 +123,15 @@ public class EraserTest {
     }
 
     @Test
-    void testPlayerCollide_DamagesPlayerRespawnsAndStartsCooldown() throws Exception {
-        Player player = new Player(world);
+    void testGetAttackRange_ReturnsCorrectValue() {
+        assertEquals(45f, eraser.getAttackRange(), 0.0001f);
+    }
 
+    @Test
+    void testPlayerCollide_DamagesPlayerRespawnsAndStartsCooldown() throws Exception {
         eraser.transform.setPosition(300, 400);
         eraser.beforeMovementUpdate(0.1f);
+
         eraser.transform.setPosition(700, 800);
         eraser.transform.setVelocity(40, 20);
 
@@ -107,13 +151,13 @@ public class EraserTest {
         assertTrue(eraser.currentPath.isEmpty());
         assertEquals(0, eraser.pathIndex);
         assertEquals(0f, eraser.pathTimer);
-        assertEquals(1.0f, getPrivateFloat(eraser, "attackCooldownTimer"));
+        assertEquals(1.0f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+
+        verify(mockAudio, times(1)).playDamage();
     }
 
     @Test
     void testPlayerCollide_DuringCooldown_DoesNothing() throws Exception {
-        Player player = new Player(world);
-
         eraser.transform.setPosition(100, 100);
         eraser.beforeMovementUpdate(0.1f);
 
@@ -124,11 +168,11 @@ public class EraserTest {
         eraser.playerCollide(player);
 
         assertEquals(healthBefore, player.getHealth());
+        verify(mockAudio, never()).playDamage();
     }
 
     @Test
     void testPlayerCollide_ImmunePlayer_DoesNothing() {
-        Player player = new Player(world);
         player.isImmune = true;
 
         eraser.transform.setPosition(100, 100);
@@ -139,11 +183,11 @@ public class EraserTest {
         eraser.playerCollide(player);
 
         assertEquals(healthBefore, player.getHealth());
+        verify(mockAudio, never()).playDamage();
     }
 
     @Test
     void testPlayerCollide_StunnedPlayer_DoesNothing() {
-        Player player = new Player(world);
         player.isStunned = true;
 
         eraser.transform.setPosition(100, 100);
@@ -154,12 +198,11 @@ public class EraserTest {
         eraser.playerCollide(player);
 
         assertEquals(healthBefore, player.getHealth());
+        verify(mockAudio, never()).playDamage();
     }
 
     @Test
     void testPlayerCollide_CooldownPreventsSecondHit() {
-        Player player = new Player(world);
-
         eraser.transform.setPosition(100, 100);
         eraser.beforeMovementUpdate(0.1f);
 
@@ -169,6 +212,97 @@ public class EraserTest {
         eraser.playerCollide(player);
 
         assertEquals(healthBefore - 10, player.getHealth());
+        verify(mockAudio, times(1)).playDamage();
+    }
+
+    @Test
+    void testPlayerCollide_AfterCooldownExpires_CanHitAgain() {
+        eraser.transform.setPosition(100, 100);
+        eraser.beforeMovementUpdate(0.1f);
+
+        int healthBefore = player.getHealth();
+
+        eraser.playerCollide(player);
+        eraser.beforeMovementUpdate(1.1f);
+        eraser.playerCollide(player);
+
+        assertEquals(healthBefore - 20, player.getHealth());
+        verify(mockAudio, times(2)).playDamage();
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesRight() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(80, 20);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(2, getFacingValue(eraser)); // RIGHT
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_HorizontalDominatesLeft() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(-80, 20);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(3, getFacingValue(eraser)); // LEFT
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesUp() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(20, 80);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(1, getFacingValue(eraser)); // UP
+    }
+
+    @Test
+    void testBeforeMovementUpdate_DiagonalMovement_VerticalDominatesDown() throws Exception {
+        eraser.transform.setPosition(100, 100);
+        eraser.transform.setVelocity(20, -80);
+
+        eraser.beforeMovementUpdate(0.1f);
+
+        assertEquals(0, getFacingValue(eraser)); // DOWN
+    }
+
+    @Test
+    void testBeforeMovementUpdate_ZeroDelta_DoesNotChangeCooldown() throws Exception {
+        setPrivateFloat(eraser, "attackCooldownTimer", 0.6f);
+
+        eraser.beforeMovementUpdate(0.0f);
+
+        assertEquals(0.6f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+    }
+
+    @Test
+    void testPlayerCollide_WithAlreadyEmptyPath_StillRespawnsAndResetsState() throws Exception {
+        eraser.transform.setPosition(250, 350);
+        eraser.beforeMovementUpdate(0.1f);
+
+        eraser.transform.setPosition(600, 700);
+        eraser.transform.setVelocity(30, 40);
+        eraser.currentPath = List.of();
+        eraser.pathIndex = 0;
+        eraser.pathTimer = 0.9f;
+
+        int healthBefore = player.getHealth();
+
+        eraser.playerCollide(player);
+
+        assertEquals(healthBefore - 10, player.getHealth());
+        assertEquals(250f, eraser.transform.position.x);
+        assertEquals(350f, eraser.transform.position.y);
+        assertEquals(0f, eraser.transform.velocity.x, 0.0001f);
+        assertEquals(0f, eraser.transform.velocity.y, 0.0001f);
+        assertTrue(eraser.currentPath.isEmpty());
+        assertEquals(0, eraser.pathIndex);
+        assertEquals(0f, eraser.pathTimer, 0.0001f);
+        verify(mockAudio, times(1)).playDamage();
     }
 
     private float getPrivateFloat(Object target, String fieldName) throws Exception {
@@ -181,5 +315,11 @@ public class EraserTest {
         Field field = target.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.setFloat(target, value);
+    }
+
+    private int getFacingValue(Object target) throws Exception {
+        Field field = target.getClass().getDeclaredField("facing");
+        field.setAccessible(true);
+        return field.getInt(target);
     }
 }
