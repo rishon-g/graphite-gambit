@@ -601,7 +601,7 @@ public class GameWorldTest extends GameTest {
         float entityLeft = solidEntity.transform.position.x;
 
         world.requestMove(mover.transform, 1.0f);
-        
+
         // Mover must not go through the blocking entity
         assert(mover.transform.position.x + mover.transform.size.x <= entityLeft);
 

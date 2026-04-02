@@ -24,7 +24,6 @@ public class RandomPatrolTest {
     @Test
     void testChoosePatrolTarget_StartOutsideMap_ReturnsNull() {
         int[][] map = new int[5][5];
-
         int[] result = RandomPatrol.choosePatrolTarget(map, 5, 0, 3);
 
         assertNull(result);
@@ -33,8 +32,8 @@ public class RandomPatrolTest {
     @Test
     void testChoosePatrolTarget_StartBlocked_ReturnsNull() {
         int[][] map = new int[5][5];
-        map[2][2] = 1;
 
+        map[2][2] = 1;
         int[] result = RandomPatrol.choosePatrolTarget(map, 2, 2, 3);
 
         assertNull(result);
@@ -51,7 +50,6 @@ public class RandomPatrolTest {
         }
 
         map[1][1] = 0;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, 1, 1, 1);
 
         assertNull(result);
@@ -63,7 +61,6 @@ public class RandomPatrolTest {
 
         int startX = 2;
         int startY = 2;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, startX, startY, 2);
 
         assertNotNull(result);
@@ -80,7 +77,6 @@ public class RandomPatrolTest {
         int startX = 3;
         int startY = 3;
         int radius = 2;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, startX, startY, radius);
 
         assertNotNull(result);
@@ -100,7 +96,6 @@ public class RandomPatrolTest {
 
         map[1][1] = 0;
         map[1][2] = 0;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, 1, 1, 1);
 
         assertNotNull(result);
@@ -111,6 +106,7 @@ public class RandomPatrolTest {
     @Test
     void testChoosePatrolTarget_DoesNotReturnBlockedTile() {
         int[][] map = new int[5][5];
+
         int startX = 2;
         int startY = 2;
 
@@ -121,7 +117,6 @@ public class RandomPatrolTest {
         map[3][1] = 1;
         map[3][2] = 1;
         map[3][3] = 1;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, startX, startY, 1);
 
         assertNotNull(result);
@@ -140,9 +135,7 @@ public class RandomPatrolTest {
         }
 
         map[2][2] = 0;
-
         map[4][4] = 0;
-
         int[] result = RandomPatrol.choosePatrolTarget(map, 2, 2, 3);
 
         assertNull(result);
