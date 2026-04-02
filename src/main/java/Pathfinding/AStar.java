@@ -99,8 +99,24 @@ public class AStar {
         // If we are already on the goal, the path is empty
         if (startX == endX && startY == endY) return Collections.emptyList();
 
+        if (map == null || map.length == 0 || map[0].length == 0) {
+            return Collections.emptyList();
+        }
+
         int width = map.length;
         int height = map[0].length;
+
+        if (startX < 0 || startY < 0 || startX >= width || startY >= height) {
+            return Collections.emptyList();
+        }
+
+        if (endX < 0 || endY < 0 || endX >= width || endY >= height) {
+            return Collections.emptyList();
+        }
+
+        if (isBlocked(map, startX, startY) || isBlocked(map, endX, endY)) {
+            return Collections.emptyList();
+        }
 
         // closed[x][y] - checked cell
         boolean[][] closed = new boolean[width][height];
