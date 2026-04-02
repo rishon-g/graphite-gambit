@@ -1,7 +1,8 @@
 package Entities;
 
 import utils.GameTest;
-
+import Game.GameWorld;
+import Screens.GameScreen;
 import com.badlogic.gdx.Gdx;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,11 @@ public class PlayerTest extends GameTest {
 
     @BeforeEach
     public void setUp() {
+        GameScreen mockScreen = mock(GameScreen.class);
+
+        mockWorld = spy(new GameWorld(-1, mockScreen));
+        mockWorld.setDimensions(2000, 2000);
+
         player = new Player(mockWorld);
     }
 
@@ -118,14 +124,13 @@ public class PlayerTest extends GameTest {
     @Test
     public void testUpdate_MovementDrainsHealth() {
         // player starts at 100 health.
-        // give them a velocity so the game thinks they are drawing
-        player.transform.velocity.set(100f, 0f);
+        when(Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.D)).thenReturn(true);
 
         // 1.0s goes by
         player.update(1.0f);
 
         // the player should have lost 2 health for moving 1 full second
-        assertEquals(100 + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "moving for 1 second does not drain health accordingly");
+        assertEquals(100 + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "moving for 1 second should drain health when the player actually moves");
     }
 
     @Test
@@ -256,10 +261,10 @@ public class PlayerTest extends GameTest {
     @Test
     public void testUpdate_YAxisMovementDrainsHealth() {
         // player moves only on the Y-axis
-        player.transform.velocity.set(0f, 100f);
+        when(Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.W)).thenReturn(true);
 
         // simulate exactly 1 second of game time
-        player.updateInternal(1.0f);
+        player.update(1.0f);
 
         // the player should lose health, hence we satisfy the Math.abs(velocity.y) > 1f branch
         assertEquals(Player.STARTING_HEALTH + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "Moving on the Y axis should drain health.");

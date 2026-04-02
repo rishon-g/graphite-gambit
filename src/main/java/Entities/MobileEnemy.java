@@ -3,6 +3,7 @@ package Entities;
 import Game.GameWorld;
 import Objects.Nonplayer;
 import Pathfinding.AStar;
+import Pathfinding.RandomPatrol;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,11 @@ public abstract class MobileEnemy extends Nonplayer {
     private static final float PATH_RECALC_TIME = 0.5f;
 
     /**
+     * Time interval in seconds between patrol path recalculations.
+     */
+    private static final float PATROL_RECALC_TIME = 1.0f;
+
+    /**
      * Distance threshold used to decide when the enemy has reached the current
      * target tile center.
      */
@@ -37,6 +43,31 @@ public abstract class MobileEnemy extends Nonplayer {
      * reachable target tile.
      */
     private static final int TARGET_SEARCH_RADIUS = 3;
+
+    /**
+     * Search radius, in tiles, used when choosing a random patrol target.
+     */
+    private static final int PATROL_SEARCH_RADIUS = 3;
+
+    /**
+     * Detection radius in world units.
+     * If the player is within this radius, the enemy switches to chase mode.
+     */
+    private static final float VISION_RADIUS = 700f;
+    private static final float CHASE_LOSE_RADIUS = 1000f;
+
+    /**
+     * Enemy movement state.
+     */
+    protected enum MovementState {
+        PATROL,
+        CHASE
+    }
+
+    /**
+     * Current movement state of the enemy.
+     */
+    protected MovementState movementState = MovementState.PATROL;
 
     /**
      * Current path represented as a list of tile coordinates.
@@ -88,10 +119,16 @@ public abstract class MobileEnemy extends Nonplayer {
 
         beforeMovementUpdate(delta);
         tryAttackPlayer(player);
+
+        updateMovementState(player);
         pathTimer += delta;
 
-        if (pathTimer >= PATH_RECALC_TIME || currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            rebuildPath(player);
+        if (shouldRebuildPath()) {
+            if (movementState == MovementState.CHASE) {
+                rebuildPath(player);
+            } else {
+                rebuildPatrolPath();
+            }
             pathTimer = 0f;
         }
 
@@ -140,6 +177,60 @@ public abstract class MobileEnemy extends Nonplayer {
     protected abstract float getMoveSpeed();
 
     /**
+     * Updates the current movement state based on player distance.
+     *
+     * @param player the current player
+     */
+    protected void updateMovementState(Player player) {
+        if (player == null) {
+            movementState = MovementState.PATROL;
+            return;
+        }
+
+        float distance = getDistanceToPlayer(player);
+
+        if (movementState == MovementState.PATROL) {
+            if (distance <= VISION_RADIUS) {
+                movementState = MovementState.CHASE;
+            }
+        } else {
+            if (distance > CHASE_LOSE_RADIUS) {
+                movementState = MovementState.PATROL;
+            }
+        }
+    }
+
+    protected float getDistanceToPlayer(Player player) {
+        float enemyCenterX = transform.position.x + transform.size.x / 2f;
+        float enemyCenterY = transform.position.y + transform.size.y / 2f;
+
+        float playerCenterX = player.transform.position.x + player.transform.size.x / 2f;
+        float playerCenterY = player.transform.position.y + player.transform.size.y / 2f;
+
+        float dx = playerCenterX - enemyCenterX;
+        float dy = playerCenterY - enemyCenterY;
+
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * Returns true if the path should be rebuilt for the current movement state.
+     *
+     * @return true if a rebuild is needed
+     */
+    protected boolean shouldRebuildPath() {
+        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
+            return true;
+        }
+
+        if (movementState == MovementState.CHASE) {
+            return pathTimer >= PATH_RECALC_TIME;
+        }
+
+        return pathTimer >= PATROL_RECALC_TIME;
+    }
+
+    /**
      * Rebuilds the path from the MobileEntity to the player's current tile.
      * @param player the current player target
      */
@@ -154,6 +245,13 @@ public abstract class MobileEnemy extends Nonplayer {
         int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
         int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
 
+        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            transform.setVelocity(0, 0);
+            return;
+        }
+
         int[] targetTile = findBestTargetTile(player, map, startX, startY);
         if (targetTile == null) {
             currentPath = Collections.emptyList();
@@ -163,6 +261,47 @@ public abstract class MobileEnemy extends Nonplayer {
 
         int endX = targetTile[0];
         int endY = targetTile[1];
+
+        if (startX == endX && startY == endY) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            return;
+        }
+
+        currentPath = AStar.findPath(map, startX, startY, endX, endY);
+        pathIndex = 0;
+    }
+
+    /**
+     * Rebuilds a random patrol path when the player is not in vision range.
+     */
+    protected void rebuildPatrolPath() {
+        int[][] map = world.getTilemap();
+        if (map == null || map.length == 0 || map[0].length == 0) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            return;
+        }
+
+        int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
+        int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
+
+        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            transform.setVelocity(0, 0);
+            return;
+        }
+
+        int[] patrolTarget = RandomPatrol.choosePatrolTarget(map, startX, startY, PATROL_SEARCH_RADIUS);
+        if (patrolTarget == null) {
+            currentPath = Collections.emptyList();
+            pathIndex = 0;
+            return;
+        }
+
+        int endX = patrolTarget[0];
+        int endY = patrolTarget[1];
 
         if (startX == endX && startY == endY) {
             currentPath = Collections.emptyList();
