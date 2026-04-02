@@ -12,13 +12,17 @@ import java.util.List;
  * Abstract base class for enemy entities that move toward the player using
  * tile-based pathfinding.
  *
- * <p>This class provides shared movement logic for mobile enemies such as
+ * <p>
+ * This class provides shared movement logic for mobile enemies such as
  * {@link Eraser} and {@link PencilSharpener}. It periodically rebuilds a path
- * to the player.</p>
+ * to the player.
+ * </p>
  *
- * <p>The path is computed on the world's tile map using the A* algorithm.
+ * <p>
+ * The path is computed on the world's tile map using the A* algorithm.
  * If the exact player tile is not reachable, the enemy searches for the best
- * reachable nearby tile within a small radius.</p>
+ * reachable nearby tile within a small radius.
+ * </p>
  */
 public abstract class MobileEnemy extends Nonplayer {
 
@@ -76,7 +80,8 @@ public abstract class MobileEnemy extends Nonplayer {
     protected List<int[]> currentPath = Collections.emptyList();
 
     /**
-     * Index of the next tile in {@link #currentPath} that the enemy should move toward.
+     * Index of the next tile in {@link #currentPath} that the enemy should move
+     * toward.
      */
     protected int pathIndex = 0;
 
@@ -95,17 +100,22 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * The update method is called every frame to update the state of the MobileEnemy entity.
+     * The update method is called every frame to update the state of the
+     * MobileEnemy entity.
      *
-     * <p>This method performs the following steps:</p>
+     * <p>
+     * This method performs the following steps:
+     * </p>
      * <ol>
-     *     <li>Gets the current player from the world.</li>
-     *     <li>Allows subclasses to run custom per-frame logic before movement.</li>
-     *     <li>Rebuilds the path if needed.</li>
-     *     <li>Moves toward the next tile in the current path.</li>
+     * <li>Gets the current player from the world.</li>
+     * <li>Allows subclasses to run custom per-frame logic before movement.</li>
+     * <li>Rebuilds the path if needed.</li>
+     * <li>Moves toward the next tile in the current path.</li>
      * </ol>
      *
-     * <p>If no player exists or no valid path is available, the enemy stops moving.</p>
+     * <p>
+     * If no player exists or no valid path is available, the enemy stops moving.
+     * </p>
      *
      * @param delta time since last update (used for movement and animations)
      */
@@ -166,8 +176,7 @@ public abstract class MobileEnemy extends Nonplayer {
      *
      * @param delta time since last update
      */
-    protected void beforeMovementUpdate(float delta) {
-    }
+    protected abstract void beforeMovementUpdate(float delta);
 
     /**
      * Returns the movement speed of this enemy.
@@ -232,6 +241,7 @@ public abstract class MobileEnemy extends Nonplayer {
 
     /**
      * Rebuilds the path from the MobileEntity to the player's current tile.
+     * 
      * @param player the current player target
      */
     protected void rebuildPath(Player player) {
@@ -316,13 +326,15 @@ public abstract class MobileEnemy extends Nonplayer {
     /**
      * Finds the best reachable tile near the player.
      *
-     * <p>The search starts at the player's tile and expands outward up to
+     * <p>
+     * The search starts at the player's tile and expands outward up to
      * {@link #TARGET_SEARCH_RADIUS}. For each candidate tile, the method checks
      * whether it is inside the map, not blocked, and reachable from the enemy's
-     * current tile. The shortest valid path found is preferred.</p>
+     * current tile. The shortest valid path found is preferred.
+     * </p>
      *
      * @param player the player being chased
-     * @param map the tile map where 1 represents a blocked tile
+     * @param map    the tile map where 1 represents a blocked tile
      * @param startX the enemy's current tile x-coordinate
      * @param startY the enemy's current tile y-coordinate
      * @return the chosen target tile or null if no target is reachable
@@ -353,9 +365,8 @@ public abstract class MobileEnemy extends Nonplayer {
                         continue;
                     }
 
-                    boolean onBorder =
-                            targetX == searchMinX || targetX == searchMaxX ||
-                                    targetY == searchMinY || targetY == searchMaxY;
+                    boolean onBorder = targetX == searchMinX || targetX == searchMaxX ||
+                            targetY == searchMinY || targetY == searchMaxY;
 
                     if (!onBorder) {
                         continue;
@@ -363,14 +374,14 @@ public abstract class MobileEnemy extends Nonplayer {
 
                     if (targetX == startX && targetY == startY) {
                         if (isPlayerWithinAttackRange(player)) {
-                            return new int[]{targetX, targetY};
+                            return new int[] { targetX, targetY };
                         }
                         continue;
                     }
 
                     List<int[]> path = AStar.findPath(map, startX, startY, targetX, targetY);
                     if (!path.isEmpty() && (bestTile == null || path.size() < bestPath.size())) {
-                        bestTile = new int[]{targetX, targetY};
+                        bestTile = new int[] { targetX, targetY };
                         bestPath = path;
                     }
                 }
@@ -388,8 +399,8 @@ public abstract class MobileEnemy extends Nonplayer {
      * Checks whether a tile coordinate lies inside the map bounds.
      *
      * @param map the tile map
-     * @param x tile x-coordinate
-     * @param y tile y-coordinate
+     * @param x   tile x-coordinate
+     * @param y   tile y-coordinate
      * @return True if the tile is inside the map bounds; False otherwise
      */
     private boolean isInsideMap(int[][] map, int x, int y) {
@@ -400,8 +411,8 @@ public abstract class MobileEnemy extends Nonplayer {
      * Checks whether the specified tile is blocked.
      *
      * @param map the tile map
-     * @param x tile x-coordinate
-     * @param y tile y-coordinate
+     * @param x   tile x-coordinate
+     * @param y   tile y-coordinate
      * @return True if the tile is blocked; False otherwise
      */
     private boolean isBlocked(int[][] map, int x, int y) {
@@ -429,7 +440,9 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Conversion a tile x-coordinate into the world x-coordinate of the centered sprite position.
+     * Conversion a tile x-coordinate into the world x-coordinate of the centered
+     * sprite position.
+     * 
      * @param tileX tile x index
      * @param width sprite width
      * @return target world x position
@@ -439,8 +452,10 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Conversion a tile y-coordinate into the world y-coordinate of the centered sprite position.
-     * @param tileY tile y index
+     * Conversion a tile y-coordinate into the world y-coordinate of the centered
+     * sprite position.
+     * 
+     * @param tileY  tile y index
      * @param height sprite height
      * @return target world y position
      */
@@ -524,4 +539,3 @@ public abstract class MobileEnemy extends Nonplayer {
         return edgeDistance <= getAttackRange();
     }
 }
-

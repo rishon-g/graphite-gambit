@@ -102,7 +102,7 @@ public class MobileEnemyTest extends GameTest {
     @Test
     void testUpdateInternal_PatrolRebuildWithNewPathStartsMovement() {
         enemy.currentPath = Collections.emptyList();
-        enemy.patrolRebuildResult = List.of(new int[]{1, 0});
+        enemy.patrolRebuildResult = List.of(new int[] { 1, 0 });
         player.transform.setPosition(2000, 2000);
 
         enemy.updateInternal(0.1f);
@@ -114,7 +114,7 @@ public class MobileEnemyTest extends GameTest {
     @Test
     void testUpdateInternal_ChaseRebuildWithNewPathStartsMovement() {
         enemy.currentPath = Collections.emptyList();
-        enemy.chaseRebuildResult = List.of(new int[]{1, 0});
+        enemy.chaseRebuildResult = List.of(new int[] { 1, 0 });
         player.transform.setPosition(100, 100);
 
         enemy.updateInternal(0.1f);
@@ -125,7 +125,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testUpdateInternal_DoesNotRebuildIfPathExistsAndTimerTooSmall_Chase() {
-        enemy.currentPath = List.of(new int[]{2, 0});
+        enemy.currentPath = List.of(new int[] { 2, 0 });
         enemy.pathIndex = 0;
         enemy.pathTimer = 0f;
         player.transform.setPosition(100, 100);
@@ -138,7 +138,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testUpdateInternal_DoesNotRebuildIfPathExistsAndTimerTooSmall_Patrol() {
-        enemy.currentPath = List.of(new int[]{2, 0});
+        enemy.currentPath = List.of(new int[] { 2, 0 });
         enemy.pathIndex = 0;
         enemy.pathTimer = 0f;
         player.transform.setPosition(3000, 3000);
@@ -149,10 +149,9 @@ public class MobileEnemyTest extends GameTest {
         assertEquals(0, enemy.patrolRebuildCalls);
     }
 
-
     @Test
     void testUpdateInternal_PathFinished_InPatrol_RebuildsPatrolPath() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 1;
         player.transform.setPosition(2000, 2000);
 
@@ -165,7 +164,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testUpdateInternal_PathFinished_InChase_RebuildsChasePath() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 1;
         player.transform.setPosition(100, 100);
 
@@ -178,7 +177,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testUpdateInternal_WithPath_MovesTowardNextTile() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
 
         enemy.updateInternal(0.1f);
@@ -192,7 +191,7 @@ public class MobileEnemyTest extends GameTest {
     void testUpdateInternal_AtTargetTile_AdvancesToNextTile() {
         enemy.transform.setScale(64, 64);
 
-        enemy.currentPath = List.of(new int[]{1, 0}, new int[]{2, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 }, new int[] { 2, 0 });
         enemy.pathIndex = 0;
         player.transform.setPosition(3000, 3000);
 
@@ -212,7 +211,7 @@ public class MobileEnemyTest extends GameTest {
     void testUpdateInternal_AllTargetsAlreadyReached_SetsVelocityToZero() {
         enemy.transform.setScale(64, 64);
 
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
         player.transform.setPosition(3000, 3000);
 
@@ -228,7 +227,6 @@ public class MobileEnemyTest extends GameTest {
         assertEquals(0f, enemy.transform.velocity.y, 0.0001f);
         assertEquals(1, enemy.pathIndex);
     }
-
 
     @Test
     void testUpdateMovementState_NullPlayer_GoesToPatrol() {
@@ -286,7 +284,6 @@ public class MobileEnemyTest extends GameTest {
         assertEquals(MobileEnemy.MovementState.PATROL, enemy.movementState);
     }
 
-
     @Test
     void testShouldRebuildPath_EmptyPath_ReturnsTrue() {
         enemy.currentPath = Collections.emptyList();
@@ -297,7 +294,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testShouldRebuildPath_PathFinished_ReturnsTrue() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 1;
 
         assertTrue(enemy.shouldRebuildPath());
@@ -305,7 +302,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testShouldRebuildPath_ChaseBeforeTimer_ReturnsFalse() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
         enemy.movementState = MobileEnemy.MovementState.CHASE;
         enemy.pathTimer = 0.1f;
@@ -315,7 +312,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testShouldRebuildPath_ChaseAfterTimer_ReturnsTrue() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
         enemy.movementState = MobileEnemy.MovementState.CHASE;
         enemy.pathTimer = 0.5f;
@@ -325,7 +322,7 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testShouldRebuildPath_PatrolBeforeTimer_ReturnsFalse() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
         enemy.movementState = MobileEnemy.MovementState.PATROL;
         enemy.pathTimer = 0.2f;
@@ -335,14 +332,13 @@ public class MobileEnemyTest extends GameTest {
 
     @Test
     void testShouldRebuildPath_PatrolAfterTimer_ReturnsTrue() {
-        enemy.currentPath = List.of(new int[]{1, 0});
+        enemy.currentPath = List.of(new int[] { 1, 0 });
         enemy.pathIndex = 0;
         enemy.movementState = MobileEnemy.MovementState.PATROL;
         enemy.pathTimer = 1.0f;
 
         assertTrue(enemy.shouldRebuildPath());
     }
-
 
     @Test
     void testRebuildPath_NullMap_GivesEmptyPath() {
@@ -394,8 +390,10 @@ public class MobileEnemyTest extends GameTest {
 
         int[][] map = new int[30][30];
 
-        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f) / GameWorld.getTileSize());
-        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f) / GameWorld.getTileSize());
+        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f)
+                / GameWorld.getTileSize());
+        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f)
+                / GameWorld.getTileSize());
 
         map[startX][startY] = 1;
         when(mockWorld.getTilemap()).thenReturn(map);
@@ -414,8 +412,10 @@ public class MobileEnemyTest extends GameTest {
 
         int[][] map = new int[30][30];
 
-        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f) / GameWorld.getTileSize());
-        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f) / GameWorld.getTileSize());
+        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f)
+                / GameWorld.getTileSize());
+        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f)
+                / GameWorld.getTileSize());
 
         map[startX][startY] = 1;
         when(mockWorld.getTilemap()).thenReturn(map);
@@ -457,8 +457,10 @@ public class MobileEnemyTest extends GameTest {
             }
         }
 
-        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f) / GameWorld.getTileSize());
-        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f) / GameWorld.getTileSize());
+        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f)
+                / GameWorld.getTileSize());
+        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f)
+                / GameWorld.getTileSize());
         map[startX][startY] = 0;
 
         when(mockWorld.getTilemap()).thenReturn(map);
@@ -501,7 +503,6 @@ public class MobileEnemyTest extends GameTest {
         assertNotNull(realEnemy.currentPath);
         assertEquals(0, realEnemy.pathIndex);
     }
-
 
     @Test
     void testFindBestTargetTile_ExactPlayerTileReachable() {
@@ -571,8 +572,10 @@ public class MobileEnemyTest extends GameTest {
 
         int[][] map = new int[5][5];
 
-        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f) / GameWorld.getTileSize());
-        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f) / GameWorld.getTileSize());
+        int startX = (int) ((realEnemy.transform.position.x + realEnemy.transform.size.x / 2f)
+                / GameWorld.getTileSize());
+        int startY = (int) ((realEnemy.transform.position.y + realEnemy.transform.size.y / 2f)
+                / GameWorld.getTileSize());
 
         int[] result = realEnemy.findBestTargetTile(player, map, startX, startY);
 
@@ -580,7 +583,6 @@ public class MobileEnemyTest extends GameTest {
         assertEquals(startX, result[0]);
         assertEquals(startY, result[1]);
     }
-
 
     @Test
     void testIsPlayerWithinAttackRange_NullPlayer_ReturnsFalse() {
@@ -647,7 +649,6 @@ public class MobileEnemyTest extends GameTest {
 
         assertTrue(enemy.isPlayerWithinAttackRange(player));
     }
-
 
     @Test
     void testTryAttackPlayer_NullPlayer_DoesNothing() {
@@ -724,15 +725,14 @@ public class MobileEnemyTest extends GameTest {
         assertEquals(1, enemy.collideCalls);
     }
 
-
     static class TestMobileEnemy extends MobileEnemy {
         int chaseRebuildCalls = 0;
         int patrolRebuildCalls = 0;
         int collideCalls = 0;
         boolean beforeMovementCalled = false;
 
-        List<int[]> chaseRebuildResult = List.of(new int[]{1, 0});
-        List<int[]> patrolRebuildResult = List.of(new int[]{1, 0});
+        List<int[]> chaseRebuildResult = List.of(new int[] { 1, 0 });
+        List<int[]> patrolRebuildResult = List.of(new int[] { 1, 0 });
 
         TestMobileEnemy(GameWorld world) {
             super(world);
@@ -790,6 +790,10 @@ public class MobileEnemyTest extends GameTest {
         @Override
         protected float getAttackRange() {
             return 0f;
+        }
+
+        @Override
+        protected void beforeMovementUpdate(float delta) {
         }
 
         @Override
