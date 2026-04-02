@@ -135,7 +135,7 @@ public class WorldLoader {
                             float spawnY = tileObject.getY();
 
                             puddle.transform.setPosition(spawnX, spawnY);
-                            world.entities.add(puddle);
+                            world.addEntity(puddle);
                         }
                     }
                     // door
@@ -146,7 +146,7 @@ public class WorldLoader {
 
                             Door doorPart = new Door(world, partWord);
                             doorPart.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(doorPart);
+                            world.addEntity(doorPart);
                         }
                     }
 
@@ -157,7 +157,7 @@ public class WorldLoader {
 
                             ExitPoint exit = new ExitPoint(world);
                             exit.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(exit);
+                            world.addEntity(exit);
                         }
                     }
 
@@ -168,7 +168,7 @@ public class WorldLoader {
 
                             Ink inkArea = new Ink(world);
                             inkArea.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(inkArea);
+                            world.addEntity(inkArea);
                         }
                     }
                 }
@@ -188,14 +188,12 @@ public class WorldLoader {
             switch (entity.type) {
                 case "Player":
                     newEntity = new Player(world);
-                    world.player = (Player) newEntity;
                     break;
                 case "Eraser":
                     newEntity = new Eraser(world);
                     break;
                 case "Node":
                     newEntity = new Node(world);
-                    world.plotpoints++;
                     break;
                 case "PencilSharpener":
                     newEntity = new PencilSharpener(world);
@@ -205,7 +203,7 @@ public class WorldLoader {
             }
 
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
-            world.entities.add(newEntity);
+            world.addEntity(newEntity);
 
         }
 

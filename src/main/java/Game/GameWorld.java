@@ -238,9 +238,9 @@ public class GameWorld {
 
                 // get and clamp weight from function
                 short weight = (short) w.getWeight(x, y, brushsize);
-                if(weight < 0){
+                if (weight < 0) {
                     weight = 0;
-                }else if (weight > 10){
+                } else if (weight > 10) {
                     weight = 10;
                 }
 
@@ -290,16 +290,19 @@ public class GameWorld {
         // Set global player reference if this is a player entity
         if (e instanceof Player) {
             // If we already have a player, remove it before adding the new one
-            if(this.player != null){
+            if (this.player != null) {
                 entities.remove(this.player);
             }
             this.player = (Player) e;
+        } else if (e instanceof Node) {
+            plotpoints++;
         }
         entities.add(e);
     }
 
     /**
      * Getter for the entities vector, used for testing purposes.
+     * 
      * @return the vector of entities in the world
      */
     public Vector<Entity> getEntities() {
@@ -358,7 +361,7 @@ public class GameWorld {
                     if (!spotTaken) {
                         Pickup newPickup = new Pickup(this);
                         newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
-                        this.entities.add(newPickup);
+                        addEntity(newPickup);
 
                         // successfully spawned, so we reset the time
                         // if the spot was taken, this time is not reset because it will instantly try
@@ -378,7 +381,7 @@ public class GameWorld {
         }
 
         // Resolve entity to player collisions
-        if(this.player != null){
+        if (this.player != null) {
             for (Entity entity : entities) {
                 if (entity instanceof Nonplayer) {
                     if (isTouchingPlayer(entity.transform)) {
@@ -404,6 +407,7 @@ public class GameWorld {
             }
         }
     }
+
     /**
      * Renders all entities in the game world. This method is called every frame
      * after update.
@@ -542,19 +546,20 @@ public class GameWorld {
      * Triggers the win condition for the game. Called when the player reaches the
      * exit point.
      */
-    public void winGame(){
+    public void winGame() {
         endGame(true);
     }
 
     /**
      * Triggers the lose condition for the game. Called when the player dies or time
      */
-    public void loseGame(){
+    public void loseGame() {
         endGame(false);
     }
 
     /**
-     * Ends the game and triggers the end screen. Called when the player wins or loses.
+     * Ends the game and triggers the end screen. Called when the player wins or
+     * loses.
      */
     public void endGame(boolean won) {
         screen.gameEnd(won);
