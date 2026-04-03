@@ -1,9 +1,9 @@
 # Graphite Gambit ✏️
 - Avoid ***erasers*** 🧼! Watch out for ***white-out*** 🕳 and ***ink spills*** ✒️!
-- Don't get caught by ***pencil sharpeners*** 🔪!
-- Collect ***graphite*** 🪨!
-- Collect ***plot points*** 🔵!
-- Navigate to the ***end cell*** after all ***plot points*** are collected to **WIN** 🏆!
+- Don't get caught by ***pencil sharpeners***! 🔪
+- Collect ***graphite***! 🪨
+- Collect ***plot points***! 🔵
+- Navigate to the ***end cell*** after all ***plot points*** are collected to **WIN**! 🏆
 ## Instructions 🗒️
 ### Build 🛠️
 1. Clone the repository with:
