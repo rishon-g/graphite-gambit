@@ -1,11 +1,11 @@
 # Graphite Gambit ✏️
-- Avoid ***erasers*** 🧼! Watch out for ***white-out*** 🕳 and ***ink spills***!
-- Don't get caught by ***pencil sharpeners***! 🔪
-- Collect ***graphite***! 🪨
-- Collect ***plot points***! 🔵
-- Navigate to the ***end cell*** after all ***plot points*** are collected to **WIN**! 🏆
-## Instructions 🗒️
-### Build 🛠️
+- Avoid ***erasers***! Watch out for ***white-out*** and ***ink spills***!
+- Don't get caught by ***pencil sharpeners***!
+- Collect ***graphite***!
+- Collect ***plot points***!
+- Navigate to the ***end cell*** after all ***plot points*** are collected to **WIN**!
+## Instructions
+### Build
 1. Clone the repository with:
 ```bash
 git clone https://github.sfu.ca/saba/CMPT276S26_Group17.git
@@ -22,7 +22,7 @@ mvn clean compile
 ```bash
 TODO
 ```
-### Testing ✅
+### Testing
 To run all tests, use:
 ```bash
 mvn test
