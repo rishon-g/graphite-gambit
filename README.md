@@ -5,7 +5,7 @@
 - Collect ***plot points***!
 - Navigate to the ***end cell*** after all ***plot points*** are collected to **WIN**!
 ## Instructions
-#### Build
+### Build
 1. Clone the repository with:
 ```bash
 https://github.sfu.ca/saba/CMPT276S26_Group17.git
@@ -22,7 +22,7 @@ mvn clean compile
 ```bash
 TODO
 ```
-#### Testing
+### Testing
 To run all tests, use:
 ```bash
 mvn test
