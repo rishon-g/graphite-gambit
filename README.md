@@ -10,15 +10,11 @@
 ```bash
 git clone https://github.sfu.ca/saba/CMPT276S26_Group17.git
 ```
-2. Install the dependencies with:
-```bash
-TODO
-```
-3. To package, run:
+2. To package, run:
 ```bash
 mvn clean package
 ```
-5. Run the game using the launcher with:
+3. Run the game using the launcher with:
 ```bash
 java -jar target/graphite-gambit-1.0.jar
 ```
