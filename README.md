@@ -14,13 +14,13 @@ git clone https://github.sfu.ca/saba/CMPT276S26_Group17.git
 ```bash
 TODO
 ```
-3. To compile, run:
+3. To package, run:
 ```bash
-mvn clean compile
+mvn clean package
 ```
 5. Run the game using the launcher with:
 ```bash
-TODO
+java -jar target/graphite-gambit-1.0.jar
 ```
 ### Testing
 To run all tests, use:
