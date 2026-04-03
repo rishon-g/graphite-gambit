@@ -15,6 +15,7 @@ import Objects.Door;
 import Objects.Ink;
 import Objects.Pickup;
 import Objects.WhiteOut;
+import Objects.Node;
 import Screens.GameScreen;
 import utils.GameTest;
 
@@ -925,8 +926,9 @@ public class GameWorldTest extends GameTest {
         eraser.transform.setPosition(100, 100);
         world.addEntity(eraser);
 
+        int prevHealth = player.getHealth();
         world.update(1);
-        assert(player.getHealth() < 100);
+        assert(player.getHealth() < prevHealth);
     }
 
     @Test public void testSharpenerCollision(){
@@ -936,10 +938,46 @@ public class GameWorldTest extends GameTest {
         world.addEntity(player);
 
         PencilSharpener sharpener = new PencilSharpener(world);
-        sharpener.transform.setPosition(100, 100);
+        sharpener.transform.setPosition(100,100);
         world.addEntity(sharpener);
 
         world.update(1);
+        assert(sharpener.dead == false);
         assert(player.isStunned == true);
+    }
+
+    @Test public void testNodeCollision(){
+        world.setDimensions(800, 600);
+        Player player = new Player(world);
+        player.transform.setPosition(100, 100);
+        world.addEntity(player);
+
+        Node node = new Node(world);
+        node.transform.setPosition(100, 100);
+        world.addEntity(node);
+
+        world.update(1);
+        assert(node.dead == true);
+        assert(world.points > 0);
+        verify(mockScreen, times(1)).collectPlotPoint();
+    }
+
+    @Test public void testGraphiteCollision(){
+        world.setDimensions(800, 600);
+        Player player = new Player(world);
+        player.transform.setPosition(100, 100);
+        world.addEntity(player);
+
+        Pickup graphite = new Pickup(world);
+        graphite.transform.setPosition(100, 100);
+        world.addEntity(graphite);
+
+        int prevHealth = player.getHealth();
+        player.modifyHealth(-1);
+
+        world.update(1);
+        assert(graphite.dead == true);
+        assert(player.getHealth() >= prevHealth);
+        assert(world.points > 0);
     }
 }
