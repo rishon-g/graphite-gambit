@@ -39,6 +39,14 @@ public class GdxGame extends Game {
     private boolean musicPlaying = true;
     private boolean sfxPlaying = true;
 
+    private static boolean testMode = false;
+
+    public static void setTestMode(){
+        testMode = true;
+    }
+    public static boolean isTestMode(){
+        return testMode;
+    }
     /**
      * Initializes the game by setting up the SpriteBatch, ScreenManager, camera, viewport, AssetService, AudioManager, and fonts.
      * Sets the initial screen to the menu screen and starts the background music.

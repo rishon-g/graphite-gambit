@@ -2,16 +2,13 @@ package Game;
 
 import Entities.Entity;
 import Entities.Player;
-import Objects.Nonplayer;
+import Objects.*;
 
 import Components.Transform;
 import Components.Vec2;
 
 import java.util.Vector;
 
-import Objects.Door;
-import Objects.Ink;
-import Objects.Pickup;
 import Screens.GameScreen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -501,6 +498,10 @@ public class GameWorld {
             return false;
         }
 
+        if (other instanceof WhiteOut) {
+            return false;
+        }
+
         if (other.transform == mover) {
             return false;
         }
@@ -594,8 +595,14 @@ public class GameWorld {
                     // snap exactly to the edge of the custom rectangle
                     if (dx > 0) { // move right
                         dx = wall.position.x - (t.position.x + t.size.x) - 0.01f;
+                        if (dx < 0f) {
+                            dx = 0f;
+                        }
                     } else { // move left
                         dx = (wall.position.x + wall.size.x) - t.position.x + 0.01f;
+                        if (dx > 0f) {
+                            dx = 0f;
+                        }
                     }
                     testBox.setPosition(t.position.x + dx, t.position.y); // update phantom box
                 }
@@ -610,8 +617,14 @@ public class GameWorld {
                 if (testBox.collides(entity.transform)) {
                     if (dx > 0) {
                         dx = entity.transform.position.x - (t.position.x + t.size.x) - 0.01f;
+                        if (dx < 0f) {
+                            dx = 0f;
+                        }
                     } else {
                         dx = (entity.transform.position.x + entity.transform.size.x) - t.position.x + 0.01f;
+                        if (dx > 0f) {
+                            dx = 0f;
+                        }
                     }
                     testBox.setPosition(t.position.x + dx, t.position.y);
                 }
@@ -632,8 +645,14 @@ public class GameWorld {
                     // snap exactly to the edge of the custom rectangle
                     if (dy > 0) { // move up
                         dy = wall.position.y - (t.position.y + t.size.y) - 0.01f;
+                        if (dy < 0f) {
+                            dy = 0f;
+                        }
                     } else { // move down
                         dy = (wall.position.y + wall.size.y) - t.position.y + 0.01f;
+                        if (dy < 0f) {
+                            dy = 0f;
+                        }
                     }
                     testBox.setPosition(t.position.x, t.position.y + dy); // update phantom box
                 }
@@ -648,14 +667,33 @@ public class GameWorld {
                 if (testBox.collides(entity.transform)) {
                     if (dy > 0) {
                         dy = entity.transform.position.y - (t.position.y + t.size.y) - 0.01f;
+                        if (dy < 0f) {
+                            dy = 0f;
+                        }
                     } else {
                         dy = (entity.transform.position.y + entity.transform.size.y) - t.position.y + 0.01f;
+                        if (dy < 0f) {
+                            dy = 0f;
+                        }
                     }
                     testBox.setPosition(t.position.x, t.position.y + dy);
                 }
             }
 
             t.move(new Vec2(0, dy)); // same thing as before but now for y
+        }
+
+        // never allow the object to end up outside the map
+        if (t.position.x < 0f) {
+            t.position.x = 0f;
+        } else if (t.position.x + t.size.x > width) {
+            t.position.x = width - t.size.x;
+        }
+
+        if (t.position.y < 0f) {
+            t.position.y = 0f;
+        } else if (t.position.y + t.size.y > height) {
+            t.position.y = height - t.size.y;
         }
     }
 }

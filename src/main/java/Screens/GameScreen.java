@@ -70,58 +70,41 @@ public class GameScreen implements Screen {
     }
 
     // menu textures
-    private final Texture normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
-    private final Texture highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
-    private final Texture textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
+    private Texture normalButton;
+    private Texture highlightedButton;
+    private Texture textBox;
 
     // menu buttons
-    private final MenuButton[] mainButtons = new MenuButton[] {
-            new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70),
-            new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70),
-            new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
-    };
+    private MenuButton[] mainButtons;
 
     // settings buttons, instance for each toggled state to switch between
-    MenuButton musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-            510, 700, 70);
-    MenuButton musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-            510, 700, 70);
-    MenuButton sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton,
-            (1920 >> 1) - (700 >> 1), 420, 700, 70);
-    MenuButton sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton,
-            (1920 >> 1) - (700 >> 1), 420, 700, 70);
-    MenuButton backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700,
-            70);
+    MenuButton backButton;
+    MenuButton sfxOffButton;
+    MenuButton sfxOnButton;
+    MenuButton musicOffButton;
+    MenuButton musicOnButton;
     MenuButton[] settingsButtons;
 
-    // game over buttons
-    private final MenuButton[] gameOverButtons = new MenuButton[] {
-            new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
-    };
 
-    // game win buttons
-    private final MenuButton[] gameWonButtons = new MenuButton[] {
-            new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70),
-            new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70),
-    };
+    // game end buttons
+    private MenuButton[] gameOverButtons;
+    private MenuButton[] gameWonButtons;
 
     // Different menu screens that can be displayed
-    private enum Layout {
+    enum Layout {
         MAIN, SETTINGS, WON, LOST
     }
-    private GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
+    GameScreen.Layout currentLayout = GameScreen.Layout.MAIN;
 
     // switch sets of buttons based on the current layout
     private MenuButton[] menuButtons = mainButtons;
 
     /**
      * Switches the current layout of the ui within the game.
-     * 
+     *
      * @param layout the layout to swap to.
      */
-    private void changeLayout(GameScreen.Layout layout) {
+    void changeLayout(GameScreen.Layout layout) {
         MenuButton music;
         MenuButton sfx;
         // set settings buttons to match stored settings
@@ -154,7 +137,7 @@ public class GameScreen implements Screen {
     /**
      * Constructor for the GameScreen class. Initializes all resources and the
      * GameWorld.
-     * 
+     *
      * @param game reference to the main game class.
      */
     public GameScreen(GdxGame game, int id) {
@@ -188,6 +171,39 @@ public class GameScreen implements Screen {
         // 1920x1080 canvas for the HUD that stretches to fit the window
         this.uiViewport = new FitViewport(1920, 1080, uiCamera);
 
+        // Menu Textures
+        normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
+        highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
+        textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
+
+        // Buttons
+        mainButtons = new MenuButton[] {
+                new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
+                new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),
+                new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+
+        musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
+                510, 700, 70, false);
+        musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
+                510, 700, 70, false);
+        sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton,
+                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
+        sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton,
+                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
+        backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700,
+                70, false);
+
+        gameOverButtons = new MenuButton[] {
+                new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+        gameWonButtons = new MenuButton[] {
+                new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+
         // generate a 1x1 white pixel texture for drawing the health bar shapes
         // TODO we need to add a nicer looking texture
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -196,6 +212,54 @@ public class GameScreen implements Screen {
         this.uiTexture = new Texture(pixmap);
         pixmap.dispose();
 
+    }
+
+    /**
+     * Test only constructor, skips libgdx and texture initialization
+     * @param game game class, should be set to test mode
+     */
+    private GameScreen(GdxGame game) {
+        // Construct without textures
+        normalButton = null;
+        highlightedButton = null;
+        textBox = null;
+
+        // Buttons
+        MenuButton[] mainButtons = new MenuButton[] {
+                new MenuButton("RESUME", null, null, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
+                new MenuButton("RESTART", null, null, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),
+                new MenuButton("SETTINGS", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("SAVE & QUIT", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+
+        musicOnButton = new MenuButton("MUSIC: ON", null, null, (1920 >> 1) - (700 >> 1),
+                510, 700, 70, false);
+        musicOffButton = new MenuButton("MUSIC: OFF", null, null, (1920 >> 1) - (700 >> 1),
+                510, 700, 70, false);
+        sfxOnButton = new MenuButton("SOUND EFFECTS: ON", null, null,
+                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
+        sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", null, null,
+                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
+        backButton = new MenuButton("BACK", null, null, (1920 >> 1) - (700 >> 1), 600, 700,
+                70, false);
+
+        gameOverButtons = new MenuButton[] {
+                new MenuButton("RESTART LEVEL", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("QUIT TO MENU", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+        gameWonButtons = new MenuButton[] {
+                new MenuButton("NEXT LEVEL", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
+                new MenuButton("QUIT TO MENU", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+        };
+        this.game = game;
+        this.playerData = PlayerData.obtainPlayerData();
+        this.world = null;
+        menuButtons = mainButtons;
+        settingsButtons = new MenuButton[] {};
+    }
+
+    public static GameScreen createForTesting(GdxGame game) {
+        return new GameScreen(game);
     }
 
     @Override
@@ -208,7 +272,7 @@ public class GameScreen implements Screen {
      * game world and rendering all entities.
      * When paused, the game stops updates to the world and displays the pause menu
      * When the player dies or completes the level, the appropriate menu is displayed and world updates stop
-     * 
+     *
      * @param delta time since last frame (used for uniform movement and animations)
      */
     @Override
@@ -392,10 +456,10 @@ public class GameScreen implements Screen {
 
     /**
      * Trigger code given the clicked button based on the selected layout and position of the button
-     * 
+     *
      * @param index index of the clicked button in its button array
      */
-    private void activateButton(int index) {
+    void activateButton(int index) {
         if (currentLayout == Layout.MAIN) {
             if (index == 0) {
                 gameUnpause();
@@ -449,7 +513,7 @@ public class GameScreen implements Screen {
     /**
      * Pauses the game when called, and reduces music volume.
      */
-    private void gamePause() {
+    void gamePause() {
         paused = true;
         AudioManager.getInstance(game).setMusicHalfVolume();
     }
@@ -457,14 +521,14 @@ public class GameScreen implements Screen {
     /**
      * unpauses the game when called, and resets music volume.
      */
-    private void gameUnpause() {
+    void gameUnpause() {
         paused = false;
         AudioManager.getInstance(game).setMusicFullVolume();
     }
 
     /**
      * resizes the current viewport. called whenever the user resizes the window.
-     * 
+     *
      * @param width  the new width of the window
      * @param height the new height of the window
      */
@@ -504,7 +568,7 @@ public class GameScreen implements Screen {
 
     /**
      * Handles the event that the GameWorld is finished with it's operation.
-     * 
+     *
      * @param won true if the player gameWon, false if not
      */
     public void gameEnd(boolean won) {
