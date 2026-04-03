@@ -9,6 +9,7 @@ import Components.Transform;
 import Components.Vec2;
 import Entities.Entity;
 import Entities.Eraser;
+import Entities.PencilSharpener;
 import Entities.Player;
 import Objects.Door;
 import Objects.Ink;
@@ -912,5 +913,33 @@ public class GameWorldTest extends GameTest {
         assert(world.shouldBlockEntityMovement(player.transform, player) == false);
         assert(world.shouldBlockEntityMovement(player.transform, whiteOut) == false);
         assert(world.shouldBlockEntityMovement(dummy.transform, dummy2) == true);
+    }
+
+    @Test public void testEraserCollision(){
+        world.setDimensions(800, 600);
+        Player player = new Player(world);
+        player.transform.setPosition(100, 100);
+        world.addEntity(player);
+
+        Eraser eraser = new Eraser(world);
+        eraser.transform.setPosition(100, 100);
+        world.addEntity(eraser);
+
+        world.update(1);
+        assert(player.getHealth() < 100);
+    }
+
+    @Test public void testSharpenerCollision(){
+        world.setDimensions(800, 600);
+        Player player = new Player(world);
+        player.transform.setPosition(100, 100);
+        world.addEntity(player);
+
+        PencilSharpener sharpener = new PencilSharpener(world);
+        sharpener.transform.setPosition(100, 100);
+        world.addEntity(sharpener);
+
+        world.update(1);
+        assert(player.isStunned == true);
     }
 }
