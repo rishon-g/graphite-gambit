@@ -67,7 +67,6 @@ public class MainMenuScreen extends ScreenAdapter {
         this.screenManager = ScreenManager.getInstance(game);
         this.header_font = game.getHeaderFont();
 
-        this.playerData = PlayerData.obtainPlayerData();
         // only load textures if not testing
         if (!GdxGame.isTestMode()) {
             plot = new Texture(Gdx.files.internal("sprites/Plot.png"));
