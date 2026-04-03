@@ -13,6 +13,7 @@ import Entities.Player;
 import Objects.Door;
 import Objects.Ink;
 import Objects.Pickup;
+import Objects.WhiteOut;
 import Screens.GameScreen;
 import utils.GameTest;
 
@@ -582,7 +583,7 @@ public class GameWorldTest extends GameTest {
         assert(mover.position.y >= startY);
     }
 
-    @Test void requestMoveWithBlockingEntity(){
+    @Test void requestMoveWithBlockingEntities(){
         world.setDimensions(800, 600);
         
         // Create a solid entity
@@ -590,24 +591,26 @@ public class GameWorldTest extends GameTest {
         solidEntity.transform.setPosition(200, 100);
         solidEntity.transform.setScale(100, 100);
         world.addEntity(solidEntity);
+        DummyEntity solidEntity2 = new DummyEntity(world);
+        solidEntity2.transform.setPosition(100, 200);
+        solidEntity2.transform.setScale(100, 100);
+        world.addEntity(solidEntity2);
 
         // Create a moving object
         DummyEntity mover = new DummyEntity(world);
         mover.transform.setPosition(100, 100);
         mover.transform.setScale(50, 50);
-        mover.transform.setVelocity(100, 0); // Move right toward the solid entity
+        mover.transform.setVelocity(100, 100); // Move right toward the solid entity
         world.addEntity(mover);
 
         float startX = mover.transform.position.x;
-        float entityLeft = solidEntity.transform.position.x;
+        float startY = mover.transform.position.y;
 
         world.requestMove(mover.transform, 1.0f);
 
         // Mover must not go through the blocking entity
-        assert(mover.transform.position.x + mover.transform.size.x <= entityLeft);
-
-        // And it must not move left of its original position
-        assert(mover.transform.position.x >= startX);
+        assert(equalsWithEpsilon(startX + 50, mover.transform.position.x, 0.01f));
+        assert(equalsWithEpsilon(startY + 50, mover.transform.position.y, 0.01f));
     }
 
     @Test void isTouchingPlayer(){
@@ -849,6 +852,20 @@ public class GameWorldTest extends GameTest {
         assert(world.getEntityByTransform(e2.transform) == e2);
     }
 
+    @Test public void testPlayerDeath(){
+        world.setDimensions(800, 600);
+        world.player = new Player(world);
+        world.player.transform.setPosition(100, 100);
+        world.player.transform.setScale(50, 50);
+
+        Player player = new Player(world);
+        world.addEntity(player);
+        player.dead = true; // Simulate player death
+        
+        world.update(1); // Should remove player and call to end game
+        verify(mockScreen, times(1)).gameEnd(false); // Should trigger game end with loss
+    }
+
     @Test
     public void testPlayerReplaced(){
         world.setDimensions(800, 600);
@@ -884,6 +901,7 @@ public class GameWorldTest extends GameTest {
         DummyEntity dummy = new DummyEntity(world);
         DummyEntity dummy2 = new DummyEntity(world);
         Player player = new Player(world);
+        WhiteOut whiteOut = new WhiteOut(world, "");
 
         world.addEntity(player);
         world.addEntity(dummy);
@@ -892,6 +910,7 @@ public class GameWorldTest extends GameTest {
         assert(world.shouldBlockEntityMovement(player.transform, ink) == false);
         assert(world.shouldBlockEntityMovement(player.transform, dummy) == false);
         assert(world.shouldBlockEntityMovement(player.transform, player) == false);
+        assert(world.shouldBlockEntityMovement(player.transform, whiteOut) == false);
         assert(world.shouldBlockEntityMovement(dummy.transform, dummy2) == true);
     }
 }
