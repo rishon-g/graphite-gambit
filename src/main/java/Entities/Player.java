@@ -1,4 +1,5 @@
 package Entities;
+import Game.AudioManager;
 import Game.DrawWeight;
 
 import com.badlogic.gdx.Gdx;
