@@ -1,8 +1,6 @@
 package Entities;
 
 import Game.GameWorld;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -33,7 +31,6 @@ public class PencilSharpener extends MobileEnemy {
     private static final int LEFT = 2;
     private static final int RIGHT = 3;
     int facing = DOWN;
-    private float time = 0;
 
     static final int HITBOX = 64;
 
@@ -41,7 +38,7 @@ public class PencilSharpener extends MobileEnemy {
     public static final float STUN_DURATION = 8f;
     public static final int DOT_DAMAGE = -5;
     public static final float DAMAGE_TICK_RATE = 0.5f;
-    private static final float ATTACK_RANGE = 72f;
+    private static final float ATTACK_RANGE = 50f;
     /**
      * sprites for the sharpener
      */

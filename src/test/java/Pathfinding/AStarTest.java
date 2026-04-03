@@ -92,4 +92,88 @@ public class AStarTest {
         assertArrayEquals(new int[]{2, 0}, path.get(1), "Path should preserve forward order toward the destination");
         assertFalse(path.stream().anyMatch(step -> step[0] == 0 && step[1] == 0), "Returned path should exclude the starting tile");
     }
+
+    @Test
+    void testFindPath_NullMap_ReturnsEmptyList() {
+        List<int[]> path = AStar.findPath(null, 0, 0, 1, 1);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Null map should return an empty path");
+    }
+
+    @Test
+    void testFindPath_EmptyMap_ReturnsEmptyList() {
+        int[][] map = new int[0][0];
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 1, 1);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Empty map should return an empty path");
+    }
+
+    @Test
+    void testFindPath_StartOutsideMap_ReturnsEmptyList() {
+        int[][] map = new int[5][5];
+
+        List<int[]> path = AStar.findPath(map, -1, 0, 1, 1);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Start outside map should return an empty path");
+    }
+
+    @Test
+    void testFindPath_EndOutsideMap_ReturnsEmptyList() {
+        int[][] map = new int[5][5];
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 5, 5);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "End outside map should return an empty path");
+    }
+
+    @Test
+    void testFindPath_StartBlocked_ReturnsEmptyList() {
+        int[][] map = new int[5][5];
+        map[0][0] = 1;
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 4, 4);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Blocked start tile should return an empty path");
+    }
+
+    @Test
+    void testFindPath_EndBlocked_ReturnsEmptyList() {
+        int[][] map = new int[5][5];
+        map[4][4] = 1;
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 4, 4);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Blocked end tile should return an empty path");
+    }
+
+    @Test
+    void testFindPath_StraightLinePath_Exists() {
+        int[][] map = new int[5][5];
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 0, 3);
+
+        assertNotNull(path);
+        assertFalse(path.isEmpty(), "Straight line path should exist");
+        assertArrayEquals(new int[]{0, 3}, path.get(path.size() - 1));
+    }
+
+    @Test
+    void testFindPath_NoRoute_ReturnsEmptyList() {
+        int[][] map = new int[5][5];
+        map[1][0] = 1;
+        map[0][1] = 1;
+        map[1][1] = 1;
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 4, 4);
+
+        assertNotNull(path);
+        assertTrue(path.isEmpty(), "Completely trapped start should return an empty path");
+    }
 }

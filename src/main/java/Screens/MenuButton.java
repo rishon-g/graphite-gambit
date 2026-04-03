@@ -21,6 +21,7 @@ public class MenuButton {
     private Texture normalTexture, hoverTexture;
     private Rectangle bounds;
     private final GlyphLayout layout = new GlyphLayout();
+    private boolean disabled;
 
     /**
      * Constructor for a menu button
@@ -32,11 +33,12 @@ public class MenuButton {
      * @param width button width
      * @param height button height
      */
-    public MenuButton(String label, Texture normalTexture, Texture hoverTexture, float x, float y, float width, float height) {
+    public MenuButton(String label, Texture normalTexture, Texture hoverTexture, float x, float y, float width, float height, boolean disabled) {
         this.label = label;
         this.normalTexture = normalTexture;
         this.hoverTexture = hoverTexture;
         this.bounds = new Rectangle(x, y, width, height);
+        this.disabled = disabled;
     }
 
     /**
@@ -79,6 +81,10 @@ public class MenuButton {
         return isHovered(viewport) && Gdx.input.isButtonJustPressed(com.badlogic.gdx.Input.Buttons.LEFT);
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
     /**
      * Disposes of the textures used by the button.
      */
@@ -87,13 +93,7 @@ public class MenuButton {
         hoverTexture.dispose();
     }
 
-    /**
-     * Checks if the normal texture matches the given texture.
-     *
-     * @param texture the texture to compare
-     * @return true if the normal texture is the same as the given texture, false otherwise
-     */
-    public boolean textureIs(Texture texture) {
-        return (normalTexture == texture);
+    public String getLabel() {
+        return label;
     }
 }

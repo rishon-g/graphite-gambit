@@ -2,7 +2,6 @@ package Asset;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 public enum MapAsset implements Asset<TiledMap> {
     LEVEL1("level1.tmx"),
@@ -11,7 +10,7 @@ public enum MapAsset implements Asset<TiledMap> {
     private final AssetDescriptor<TiledMap> descriptor;
 
     MapAsset(String mapName) {
-        TmxMapLoader.Parameters parameters = new TmxMapLoader.Parameters();
+        //TmxMapLoader.Parameters parameters = new TmxMapLoader.Parameters();
         this.descriptor = new  AssetDescriptor<>("maps/" + mapName, TiledMap.class);
     }
 
