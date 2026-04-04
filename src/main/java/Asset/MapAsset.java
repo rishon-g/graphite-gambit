@@ -10,7 +10,6 @@ public enum MapAsset implements Asset<TiledMap> {
     private final AssetDescriptor<TiledMap> descriptor;
 
     MapAsset(String mapName) {
-        //TmxMapLoader.Parameters parameters = new TmxMapLoader.Parameters();
         this.descriptor = new  AssetDescriptor<>("maps/" + mapName, TiledMap.class);
     }
 

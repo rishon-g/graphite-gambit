@@ -19,11 +19,11 @@
                 7,
                 2
             ],
-            "scale": 0.2,
-            "selectedLayer": 6,
+            "scale": 0.1372,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 1840,
-                "y": 1867.5
+                "x": 2252.186588921283,
+                "y": 1585.2769679300293
             }
         },
         "level1.tmx#maintiles": {
