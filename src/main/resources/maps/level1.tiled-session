@@ -11,7 +11,7 @@
             "scaleInDock": 1
         },
         "bigobjects.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "level1.tmx": {
             "expandedObjectLayers": [

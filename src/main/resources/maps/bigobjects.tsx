@@ -36,9 +36,15 @@
  </tile>
  <tile id="88">
   <image source="../images/keypixel1.png" width="128" height="128"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="18" width="128" height="83"/>
+  </objectgroup>
  </tile>
  <tile id="89">
   <image source="../images/keypixel2.png" width="128" height="128"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="17" width="128" height="80"/>
+  </objectgroup>
  </tile>
  <tile id="90">
   <image source="../images/cornerdesign.png" width="396" height="400"/>
