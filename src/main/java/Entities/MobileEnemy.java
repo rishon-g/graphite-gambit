@@ -141,7 +141,7 @@ public abstract class MobileEnemy extends Nonplayer {
 
         if (shouldRebuildPath()) {
             if (movementState == MovementState.CHASE) {
-                rebuildPath(player);
+                rebuildChasePath(player);
             } else {
                 rebuildPatrolPath();
             }
@@ -246,32 +246,57 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Rebuilds the path from the MobileEntity to the player's current tile.
-     * 
-     * @param player the current player target
+     * Clears the current movement path and resets the path index.
      */
-    protected void rebuildPath(Player player) {
+    private void clearCurrentPath() {
+        currentPath = Collections.emptyList();
+        pathIndex = 0;
+    }
+
+    /**
+     * Returns the current world tile map if it is valid.
+     *
+     * <p>If the tile map is missing or empty, the current path is cleared and
+     * {@code null} is returned.</p>
+     *
+     * @return the current valid tile map, or {@code null} if unavailable
+     */
+    private int[][] getValidTileMap() {
         int[][] map = world.getTilemap();
         if (map == null || map.length == 0 || map[0].length == 0) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
-            return;
+            clearCurrentPath();
+            return null;
         }
+        return map;
+    }
 
+    /**
+     * Returns this enemy's current tile position.
+     *
+     * <p>The returned array has the form {@code {x, y}}.</p>
+     *
+     * @return the current tile coordinates of this enemy
+     */
+    private int[] getCurrentTilePosition() {
         int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
         int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
+        return new int[]{startX, startY};
+    }
 
-        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        int[] targetTile = findBestTargetTile(player, map, startX, startY);
+    /**
+     * Rebuilds the current path from the given start tile to the given target tile.
+     *
+     * <p>If the target is {@code null}, or if the start and target tiles are the
+     * same, the current path is cleared.</p>
+     *
+     * @param map the tile map
+     * @param startX the starting tile x-coordinate
+     * @param startY the starting tile y-coordinate
+     * @param targetTile the destination tile as {@code {x, y}}, or {@code null}
+     */
+    private void rebuildPathToTarget(int[][] map, int startX, int startY, int[] targetTile) {
         if (targetTile == null) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
+            clearCurrentPath();
             return;
         }
 
@@ -279,8 +304,7 @@ public abstract class MobileEnemy extends Nonplayer {
         int endY = targetTile[1];
 
         if (startX == endX && startY == endY) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
+            clearCurrentPath();
             return;
         }
 
@@ -289,44 +313,51 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Rebuilds a random patrol path when the player is not in vision range.
+     * Rebuilds the chase path toward the best reachable tile near the player.
+     *
+     * @param player the current player target
      */
-    protected void rebuildPatrolPath() {
-        int[][] map = world.getTilemap();
-        if (map == null || map.length == 0 || map[0].length == 0) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
+    protected void rebuildChasePath(Player player) {
+        int[][] map = getValidTileMap();
+        if (map == null) {
             return;
         }
 
-        int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
-        int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
+        int[] startTile = getCurrentTilePosition();
+        int startX = startTile[0];
+        int startY = startTile[1];
 
         if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
+            clearCurrentPath();
+            transform.setVelocity(0, 0);
+            return;
+        }
+
+        int[] targetTile = findBestTargetTile(player, map, startX, startY);
+        rebuildPathToTarget(map, startX, startY, targetTile);
+    }
+
+    /**
+     * Rebuilds a random patrol path when the player is not in vision range.
+     */
+    protected void rebuildPatrolPath() {
+        int[][] map = getValidTileMap();
+        if (map == null) {
+            return;
+        }
+
+        int[] startTile = getCurrentTilePosition();
+        int startX = startTile[0];
+        int startY = startTile[1];
+
+        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
+            clearCurrentPath();
             transform.setVelocity(0, 0);
             return;
         }
 
         int[] patrolTarget = RandomPatrol.choosePatrolTarget(map, startX, startY, PATROL_SEARCH_RADIUS);
-        if (patrolTarget == null) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
-            return;
-        }
-
-        int endX = patrolTarget[0];
-        int endY = patrolTarget[1];
-
-        if (startX == endX && startY == endY) {
-            currentPath = Collections.emptyList();
-            pathIndex = 0;
-            return;
-        }
-
-        currentPath = AStar.findPath(map, startX, startY, endX, endY);
-        pathIndex = 0;
+        rebuildPathToTarget(map, startX, startY, patrolTarget);
     }
 
     /**

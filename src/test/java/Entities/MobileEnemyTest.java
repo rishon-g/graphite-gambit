@@ -348,7 +348,7 @@ public class MobileEnemyTest extends GameTest {
 
         when(mockWorld.getTilemap()).thenReturn(null);
 
-        realEnemy.rebuildPath(player);
+        realEnemy.rebuildChasePath(player);
 
         assertTrue(realEnemy.currentPath.isEmpty());
         assertEquals(0, realEnemy.pathIndex);
@@ -376,7 +376,7 @@ public class MobileEnemyTest extends GameTest {
 
         when(mockWorld.getTilemap()).thenReturn(new int[0][0]);
 
-        realEnemy.rebuildPath(player);
+        realEnemy.rebuildChasePath(player);
 
         assertTrue(realEnemy.currentPath.isEmpty());
         assertEquals(0, realEnemy.pathIndex);
@@ -420,7 +420,7 @@ public class MobileEnemyTest extends GameTest {
         map[startX][startY] = 1;
         when(mockWorld.getTilemap()).thenReturn(map);
 
-        realEnemy.rebuildPath(player);
+        realEnemy.rebuildChasePath(player);
 
         assertTrue(realEnemy.currentPath.isEmpty());
         assertEquals(0, realEnemy.pathIndex);
@@ -438,7 +438,7 @@ public class MobileEnemyTest extends GameTest {
         player.transform.setScale(64, 64);
         player.transform.setPosition(32, 32);
 
-        realEnemy.rebuildPath(player);
+        realEnemy.rebuildChasePath(player);
 
         assertTrue(realEnemy.currentPath.isEmpty());
         assertEquals(0, realEnemy.pathIndex);
@@ -483,7 +483,7 @@ public class MobileEnemyTest extends GameTest {
         player.transform.setScale(64, 64);
         player.transform.setPosition(300, 300);
 
-        realEnemy.rebuildPath(player);
+        realEnemy.rebuildChasePath(player);
 
         assertFalse(realEnemy.currentPath.isEmpty());
         assertEquals(0, realEnemy.pathIndex);
@@ -750,7 +750,7 @@ public class MobileEnemyTest extends GameTest {
         }
 
         @Override
-        protected void rebuildPath(Player player) {
+        protected void rebuildChasePath(Player player) {
             chaseRebuildCalls++;
             currentPath = chaseRebuildResult;
             pathIndex = 0;
