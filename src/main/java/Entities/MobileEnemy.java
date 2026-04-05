@@ -434,6 +434,12 @@ public abstract class MobileEnemy extends Nonplayer {
         return getEdgeDistanceToPlayer(player) <= ATTACK_RANGE;
     }
 
+    /**
+     * Computes the center-to-center distance between this enemy and the player.
+     *
+     * @param player the player whose distance from this enemy is measured
+     * @return the distance between the centers of the enemy and player
+     */
     protected float getCenterDistanceToPlayer(Player player) {
         float enemyCenterX = transform.position.x + transform.size.x / 2f;
         float enemyCenterY = transform.position.y + transform.size.y / 2f;
