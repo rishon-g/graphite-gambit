@@ -106,6 +106,65 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
+     * Updates the current path if a rebuild is needed for the current movement state.
+     *
+     * @param player the current player target
+     */
+    private void handlePathRebuild(Player player) {
+        if (!shouldRebuildPath()) {
+            return;
+        }
+
+        if (movementState == MovementState.CHASE) {
+            rebuildChasePath(player);
+        } else {
+            rebuildPatrolPath();
+        }
+
+        pathTimer = 0f;
+    }
+
+    /**
+     * Moves this enemy along its current path toward the next target tile.
+     *
+     * <p>If there is no valid path, the enemy stops moving. If the enemy reaches
+     * the current target tile, it advances to the next one. If the player comes
+     * within attack range while moving, an attack is attempted.</p>
+     *
+     * @param player the player target
+     */
+    private void followCurrentPath(Player player) {
+        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
+            transform.setVelocity(0, 0);
+            return;
+        }
+
+        while (pathIndex < currentPath.size()) {
+            int[] nextTile = currentPath.get(pathIndex);
+
+            float targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
+            float targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
+
+            float dx = targetX - transform.position.x;
+            float dy = targetY - transform.position.y;
+            float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+            if (dist <= TARGET_DIF) {
+                transform.setPosition(targetX, targetY);
+                pathIndex++;
+                continue;
+            }
+
+            transform.setVelocity((dx / dist) * getMoveSpeed(), (dy / dist) * getMoveSpeed());
+            tryAttackPlayer(player);
+            return;
+        }
+
+        transform.setVelocity(0, 0);
+        tryAttackPlayer(player);
+    }
+
+    /**
      * The update method is called every frame to update the state of the
      * MobileEnemy entity.
      *
@@ -139,42 +198,8 @@ public abstract class MobileEnemy extends Nonplayer {
         updateMovementState(player);
         pathTimer += delta;
 
-        if (shouldRebuildPath()) {
-            if (movementState == MovementState.CHASE) {
-                rebuildChasePath(player);
-            } else {
-                rebuildPatrolPath();
-            }
-            pathTimer = 0f;
-        }
-
-        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        while (pathIndex < currentPath.size()) {
-            int[] nextTile = currentPath.get(pathIndex);
-
-            float targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
-            float targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
-
-            float dx = targetX - transform.position.x;
-            float dy = targetY - transform.position.y;
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-            if (dist <= TARGET_DIF) {
-                transform.setPosition(targetX, targetY);
-                pathIndex++;
-                continue;
-            }
-            transform.setVelocity((dx / dist) * getMoveSpeed(), (dy / dist) * getMoveSpeed());
-            tryAttackPlayer(player);
-            return;
-        }
-
-        transform.setVelocity(0, 0);
-        tryAttackPlayer(player);
+        handlePathRebuild(player);
+        followCurrentPath(player);
     }
 
     /**
