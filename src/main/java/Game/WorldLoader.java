@@ -40,6 +40,26 @@ public class WorldLoader {
     public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
 
+        // #pickups depends on the level
+        switch (id) {
+            case 1:
+                world.maxPickups = 5;
+                world.spawnInterval = 5.0f;
+                break;
+            case 2:
+                world.maxPickups = 7;
+                world.spawnInterval = 4.0f;
+                break;
+            case 3:
+                world.maxPickups = 12;
+                world.spawnInterval = 3.0f;
+                break;
+            default:
+                world.maxPickups = 5 + id;
+                world.spawnInterval = Math.max(1.0f, 6.0f - id);
+                break;
+        }
+
         // get the map dynamically using the id
         MapAsset currentLevel = MapAsset.getLevelAsset(id);
         TiledMap map = game.getAssetService().get(currentLevel);

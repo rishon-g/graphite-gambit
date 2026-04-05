@@ -37,8 +37,8 @@ public class GameWorld {
     // spawner variables
     public Array<Vec2> spawnPoints = new Array<>();
     private float spawnTimer = 0f;
-    private final float SPAWN_INTERVAL = 5.0f;
-    private final int MAX_PICKUPS = 5;
+    public float spawnInterval = 5.0f;
+    public int maxPickups = 5;
 
     int points;
     public float time;
@@ -343,7 +343,7 @@ public class GameWorld {
             if (spawnPoints.size > 0) {
                 spawnTimer += delta;
 
-                if (spawnTimer >= SPAWN_INTERVAL) {
+                if (spawnTimer >= spawnInterval) {
 
                     // count how many pickups concurrently are on the map
                     int currentPickups = 0;
@@ -354,7 +354,7 @@ public class GameWorld {
                     }
 
                     // do we have room to spawn more?
-                    if (currentPickups < MAX_PICKUPS) {
+                    if (currentPickups < maxPickups) {
 
                         int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
                         Vec2 chosenLoc = spawnPoints.get(randomIndex);
@@ -383,6 +383,7 @@ public class GameWorld {
                             // again until it finds an empty spot
                             spawnTimer = 0f;
                         }
+
 
                     } else {
                         // we are at max limit but we try to spawn more

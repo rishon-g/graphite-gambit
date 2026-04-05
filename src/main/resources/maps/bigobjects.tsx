@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1024" tileheight="1024" tilecount="22" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1200" tileheight="1371" tilecount="33" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="74">
   <image source="../images/hole4pixel.png" width="1024" height="1024"/>
@@ -66,5 +66,38 @@
  </tile>
  <tile id="100">
   <image source="../images/greydot.png" width="128" height="128"/>
+ </tile>
+ <tile id="101">
+  <image source="../images/protractor.png" width="384" height="384"/>
+ </tile>
+ <tile id="102">
+  <image source="../images/ruler.png" width="1024" height="1024"/>
+ </tile>
+ <tile id="103">
+  <image source="../images/protractor (2).png" width="768" height="768"/>
+ </tile>
+ <tile id="104">
+  <image source="../images/pencil.png" width="768" height="768"/>
+ </tile>
+ <tile id="105">
+  <image source="../images/drawingpencil.png" width="1024" height="1024"/>
+ </tile>
+ <tile id="106">
+  <image source="../images/pencilcase.png" width="768" height="768"/>
+ </tile>
+ <tile id="107">
+  <image source="../images/doodles.png" width="1200" height="1200"/>
+ </tile>
+ <tile id="108">
+  <image source="../images/pikachu.png" width="271" height="400"/>
+ </tile>
+ <tile id="109">
+  <image source="../images/moondrawing.png" width="400" height="400"/>
+ </tile>
+ <tile id="112">
+  <image source="../images/drawings (1).png" width="1024" height="681"/>
+ </tile>
+ <tile id="113">
+  <image source="../images/flowers (1).png" width="768" height="1371"/>
  </tile>
 </tileset>

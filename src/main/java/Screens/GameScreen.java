@@ -310,10 +310,10 @@ public class GameScreen implements Screen {
         // expand the camera's "culling box" by 5 world units such that big objects do
         // not despawn
         float bleed = 10f;
-        float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
-        float startY = this.camera.position.y - (this.camera.viewportHeight / 2f) - bleed;
-        float boxWidth = this.camera.viewportWidth + (bleed * 2);
-        float boxHeight = this.camera.viewportHeight + (bleed * 2);
+        float startX = this.camera.position.x - ((this.camera.viewportWidth * this.camera.zoom) / 2f) - bleed;
+        float startY = this.camera.position.y - ((this.camera.viewportHeight * this.camera.zoom) / 2f) - bleed;
+        float boxWidth = (this.camera.viewportWidth * this.camera.zoom) + (bleed * 2);
+        float boxHeight = (this.camera.viewportHeight * this.camera.zoom) + (bleed * 2);
 
         this.mapRenderer.setView(this.camera.combined, startX, startY, boxWidth, boxHeight);
         this.mapRenderer.render();
@@ -502,10 +502,12 @@ public class GameScreen implements Screen {
                 if (playerData.getLevelUnlocked() >= world.getId() + 1) {
                     screenManager.SetGameScreen(world.getId() + 1);
                 } else {
+                    AudioManager.getInstance().startMusic();
                     screenManager.SetMenuScreen();
                 }
             }
             if (index == 1) {
+                AudioManager.getInstance().startMusic();
                 screenManager.SetMenuScreen();
             }
         }
