@@ -114,28 +114,72 @@ public class Eraser extends MobileEnemy {
      */
     @Override
     protected void beforeMovementUpdate(float delta) {
+        saveSpawnPositionIfNeeded();
+        updateAttackCooldown(delta);
+
+        if (!isMoving()) {
+            return;
+        }
+
+        updateFacingFromVelocity();
+        eraseFloorUnderEraser();
+    }
+
+    /**
+     * Saves the eraser's initial spawn position the first time it updates.
+     */
+    private void saveSpawnPositionIfNeeded() {
         if (startX == -1f) {
             startX = transform.position.x;
             startY = transform.position.y;
         }
+    }
 
+    /**
+     * Updates the remaining attack cooldown time.
+     *
+     * @param delta time since last update
+     */
+    private void updateAttackCooldown(float delta) {
         if (attackCooldownTimer > 0f) {
             attackCooldownTimer -= delta;
             if (attackCooldownTimer < 0f) {
                 attackCooldownTimer = 0f;
             }
         }
+    }
 
-        if (transform.velocity.x != 0 || transform.velocity.y != 0) {
-            if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
-                facing = transform.velocity.y > 0 ? UP : DOWN;
-            } else {
-                facing = transform.velocity.x > 0 ? RIGHT : LEFT;
-            }
+    /**
+     * Checks whether the eraser is currently moving.
+     *
+     * @return true if the eraser has non-zero velocity
+     */
+    private boolean isMoving() {
+        return transform.velocity.x != 0 || transform.velocity.y != 0;
+    }
 
-            world.floorDraw(transform.position.x + transform.size.x / 2, transform.position.y + transform.size.y / 4,
-                    true, 10, weight);
+    /**
+     * Updates the facing direction based on the current velocity.
+     */
+    private void updateFacingFromVelocity() {
+        if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
+            facing = transform.velocity.y > 0 ? UP : DOWN;
+        } else {
+            facing = transform.velocity.x > 0 ? RIGHT : LEFT;
         }
+    }
+
+    /**
+     * Erases drawn floor tiles under the eraser.
+     */
+    private void eraseFloorUnderEraser() {
+        world.floorDraw(
+                transform.position.x + transform.size.x / 2,
+                transform.position.y + transform.size.y / 4,
+                true,
+                10,
+                weight
+        );
     }
 
     /**
