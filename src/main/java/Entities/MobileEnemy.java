@@ -470,15 +470,16 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Attempts to attack the player if they are within this enemy's attack range.
+     * Computes the edge-to-edge distance between this enemy and the player.
      *
-     * @param player the player target
+     * <p>If the enemy and player overlap on one axis, the gap on that axis is
+     * treated as zero. The final distance is computed from the horizontal and
+     * vertical gaps.</p>
+     *
+     * @param player the player whose distance from this enemy is measured
+     * @return the edge-to-edge distance between the enemy and player
      */
-    protected void tryAttackPlayer(Player player) {
-        if (player == null) {
-            return;
-        }
-
+    private float getEdgeDistanceToPlayer(Player player) {
         float enemyLeft = transform.position.x;
         float enemyRight = transform.position.x + transform.size.x;
         float enemyBottom = transform.position.y;
@@ -503,43 +504,34 @@ public abstract class MobileEnemy extends Nonplayer {
             gapY = enemyBottom - playerTop;
         }
 
-        float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
+        return (float) Math.sqrt(gapX * gapX + gapY * gapY);
+    }
 
-        if (edgeDistance <= ATTACK_RANGE) {
+    /**
+     * Attempts to attack the player if they are currently within this enemy's
+     * attack range.
+     *
+     * @param player the player to attack
+     */
+    protected void tryAttackPlayer(Player player) {
+        if (isPlayerWithinAttackRange(player)) {
             playerCollide(player);
         }
     }
 
+    /**
+     * Checks whether the player is within this enemy's attack range.
+     *
+     * <p>The distance is measured as the edge-to-edge distance between
+     * the enemy's bounding hitbox and the player's bounding hitbox.</p>
+     *
+     * @param player the player to test
+     * @return true if the player is within {@code ATTACK_RANGE}; false otherwise
+     */
     protected boolean isPlayerWithinAttackRange(Player player) {
         if (player == null) {
             return false;
         }
-
-        float enemyLeft = transform.position.x;
-        float enemyRight = transform.position.x + transform.size.x;
-        float enemyBottom = transform.position.y;
-        float enemyTop = transform.position.y + transform.size.y;
-
-        float playerLeft = player.transform.position.x;
-        float playerRight = player.transform.position.x + player.transform.size.x;
-        float playerBottom = player.transform.position.y;
-        float playerTop = player.transform.position.y + player.transform.size.y;
-
-        float gapX = 0f;
-        if (enemyRight < playerLeft) {
-            gapX = playerLeft - enemyRight;
-        } else if (playerRight < enemyLeft) {
-            gapX = enemyLeft - playerRight;
-        }
-
-        float gapY = 0f;
-        if (enemyTop < playerBottom) {
-            gapY = playerBottom - enemyTop;
-        } else if (playerTop < enemyBottom) {
-            gapY = enemyBottom - playerTop;
-        }
-
-        float edgeDistance = (float) Math.sqrt(gapX * gapX + gapY * gapY);
-        return edgeDistance <= ATTACK_RANGE;
+        return getEdgeDistanceToPlayer(player) <= ATTACK_RANGE;
     }
 }
