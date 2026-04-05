@@ -11,7 +11,7 @@
             "scaleInDock": 1
         },
         "bigobjects.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "level1.tmx": {
             "expandedObjectLayers": [
@@ -19,11 +19,11 @@
                 7,
                 2
             ],
-            "scale": 0.1372,
-            "selectedLayer": 5,
+            "scale": 0.19,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2252.186588921283,
-                "y": 1585.2769679300293
+                "x": 2189.4736842105267,
+                "y": 1476.3157894736846
             }
         },
         "level1.tmx#maintiles": {
@@ -38,7 +38,7 @@
             }
         },
         "maintiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
         },
         "updatedtiles.tsx": {
             "dynamicWrapping": false,

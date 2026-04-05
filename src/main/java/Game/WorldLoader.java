@@ -196,6 +196,16 @@ public class WorldLoader {
                 case "Node":
                     newEntity = new Node(world);
                     world.plotpoints++;
+
+                    newEntity.transform.setTilePosition(entity.x, entity.y, 128);
+                    newEntity.transform.position.x += 48f;
+                    newEntity.transform.position.y += 48f;
+
+                    // save the precise visual center (node is 32x32, so we add 16)
+                    world.nodePositions.add(new Vec2(
+                            newEntity.transform.position.x + 16f,
+                            newEntity.transform.position.y + 16f
+                    ));
                     break;
                 case "PencilSharpener":
                     newEntity = new PencilSharpener(world);
