@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1200" tileheight="1371" tilecount="33" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="bigobjects" tilewidth="1200" tileheight="1371" tilecount="40" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="74">
   <image source="../images/hole4pixel.png" width="1024" height="1024"/>
@@ -99,5 +99,26 @@
  </tile>
  <tile id="113">
   <image source="../images/flowers (1).png" width="768" height="1371"/>
+ </tile>
+ <tile id="114">
+  <image source="../images/2plus2.png" width="768" height="768"/>
+ </tile>
+ <tile id="115">
+  <image source="../images/bear.png" width="768" height="944"/>
+ </tile>
+ <tile id="116">
+  <image source="../images/bigbear.png" width="512" height="383"/>
+ </tile>
+ <tile id="117">
+  <image source="../images/dog.png" width="256" height="457"/>
+ </tile>
+ <tile id="118">
+  <image source="../images/flowerl2.png" width="512" height="742"/>
+ </tile>
+ <tile id="119">
+  <image source="../images/koala.png" width="256" height="256"/>
+ </tile>
+ <tile id="120">
+  <image source="../images/penguin.png" width="512" height="512"/>
  </tile>
 </tileset>
