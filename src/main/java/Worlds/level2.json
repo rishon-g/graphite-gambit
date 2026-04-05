@@ -4,6 +4,61 @@
       "type": "Player",
       "x": 3,
       "y": 17
+    },
+    {
+      "type": "Node",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "type": "Node",
+      "x": 0,
+      "y": 24
+    },
+    {
+      "type": "Node",
+      "x": 39,
+      "y": 24
+    },
+    {
+      "type": "Node",
+      "x": 39,
+      "y": 0
+    },
+    {
+      "type": "Eraser",
+      "x": 28,
+      "y": 4
+    },
+    {
+      "type": "Eraser",
+      "x": 6,
+      "y": 4
+    },
+    {
+      "type": "Eraser",
+      "x": 14,
+      "y": 21
+    },
+    {
+      "type": "Eraser",
+      "x": 29,
+      "y": 21
+    },
+    {
+      "type": "Eraser",
+      "x": 17,
+      "y": 18
+    },
+    {
+      "type": "PencilSharpener",
+      "x": 39,
+      "y": 14
+    },
+    {
+      "type": "PencilSharpener",
+      "x": 27,
+      "y": 0
     }
   ]
 }
