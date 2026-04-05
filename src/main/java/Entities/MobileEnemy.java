@@ -61,18 +61,18 @@ public abstract class MobileEnemy extends Nonplayer {
     private static final float CHASE_LOSE_RADIUS = 1000f;
 
     /**
-     * Range within which the enemy can attack the player.
-     * set by subclasses in their constructors.
-     */
-    protected float ATTACK_RANGE;
-
-    /**
      * Enemy movement state.
      */
     protected enum MovementState {
         PATROL,
         CHASE
     }
+
+    /**
+     * Range within which the enemy can attack the player.
+     * set by subclasses in their constructors.
+     */
+    protected float ATTACK_RANGE;
 
     /**
      * Current movement state of the enemy.
@@ -103,65 +103,6 @@ public abstract class MobileEnemy extends Nonplayer {
      */
     public MobileEnemy(GameWorld world) {
         super(world);
-    }
-
-    /**
-     * Updates the current path if a rebuild is needed for the current movement state.
-     *
-     * @param player the current player target
-     */
-    private void handlePathRebuild(Player player) {
-        if (!shouldRebuildPath()) {
-            return;
-        }
-
-        if (movementState == MovementState.CHASE) {
-            rebuildChasePath(player);
-        } else {
-            rebuildPatrolPath();
-        }
-
-        pathTimer = 0f;
-    }
-
-    /**
-     * Moves this enemy along its current path toward the next target tile.
-     *
-     * <p>If there is no valid path, the enemy stops moving. If the enemy reaches
-     * the current target tile, it advances to the next one. If the player comes
-     * within attack range while moving, an attack is attempted.</p>
-     *
-     * @param player the player target
-     */
-    private void followCurrentPath(Player player) {
-        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
-            transform.setVelocity(0, 0);
-            return;
-        }
-
-        while (pathIndex < currentPath.size()) {
-            int[] nextTile = currentPath.get(pathIndex);
-
-            float targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
-            float targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
-
-            float dx = targetX - transform.position.x;
-            float dy = targetY - transform.position.y;
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-            if (dist <= TARGET_DIF) {
-                transform.setPosition(targetX, targetY);
-                pathIndex++;
-                continue;
-            }
-
-            transform.setVelocity((dx / dist) * getMoveSpeed(), (dy / dist) * getMoveSpeed());
-            tryAttackPlayer(player);
-            return;
-        }
-
-        transform.setVelocity(0, 0);
-        tryAttackPlayer(player);
     }
 
     /**
@@ -227,7 +168,7 @@ public abstract class MobileEnemy extends Nonplayer {
             return;
         }
 
-        float distance = getDistanceToPlayer(player);
+        float distance = getCenterDistanceToPlayer(player);
 
         if (movementState == MovementState.PATROL) {
             if (distance <= VISION_RADIUS) {
@@ -238,19 +179,6 @@ public abstract class MobileEnemy extends Nonplayer {
                 movementState = MovementState.PATROL;
             }
         }
-    }
-
-    protected float getDistanceToPlayer(Player player) {
-        float enemyCenterX = transform.position.x + transform.size.x / 2f;
-        float enemyCenterY = transform.position.y + transform.size.y / 2f;
-
-        float playerCenterX = player.transform.position.x + player.transform.size.x / 2f;
-        float playerCenterY = player.transform.position.y + player.transform.size.y / 2f;
-
-        float dx = playerCenterX - enemyCenterX;
-        float dy = playerCenterY - enemyCenterY;
-
-        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     /**
@@ -271,70 +199,62 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
-     * Clears the current movement path and resets the path index.
+     * Updates the current path if a rebuild is needed for the current movement state.
+     *
+     * @param player the current player target
      */
-    private void clearCurrentPath() {
-        currentPath = Collections.emptyList();
-        pathIndex = 0;
-    }
-
-    /**
-     * Returns the current world tile map if it is valid.
-     *
-     * <p>If the tile map is missing or empty, the current path is cleared and
-     * {@code null} is returned.</p>
-     *
-     * @return the current valid tile map, or {@code null} if unavailable
-     */
-    private int[][] getValidTileMap() {
-        int[][] map = world.getTilemap();
-        if (map == null || map.length == 0 || map[0].length == 0) {
-            clearCurrentPath();
-            return null;
-        }
-        return map;
-    }
-
-    /**
-     * Returns this enemy's current tile position.
-     *
-     * <p>The returned array has the form {@code {x, y}}.</p>
-     *
-     * @return the current tile coordinates of this enemy
-     */
-    private int[] getCurrentTilePosition() {
-        int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
-        int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
-        return new int[]{startX, startY};
-    }
-
-    /**
-     * Rebuilds the current path from the given start tile to the given target tile.
-     *
-     * <p>If the target is {@code null}, or if the start and target tiles are the
-     * same, the current path is cleared.</p>
-     *
-     * @param map the tile map
-     * @param startX the starting tile x-coordinate
-     * @param startY the starting tile y-coordinate
-     * @param targetTile the destination tile as {@code {x, y}}, or {@code null}
-     */
-    private void rebuildPathToTarget(int[][] map, int startX, int startY, int[] targetTile) {
-        if (targetTile == null) {
-            clearCurrentPath();
+    private void handlePathRebuild(Player player) {
+        if (!shouldRebuildPath()) {
             return;
         }
 
-        int endX = targetTile[0];
-        int endY = targetTile[1];
+        if (movementState == MovementState.CHASE) {
+            rebuildChasePath(player);
+        } else {
+            rebuildPatrolPath();
+        }
 
-        if (startX == endX && startY == endY) {
-            clearCurrentPath();
+        pathTimer = 0f;
+    }
+
+    /**
+     * Moves this enemy along its current path toward the next target tile.
+     *
+     * <p>If there is no valid path, the enemy stops moving. If the enemy reaches
+     * the current target tile, it advances to the next one. If the player comes
+     * within attack range while moving, an attack is attempted.</p>
+     *
+     * @param player the player target
+     */
+    private void followCurrentPath(Player player) {
+        if (currentPath.isEmpty() || pathIndex >= currentPath.size()) {
+            transform.setVelocity(0, 0);
             return;
         }
 
-        currentPath = AStar.findPath(map, startX, startY, endX, endY);
-        pathIndex = 0;
+        while (pathIndex < currentPath.size()) {
+            int[] nextTile = currentPath.get(pathIndex);
+
+            float targetX = tileToWorldCenterX(nextTile[0], transform.size.x);
+            float targetY = tileToWorldCenterY(nextTile[1], transform.size.y);
+
+            float dx = targetX - transform.position.x;
+            float dy = targetY - transform.position.y;
+            float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+            if (dist <= TARGET_DIF) {
+                transform.setPosition(targetX, targetY);
+                pathIndex++;
+                continue;
+            }
+
+            transform.setVelocity((dx / dist) * getMoveSpeed(), (dy / dist) * getMoveSpeed());
+            tryAttackPlayer(player);
+            return;
+        }
+
+        transform.setVelocity(0, 0);
+        tryAttackPlayer(player);
     }
 
     /**
@@ -383,6 +303,35 @@ public abstract class MobileEnemy extends Nonplayer {
 
         int[] patrolTarget = RandomPatrol.choosePatrolTarget(map, startX, startY, PATROL_SEARCH_RADIUS);
         rebuildPathToTarget(map, startX, startY, patrolTarget);
+    }
+
+    /**
+     * Rebuilds the current path from the given start tile to the given target tile.
+     *
+     * <p>If the target is {@code null}, or if the start and target tiles are the
+     * same, the current path is cleared.</p>
+     *
+     * @param map the tile map
+     * @param startX the starting tile x-coordinate
+     * @param startY the starting tile y-coordinate
+     * @param targetTile the destination tile as {@code {x, y}}, or {@code null}
+     */
+    private void rebuildPathToTarget(int[][] map, int startX, int startY, int[] targetTile) {
+        if (targetTile == null) {
+            clearCurrentPath();
+            return;
+        }
+
+        int endX = targetTile[0];
+        int endY = targetTile[1];
+
+        if (startX == endX && startY == endY) {
+            clearCurrentPath();
+            return;
+        }
+
+        currentPath = AStar.findPath(map, startX, startY, endX, endY);
+        pathIndex = 0;
     }
 
     /**
@@ -458,6 +407,123 @@ public abstract class MobileEnemy extends Nonplayer {
     }
 
     /**
+     * Attempts to attack the player if they are currently within this enemy's
+     * attack range.
+     *
+     * @param player the player to attack
+     */
+    protected void tryAttackPlayer(Player player) {
+        if (isPlayerWithinAttackRange(player)) {
+            playerCollide(player);
+        }
+    }
+
+    /**
+     * Checks whether the player is within this enemy's attack range.
+     *
+     * <p>The distance is measured as the edge-to-edge distance between
+     * the enemy's bounding hitbox and the player's bounding hitbox.</p>
+     *
+     * @param player the player to test
+     * @return true if the player is within {@code ATTACK_RANGE}; false otherwise
+     */
+    protected boolean isPlayerWithinAttackRange(Player player) {
+        if (player == null) {
+            return false;
+        }
+        return getEdgeDistanceToPlayer(player) <= ATTACK_RANGE;
+    }
+
+    protected float getCenterDistanceToPlayer(Player player) {
+        float enemyCenterX = transform.position.x + transform.size.x / 2f;
+        float enemyCenterY = transform.position.y + transform.size.y / 2f;
+
+        float playerCenterX = player.transform.position.x + player.transform.size.x / 2f;
+        float playerCenterY = player.transform.position.y + player.transform.size.y / 2f;
+
+        float dx = playerCenterX - enemyCenterX;
+        float dy = playerCenterY - enemyCenterY;
+
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * Computes the edge-to-edge distance between this enemy and the player.
+     *
+     * <p>If the enemy and player overlap on one axis, the gap on that axis is
+     * treated as zero. The final distance is computed from the horizontal and
+     * vertical gaps.</p>
+     *
+     * @param player the player whose distance from this enemy is measured
+     * @return the edge-to-edge distance between the enemy and player
+     */
+    private float getEdgeDistanceToPlayer(Player player) {
+        float enemyLeft = transform.position.x;
+        float enemyRight = transform.position.x + transform.size.x;
+        float enemyBottom = transform.position.y;
+        float enemyTop = transform.position.y + transform.size.y;
+
+        float playerLeft = player.transform.position.x;
+        float playerRight = player.transform.position.x + player.transform.size.x;
+        float playerBottom = player.transform.position.y;
+        float playerTop = player.transform.position.y + player.transform.size.y;
+
+        float gapX = 0f;
+        if (enemyRight < playerLeft) {
+            gapX = playerLeft - enemyRight;
+        } else if (playerRight < enemyLeft) {
+            gapX = enemyLeft - playerRight;
+        }
+
+        float gapY = 0f;
+        if (enemyTop < playerBottom) {
+            gapY = playerBottom - enemyTop;
+        } else if (playerTop < enemyBottom) {
+            gapY = enemyBottom - playerTop;
+        }
+
+        return (float) Math.sqrt(gapX * gapX + gapY * gapY);
+    }
+
+    /**
+     * Clears the current movement path and resets the path index.
+     */
+    private void clearCurrentPath() {
+        currentPath = Collections.emptyList();
+        pathIndex = 0;
+    }
+
+    /**
+     * Returns the current world tile map if it is valid.
+     *
+     * <p>If the tile map is missing or empty, the current path is cleared and
+     * {@code null} is returned.</p>
+     *
+     * @return the current valid tile map, or {@code null} if unavailable
+     */
+    private int[][] getValidTileMap() {
+        int[][] map = world.getTilemap();
+        if (map == null || map.length == 0 || map[0].length == 0) {
+            clearCurrentPath();
+            return null;
+        }
+        return map;
+    }
+
+    /**
+     * Returns this enemy's current tile position.
+     *
+     * <p>The returned array has the form {@code {x, y}}.</p>
+     *
+     * @return the current tile coordinates of this enemy
+     */
+    private int[] getCurrentTilePosition() {
+        int startX = worldToTileX(transform.position.x + transform.size.x / 2f);
+        int startY = worldToTileY(transform.position.y + transform.size.y / 2f);
+        return new int[]{startX, startY};
+    }
+
+    /**
      * Checks whether a tile coordinate lies inside the map bounds.
      *
      * @param map the tile map
@@ -523,71 +589,5 @@ public abstract class MobileEnemy extends Nonplayer {
      */
     private float tileToWorldCenterY(int tileY, float height) {
         return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
-    }
-
-    /**
-     * Computes the edge-to-edge distance between this enemy and the player.
-     *
-     * <p>If the enemy and player overlap on one axis, the gap on that axis is
-     * treated as zero. The final distance is computed from the horizontal and
-     * vertical gaps.</p>
-     *
-     * @param player the player whose distance from this enemy is measured
-     * @return the edge-to-edge distance between the enemy and player
-     */
-    private float getEdgeDistanceToPlayer(Player player) {
-        float enemyLeft = transform.position.x;
-        float enemyRight = transform.position.x + transform.size.x;
-        float enemyBottom = transform.position.y;
-        float enemyTop = transform.position.y + transform.size.y;
-
-        float playerLeft = player.transform.position.x;
-        float playerRight = player.transform.position.x + player.transform.size.x;
-        float playerBottom = player.transform.position.y;
-        float playerTop = player.transform.position.y + player.transform.size.y;
-
-        float gapX = 0f;
-        if (enemyRight < playerLeft) {
-            gapX = playerLeft - enemyRight;
-        } else if (playerRight < enemyLeft) {
-            gapX = enemyLeft - playerRight;
-        }
-
-        float gapY = 0f;
-        if (enemyTop < playerBottom) {
-            gapY = playerBottom - enemyTop;
-        } else if (playerTop < enemyBottom) {
-            gapY = enemyBottom - playerTop;
-        }
-
-        return (float) Math.sqrt(gapX * gapX + gapY * gapY);
-    }
-
-    /**
-     * Attempts to attack the player if they are currently within this enemy's
-     * attack range.
-     *
-     * @param player the player to attack
-     */
-    protected void tryAttackPlayer(Player player) {
-        if (isPlayerWithinAttackRange(player)) {
-            playerCollide(player);
-        }
-    }
-
-    /**
-     * Checks whether the player is within this enemy's attack range.
-     *
-     * <p>The distance is measured as the edge-to-edge distance between
-     * the enemy's bounding hitbox and the player's bounding hitbox.</p>
-     *
-     * @param player the player to test
-     * @return true if the player is within {@code ATTACK_RANGE}; false otherwise
-     */
-    protected boolean isPlayerWithinAttackRange(Player player) {
-        if (player == null) {
-            return false;
-        }
-        return getEdgeDistanceToPlayer(player) <= ATTACK_RANGE;
     }
 }
