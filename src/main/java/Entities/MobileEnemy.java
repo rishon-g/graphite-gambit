@@ -351,15 +351,11 @@ public abstract class MobileEnemy extends Nonplayer {
      * @return the chosen target tile or null if no target is reachable
      */
     protected int[] findBestTargetTile(Player player, int[][] map, int startX, int startY) {
-        float minX = player.transform.position.x;
-        float maxX = player.transform.position.x + player.transform.size.x - 0.01f;
-        float minY = player.transform.position.y;
-        float maxY = player.transform.position.y + player.transform.size.y - 0.01f;
-
-        int playerMinTileX = worldToTileX(minX);
-        int playerMaxTileX = worldToTileX(maxX);
-        int playerMinTileY = worldToTileY(minY);
-        int playerMaxTileY = worldToTileY(maxY);
+        int[] playerBounds = getPlayerTileBounds(player);
+        int playerMinTileX = playerBounds[0];
+        int playerMaxTileX = playerBounds[1];
+        int playerMinTileY = playerBounds[2];
+        int playerMaxTileY = playerBounds[3];
 
         List<int[]> bestPath = Collections.emptyList();
         int[] bestTile = null;
@@ -372,27 +368,21 @@ public abstract class MobileEnemy extends Nonplayer {
 
             for (int targetX = searchMinX; targetX <= searchMaxX; targetX++) {
                 for (int targetY = searchMinY; targetY <= searchMaxY; targetY++) {
-                    if (!isInsideMap(map, targetX, targetY) || isBlocked(map, targetX, targetY)) {
-                        continue;
-                    }
-
-                    boolean onBorder = targetX == searchMinX || targetX == searchMaxX ||
-                            targetY == searchMinY || targetY == searchMaxY;
-
-                    if (!onBorder) {
+                    if (!isValidTargetCandidate(map, targetX, targetY,
+                            searchMinX, searchMaxX, searchMinY, searchMaxY)) {
                         continue;
                     }
 
                     if (targetX == startX && targetY == startY) {
                         if (isPlayerWithinAttackRange(player)) {
-                            return new int[] { targetX, targetY };
+                            return new int[]{targetX, targetY};
                         }
                         continue;
                     }
 
                     List<int[]> path = AStar.findPath(map, startX, startY, targetX, targetY);
-                    if (!path.isEmpty() && (bestTile == null || path.size() < bestPath.size())) {
-                        bestTile = new int[] { targetX, targetY };
+                    if (isBetterTargetPath(path, bestTile, bestPath)) {
+                        bestTile = new int[]{targetX, targetY};
                         bestPath = path;
                     }
                 }
@@ -404,6 +394,77 @@ public abstract class MobileEnemy extends Nonplayer {
         }
 
         return null;
+    }
+
+    /**
+     * Returns the tile bounds where is the player.
+     *
+     * <p>The returned array has the form
+     * {@code {minTileX, maxTileX, minTileY, maxTileY}}.</p>
+     *
+     * @param player the player whose occupied tile bounds are computed
+     * @return the tile bounds where is the player
+     */
+    private int[] getPlayerTileBounds(Player player) {
+        float minX = player.transform.position.x;
+        float maxX = player.transform.position.x + player.transform.size.x - 0.01f;
+        float minY = player.transform.position.y;
+        float maxY = player.transform.position.y + player.transform.size.y - 0.01f;
+
+        return new int[]{worldToTileX(minX), worldToTileX(maxX), worldToTileY(minY), worldToTileY(maxY)};
+    }
+
+    /**
+     * Checks whether a candidate tile is valid for consideration during target search.
+     *
+     * @param map the tile map
+     * @param targetX candidate tile x-coordinate
+     * @param targetY candidate tile y-coordinate
+     * @param searchMinX minimum x-coordinate of the current search area
+     * @param searchMaxX maximum x-coordinate of the current search area
+     * @param searchMinY minimum y-coordinate of the current search area
+     * @param searchMaxY maximum y-coordinate of the current search area
+     * @return true if the tile is inside the map, not blocked, and on the search border
+     */
+    private boolean isValidTargetCandidate(int[][] map, int targetX, int targetY,
+                                           int searchMinX, int searchMaxX,
+                                           int searchMinY, int searchMaxY) {
+        return isInsideMap(map, targetX, targetY)
+                && !isBlocked(map, targetX, targetY)
+                && isOnSearchBorder(targetX, targetY, searchMinX, searchMaxX, searchMinY, searchMaxY);
+    }
+
+    /**
+     * Checks whether a candidate path is a better choice than the current best path.
+     *
+     * <p>A path is considered better if it is non-empty and either no best tile has
+     * been chosen yet or it is shorter than the current best path.</p>
+     *
+     * @param candidatePath the candidate path to evaluate
+     * @param bestTile the current best target tile, or {@code null} if none exists
+     * @param bestPath the current best path
+     * @return true if the candidate path should replace the current best path
+     */
+    private boolean isBetterTargetPath(List<int[]> candidatePath, int[] bestTile, List<int[]> bestPath) {
+        return !candidatePath.isEmpty() && (bestTile == null || candidatePath.size() < bestPath.size());
+    }
+
+    /**
+     * Checks whether a target tile lies on the border of the current search ring.
+     *
+     * @param targetX current candidate tile x-coordinate
+     * @param targetY current candidate tile y-coordinate
+     * @param searchMinX minimum x-coordinate of the current search area
+     * @param searchMaxX maximum x-coordinate of the current search area
+     * @param searchMinY minimum y-coordinate of the current search area
+     * @param searchMaxY maximum y-coordinate of the current search area
+     * @return true if the tile lies on the border of the current search ring
+     */
+    private boolean isOnSearchBorder(int targetX, int targetY,
+                                     int searchMinX, int searchMaxX,
+                                     int searchMinY, int searchMaxY) {
+        return targetX == searchMinX || targetX == searchMaxX
+                || targetY == searchMinY || targetY == searchMaxY;
     }
 
     /**
