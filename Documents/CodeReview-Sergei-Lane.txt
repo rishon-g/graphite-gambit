@@ -1,0 +1,24 @@
+1: Long Method
+Within Player.updateInternal, the method alone ran lots of code, including the stun handling, input handling, and movement.
+This was refactored to split off into an input handling method, which then calls to a move method.
+The stun may further be split into it's own method later.
+
+2: Parent gets from child
+Within MobileEntity, the parent abstracts a getAttackRange method which is continuously drawn from by the abstracted part.
+Instead, this was changed such that the abstracted counterpart sets the variable for the attack range upon creation such that
+no indirection is needed to obtain this constant data.
+
+3: Long Method
+Within MobileEntity, the AStar path construction within updateInternal was a very long process.
+This was refactored into multiple methods outside of updateInternal.
+
+4:
+
+5:
+
+6:
+
+7:
+
+8:
+
