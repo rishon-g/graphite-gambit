@@ -1,5 +1,6 @@
 package Pathfinding;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +26,14 @@ public final class RandomPatrol {
     private static final Random RANDOM = new Random();
 
     /**
+     * Directions used for BFS.
+     */
+    private static final int[][] DIRECTIONS = {
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1},
+            {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+    };
+
+    /**
      * Private constructor to prevent instantiation.
      */
     private RandomPatrol() {
@@ -33,17 +42,9 @@ public final class RandomPatrol {
     /**
      * Chooses a random reachable patrol target near the given start tile.
      *
-     * <p>The method searches all tiles in a square region centered at the
-     * start tile with radius {@code searchRadius}. A tile is considered a valid
-     * patrol target if it:</p>
-     * <ul>
-     *     <li>lies inside the map bounds,</li>
-     *     <li>is not blocked,</li>
-     *     <li>is not the start tile itself,</li>
-     *     <li>and is reachable from the start tile using A*.</li>
-     * </ul>
-     *
-     * <p>If no valid target exists, {@code null} is returned.</p>
+     * <p>This version avoids repeated A* calls. It first computes which tiles
+     * are reachable from the start using one BFS, then picks a random reachable
+     * tile within the search radius.</p>
      *
      * @param map the tile map
      * @param startX the starting tile x-coordinate
@@ -64,7 +65,8 @@ public final class RandomPatrol {
             return null;
         }
 
-        List<int[]> candidates = new ArrayList<int[]>();
+        boolean[][] reachable = buildReachableMap(map, startX, startY);
+        List<int[]> candidates = new ArrayList<>();
 
         int minX = startX - searchRadius;
         int maxX = startX + searchRadius;
@@ -85,7 +87,7 @@ public final class RandomPatrol {
                     continue;
                 }
 
-                if (AStar.findPath(map, startX, startY, x, y).isEmpty()) {
+                if (!reachable[x][y]) {
                     continue;
                 }
 
@@ -98,6 +100,55 @@ public final class RandomPatrol {
         }
 
         return candidates.get(RANDOM.nextInt(candidates.size()));
+    }
+
+    /**
+     * Builds a map of tiles reachable from the start using BFS algorithm.
+     *
+     * @param map the tile map
+     * @param startX start tile x-coordinate
+     * @param startY start tile y-coordinate
+     * @return reachable[x][y] is true if that tile can be reached
+     */
+    private static boolean[][] buildReachableMap(int[][] map, int startX, int startY) {
+        boolean[][] reachable = new boolean[map.length][map[0].length];
+        ArrayDeque<int[]> queue = new ArrayDeque<>();
+
+        reachable[startX][startY] = true;
+        queue.add(new int[]{startX, startY});
+
+        while (!queue.isEmpty()) {
+            int[] current = queue.removeFirst();
+            int currentX = current[0];
+            int currentY = current[1];
+
+            for (int[] dir : DIRECTIONS) {
+                int nextX = currentX + dir[0];
+                int nextY = currentY + dir[1];
+
+                if (!isInsideMap(map, nextX, nextY)) {
+                    continue;
+                }
+
+                if (isBlocked(map, nextX, nextY)) {
+                    continue;
+                }
+
+                if (reachable[nextX][nextY]) {
+                    continue;
+                }
+
+                if (isDiagonalMove(dir[0], dir[1])
+                        && cutsCorner(map, currentX, currentY, nextX, nextY)) {
+                    continue;
+                }
+
+                reachable[nextX][nextY] = true;
+                queue.addLast(new int[]{nextX, nextY});
+            }
+        }
+
+        return reachable;
     }
 
     /**
@@ -122,5 +173,38 @@ public final class RandomPatrol {
      */
     private static boolean isBlocked(int[][] map, int x, int y) {
         return map[x][y] == 1;
+    }
+
+    /**
+     * Returns true if the move is diagonal.
+     *
+     * @param dx x step
+     * @param dy y step
+     * @return true if diagonal
+     */
+    private static boolean isDiagonalMove(int dx, int dy) {
+        return dx != 0 && dy != 0;
+    }
+
+    /**
+     * Prevents diagonal movement through blocked corners.
+     *
+     * @param map the tile map
+     * @param currentX current x
+     * @param currentY current y
+     * @param nextX next x
+     * @param nextY next y
+     * @return true if the diagonal move cuts a blocked corner
+     */
+    private static boolean cutsCorner(int[][] map, int currentX, int currentY, int nextX, int nextY) {
+        int dx = nextX - currentX;
+        int dy = nextY - currentY;
+
+        if (dx == 0 || dy == 0) {
+            return false;
+        }
+
+        return isBlocked(map, currentX + dx, currentY)
+                || isBlocked(map, currentX, currentY + dy);
     }
 }

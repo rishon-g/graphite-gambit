@@ -1,6 +1,5 @@
 package Objects;
 
-import Entities.Entity;
 import Entities.Player;
 
 import com.badlogic.gdx.Gdx;
