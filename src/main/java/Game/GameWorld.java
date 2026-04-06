@@ -50,6 +50,7 @@ public class GameWorld {
     // separate reference to the player entity
     Player player;
 
+    //TODO data clump
     // the size of the map
     int width, height;
 

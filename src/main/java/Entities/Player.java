@@ -362,5 +362,4 @@ public class Player extends Entity {
 
         batch.setColor(Color.WHITE);
     }
-
 }
