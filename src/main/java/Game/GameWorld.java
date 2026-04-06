@@ -419,6 +419,10 @@ public class GameWorld {
                     // Remove entity from list
                     else {
                         entities.remove(i);
+                    }
+                }
+            }
+        }
 
         // Resolve entity to player collisions
         if (this.player != null) {
@@ -464,9 +468,9 @@ public class GameWorld {
                 // we add some extra time after the drawing is done so the player can admire the canvas
                 if (animTimer > 1.0f) {
                     boolean doorOpened = false;
-                    for (int i = entities.size() - 1; i >= 0; i--) {
-                        if (entities.get(i) instanceof Door) {
-                            entities.remove(i);
+                    for (int f = entities.size() - 1; f >= 0; f--) {
+                        if (entities.get(f) instanceof Door) {
+                            entities.remove(f);
                             doorOpened = true;
                         }
                     }
