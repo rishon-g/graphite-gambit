@@ -216,8 +216,6 @@ public class WorldLoader {
                     break;
                 case "Node":
                     newEntity = new Node(world);
-                    world.plotpoints++;
-
                     newEntity.transform.setTilePosition(entity.x, entity.y, 128);
                     newEntity.transform.position.x += 48f;
                     newEntity.transform.position.y += 48f;
