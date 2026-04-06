@@ -28,6 +28,9 @@ public class AudioManager implements Disposable {
     private Sound scoreSound;
     private Sound hoverSound;
     private Sound clickSound;
+    private Sound lineSound;
+    private Sound doorSound;
+    private Sound winSound;
 
     // Volume variables
     final float musicVolumeInit = 0.1f;
@@ -39,6 +42,9 @@ public class AudioManager implements Disposable {
     private float scoreVolume = 0.5f;
     private float hoverVolume = 0.2f;
     private float clickVolume = 0.5f;
+    private float lineVolume = 1f;
+    private float doorVolume = 2f;
+    private float winVolume = 1f;
 
     // track looping state
     long moveSoundId = -1;
@@ -94,6 +100,9 @@ public class AudioManager implements Disposable {
             scoreSound = Gdx.audio.newSound(Gdx.files.internal("audio/sfx_score.mp3"));
             hoverSound = Gdx.audio.newSound(Gdx.files.internal("audio/ui_hover.mp3"));
             clickSound = Gdx.audio.newSound(Gdx.files.internal("audio/ui_click.mp3"));
+            lineSound = Gdx.audio.newSound(Gdx.files.internal("audio/linedraw.mp3"));
+            doorSound = Gdx.audio.newSound(Gdx.files.internal("audio/door.wav"));
+            winSound = Gdx.audio.newSound(Gdx.files.internal("audio/win.wav"));
         }
     }
 
@@ -244,6 +253,24 @@ public class AudioManager implements Disposable {
         }
     }
 
+    public void playLineDrawSound() {
+        if (game.isSfxPlaying() && lineSound != null) {
+            lineSound.play(lineVolume);
+        }
+    }
+
+    public void playDoorOpenSound() {
+        if (game.isSfxPlaying() && doorSound != null) {
+            doorSound.play(doorVolume);
+        }
+    }
+
+    public void playWinSound() {
+        if (game.isSfxPlaying() && winSound != null) {
+            winSound.play(winVolume);
+        }
+    }
+
     /**
      * Toggles SFX based on the game settings
      * @param enabled true to enable SFX, false to disable
@@ -264,6 +291,10 @@ public class AudioManager implements Disposable {
         if (sharpenerSound != null) sharpenerSound.dispose();
         if (damageSound != null) damageSound.dispose();
         if (scoreSound != null) scoreSound.dispose();
+        if (hoverSound != null) hoverSound.dispose();
+        if (clickSound != null) clickSound.dispose();
+        if (lineSound != null) lineSound.dispose();
+        if (doorSound != null) doorSound.dispose();
         instance = null;
     }
 }

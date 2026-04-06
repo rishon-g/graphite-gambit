@@ -265,6 +265,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         AudioManager.getInstance().setMusicFullVolume();
+        AudioManager.getInstance().startMusic();
     }
 
     /**
@@ -308,11 +309,11 @@ public class GameScreen implements Screen {
 
         // expand the camera's "culling box" by 5 world units such that big objects do
         // not despawn
-        float bleed = 5f;
-        float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
-        float startY = this.camera.position.y - (this.camera.viewportHeight / 2f) - bleed;
-        float boxWidth = this.camera.viewportWidth + (bleed * 2);
-        float boxHeight = this.camera.viewportHeight + (bleed * 2);
+        float bleed = 10f;
+        float startX = this.camera.position.x - ((this.camera.viewportWidth * this.camera.zoom) / 2f) - bleed;
+        float startY = this.camera.position.y - ((this.camera.viewportHeight * this.camera.zoom) / 2f) - bleed;
+        float boxWidth = (this.camera.viewportWidth * this.camera.zoom) + (bleed * 2);
+        float boxHeight = (this.camera.viewportHeight * this.camera.zoom) + (bleed * 2);
 
         this.mapRenderer.setView(this.camera.combined, startX, startY, boxWidth, boxHeight);
         this.mapRenderer.render();
@@ -440,10 +441,10 @@ public class GameScreen implements Screen {
 
             layout.setText(font, "MASH SPACE!");
 
-            // 3. Draw it dead center
+            // draw it dead center
             font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
 
-            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
+            // clean the brush
             font.getData().setScale(1.0f);
             font.setColor(Color.WHITE);
         }
@@ -501,10 +502,12 @@ public class GameScreen implements Screen {
                 if (playerData.getLevelUnlocked() >= world.getId() + 1) {
                     screenManager.SetGameScreen(world.getId() + 1);
                 } else {
+                    AudioManager.getInstance().startMusic();
                     screenManager.SetMenuScreen();
                 }
             }
             if (index == 1) {
+                AudioManager.getInstance().startMusic();
                 screenManager.SetMenuScreen();
             }
         }
@@ -581,6 +584,8 @@ public class GameScreen implements Screen {
         if (won) {
             changeLayout(Layout.WON);
             gameWon = true;
+            AudioManager.getInstance().stopMusic();
+            AudioManager.getInstance().playWinSound();
 
             int timeBonus = (int) world.time;
             world.score(timeBonus);

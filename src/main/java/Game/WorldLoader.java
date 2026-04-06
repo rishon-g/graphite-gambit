@@ -39,7 +39,27 @@ public class WorldLoader {
      */
     public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
-        
+
+        // #pickups depends on the level
+        switch (id) {
+            case 1:
+                world.maxPickups = 5;
+                world.spawnInterval = 5.0f;
+                break;
+            case 2:
+                world.maxPickups = 7;
+                world.spawnInterval = 4.0f;
+                break;
+            case 3:
+                world.maxPickups = 12;
+                world.spawnInterval = 3.0f;
+                break;
+            default:
+                world.maxPickups = 5 + id;
+                world.spawnInterval = Math.max(1.0f, 6.0f - id);
+                break;
+        }
+
         // get the map dynamically using the id
         MapAsset currentLevel = MapAsset.getLevelAsset(id);
         TiledMap map = game.getAssetService().get(currentLevel);
@@ -196,6 +216,17 @@ public class WorldLoader {
                     break;
                 case "Node":
                     newEntity = new Node(world);
+                    world.plotpoints++;
+
+                    newEntity.transform.setTilePosition(entity.x, entity.y, 128);
+                    newEntity.transform.position.x += 48f;
+                    newEntity.transform.position.y += 48f;
+
+                    // save the precise visual center (node is 32x32, so we add 16)
+                    world.nodePositions.add(new Vec2(
+                            newEntity.transform.position.x + 16f,
+                            newEntity.transform.position.y + 16f
+                    ));
                     break;
                 case "PencilSharpener":
                     newEntity = new PencilSharpener(world);

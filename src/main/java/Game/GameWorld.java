@@ -37,8 +37,8 @@ public class GameWorld {
     // spawner variables
     public Array<Vec2> spawnPoints = new Array<>();
     private float spawnTimer = 0f;
-    private final float SPAWN_INTERVAL = 5.0f;
-    private final int MAX_PICKUPS = 5;
+    public float spawnInterval = 5.0f;
+    public int maxPickups = 5;
 
     int points;
     public float time;
@@ -66,6 +66,18 @@ public class GameWorld {
 
     // reference to the managing screen
     GameScreen screen;
+
+    // state machine for the cutscene
+    public enum GameState { PLAYING, PAN_OUT, DRAWING, HOLD_OUT, PAN_IN }
+    public GameState currentState = GameState.PLAYING;
+
+    // cutscene variables
+    public Array<Vec2> nodePositions = new Array<>();
+    private float animTimer = 0f;
+    private int drawnLines = 0;
+
+    // camera variables for smooth panning
+    private float camZoom = 1f;
 
     /**
      * Constructor for the GameWorld class, initializes the entities vector and
@@ -114,12 +126,17 @@ public class GameWorld {
         screen.collectPlotPoint();
         score(100);
         this.plotpoints--;
-        if (plotpoints <= 0) {
-            for (Entity e : entities) {
-                if (e instanceof Door) {
-                    e.dead = true; // This removes it from the world instantly
-                }
+        if (plotpoints <= 0 && currentState == GameState.PLAYING) {
+            // trigger the end cutscene
+            currentState = GameState.PAN_OUT;
+            animTimer = 0f;
+            drawnLines = 0;
+
+            // halt player movement and kill the audio loop
+            if (player != null) {
+                player.transform.velocity.set(0, 0);
             }
+            Game.AudioManager.getInstance().updateMoveSound(false, false);
         }
     }
 
@@ -312,70 +329,96 @@ public class GameWorld {
      * @param delta time since last update (used for movement and animations)
      */
     public void update(float delta) {
-        // subtract delta to count down
-        time -= delta;
+        if (currentState == GameState.PLAYING) {
+            // subtract delta to count down
+            time -= delta;
 
-        // check for font.getData().setScale(1.0f);time over
-        if (time <= 0) {
-            time = 0;
-            loseGame();
-        }
+            // check for font.getData().setScale(1.0f);time over
+            if (time <= 0) {
+                time = 0;
+                loseGame();
+            }
 
-        // random spawner logic (meant for graphite shards for now)
-        if (spawnPoints.size > 0) {
-            spawnTimer += delta;
+            // random spawner logic (meant for graphite shards for now)
+            if (spawnPoints.size > 0) {
+                spawnTimer += delta;
 
-            if (spawnTimer >= SPAWN_INTERVAL) {
+                if (spawnTimer >= spawnInterval) {
 
-                // count how many pickups concurrently are on the map
-                int currentPickups = 0;
-                for (Entity e : entities) {
-                    if (e instanceof Pickup) {
-                        currentPickups++;
-                    }
-                }
-
-                // do we have room to spawn more?
-                if (currentPickups < MAX_PICKUPS) {
-
-                    int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
-                    Vec2 chosenLoc = spawnPoints.get(randomIndex);
-
-                    // occupancy check (making sure they don't spawn in the same location)
-                    boolean spotTaken = false;
+                    // count how many pickups concurrently are on the map
+                    int currentPickups = 0;
                     for (Entity e : entities) {
                         if (e instanceof Pickup) {
-                            // if an existing pickup is extremely close to our chosen location
-                            if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
-                                    Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
-                                spotTaken = true;
-                                break;
-                            }
+                            currentPickups++;
                         }
                     }
 
-                    // we only spawn if the spot is completely empty
-                    if (!spotTaken) {
-                        Pickup newPickup = new Pickup(this);
-                        newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
-                        addEntity(newPickup);
+                    // do we have room to spawn more?
+                    if (currentPickups < maxPickups) {
 
-                        // successfully spawned, so we reset the time
-                        // if the spot was taken, this time is not reset because it will instantly try
-                        // again until it finds an empty spot
+                        int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
+                        Vec2 chosenLoc = spawnPoints.get(randomIndex);
+
+                        // occupancy check (making sure they don't spawn in the same location)
+                        boolean spotTaken = false;
+                        for (Entity e : entities) {
+                            if (e instanceof Pickup) {
+                                // if an existing pickup is extremely close to our chosen location
+                                if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
+                                        Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
+                                    spotTaken = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // we only spawn if the spot is completely empty
+                        if (!spotTaken) {
+                            Pickup newPickup = new Pickup(this);
+                            newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
+                            this.entities.add(newPickup);
+
+                            // successfully spawned, so we reset the time
+                            // if the spot was taken, this time is not reset because it will instantly try
+                            // again until it finds an empty spot
+                            spawnTimer = 0f;
+                        }
+
+                    } else {
+                        // we are at max limit but we try to spawn more
                         spawnTimer = 0f;
                     }
-
-                } else {
-                    // we are at max limit but we try to spawn more
-                    spawnTimer = 0f;
                 }
             }
-        }
-        // Entity updates
-        for (Entity entity : entities) {
-            entity.update(delta);
-        }
+            // Entity updates
+            for (Entity entity : entities) {
+                entity.update(delta);
+            }
+
+            // Resolve entity to player collisions
+            if (this.player != null) {
+                for (Entity entity : entities) {
+                    if (entity instanceof Nonplayer) {
+                        if (isTouchingPlayer(entity.transform)) {
+                            ((Nonplayer) entity).playerCollide(player);
+                        }
+                    }
+                }
+            }
+
+
+            // Resolve deaths
+            for (int i = entities.size() - 1; i >= 0; i--) {
+                if (entities.get(i).dead()) {
+
+                    // Handle game over
+                    if (entities.get(i) instanceof Player) {
+                        loseGame();
+                    }
+
+                    // Remove entity from list
+                    else {
+                        entities.remove(i);
 
         // Resolve entity to player collisions
         if (this.player != null) {
@@ -383,27 +426,93 @@ public class GameWorld {
                 if (entity instanceof Nonplayer) {
                     if (isTouchingPlayer(entity.transform)) {
                         ((Nonplayer) entity).playerCollide(player);
+
                     }
                 }
             }
-        }
+        } else {
+            // cutscene logic
+            animTimer += delta;
 
-        // Resolve deaths
-        for (int i = entities.size() - 1; i >= 0; i--) {
-            if (entities.get(i).dead()) {
-
-                // Handle game over
-                if (entities.get(i) instanceof Player) {
-                    loseGame();
+            if (currentState == GameState.PAN_OUT) {
+                // wait some time for camera to pan out, then start drawing
+                if (animTimer > 1.5f) {
+                    currentState = GameState.DRAWING;
+                    animTimer = 0f;
                 }
 
-                // Remove entity from list
-                else {
-                    entities.remove(i);
+            } else if (currentState == GameState.DRAWING) {
+                // failsafe if the array didn't populate properly
+                if (nodePositions.size < 2) {
+                    currentState = GameState.HOLD_OUT;
+                    animTimer = 0f;
+                }
+                // normal drawing logic
+                else if (animTimer > 0.3f) {
+                    drawnLines++;
+                    animTimer = 0f;
+
+                    Game.AudioManager.getInstance().playLineDrawSound();
+
+                    if (drawnLines > nodePositions.size) {
+                        currentState = GameState.HOLD_OUT;
+                        animTimer = 0f;
+                    }
+                }
+
+            } else if (currentState == GameState.HOLD_OUT) {
+                // we add some extra time after the drawing is done so the player can admire the canvas
+                if (animTimer > 1.0f) {
+                    boolean doorOpened = false;
+                    for (int i = entities.size() - 1; i >= 0; i--) {
+                        if (entities.get(i) instanceof Door) {
+                            entities.remove(i);
+                            doorOpened = true;
+                        }
+                    }
+
+                    // sfx
+                    if (doorOpened) {
+                        Game.AudioManager.getInstance().playDoorOpenSound();
+                    }
+                }
+
+                // wait some more time to admire the open doors, then pan in
+                if (animTimer > 2.0f) {
+                    currentState = GameState.PAN_IN;
+                    animTimer = 0f;
+                }
+
+            } else if (currentState == GameState.PAN_IN) {
+                // wait some time to zoom back to player, then resume game
+                if (animTimer > 1.5f) {
+                    currentState = GameState.PLAYING;
+                    animTimer = 0f;
                 }
             }
         }
     }
+
+    // helper method to draw lines
+    private void drawLine(SpriteBatch batch, Vec2 p1, Vec2 p2) {
+        if (p1 == null || p2 == null || pixel == null) return;
+
+
+        float x1 = p1.x * GdxGame.UNIT_SCALE;
+        float y1 = p1.y * GdxGame.UNIT_SCALE;
+        float x2 = p2.x * GdxGame.UNIT_SCALE;
+        float y2 = p2.y * GdxGame.UNIT_SCALE;
+
+
+        float distance = (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        float angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x2 - x1));
+
+        // thickness of the line
+        float thickness = 0.15f;
+
+        batch.draw(pixel, x1, y1, 0f, thickness / 2f, distance, thickness, 1f, 1f, angle);
+    }
+
 
     /**
      * Renders all entities in the game world. This method is called every frame
@@ -413,7 +522,23 @@ public class GameWorld {
      * @param delta the time since the last update
      */
     public void render(SpriteBatch batch, float delta) {
+        // draw the floor
         renderFloor(batch);
+
+        // draw the connecting lines on the floor
+        if (drawnLines > 0) {
+            batch.setColor(Color.GRAY);
+
+            for (int i = 1; i <= Math.min(drawnLines, nodePositions.size); i++) {
+                Vec2 current = nodePositions.get(i % nodePositions.size);
+                Vec2 previous = nodePositions.get(i - 1);
+                drawLine(batch, previous, current);
+            }
+
+            batch.setColor(Color.WHITE);
+        }
+
+        // we draw all entities including the player last so they sit on top of the lines
         for (Entity entity : entities) {
             entity.render(batch, delta);
         }
@@ -428,16 +553,44 @@ public class GameWorld {
     }
 
     /**
-     * updates the position of the camera to follow the player.
-     * called by the screen before rendering the spritebatch.
-     * 
-     * @param camera the camera following the player.
+     * Updates the position of the camera depending on the current GameState
+     * @param camera the camera.
      */
     public void updateCamera(OrthographicCamera camera) {
-        camera.position.set(
-                player.transform.position.x * GdxGame.UNIT_SCALE,
-                player.transform.position.y * GdxGame.UNIT_SCALE,
-                0);
+        float targetX, targetY, targetZoom;
+        float camSpeed;
+
+        // UPDATED CAMERA MOVEMENT
+        // determine where the camera should be at
+        if (currentState == GameState.PLAYING || currentState == GameState.PAN_IN) {
+            // target the player
+            targetX = player.transform.position.x * GdxGame.UNIT_SCALE;
+            targetY = player.transform.position.y * GdxGame.UNIT_SCALE;
+            targetZoom = 1f;
+
+            // we add faster tracking during gameplay so it doesn't feel too laggy
+            camSpeed = 6f;
+        } else {
+            // target the center of the map (this applies to PAN_OUT, DRAWING and HOLD_OUT)
+            targetX = (width / 2f) * GdxGame.UNIT_SCALE;
+            targetY = (height / 2f) * GdxGame.UNIT_SCALE;
+
+            float zoomX = (width * GdxGame.UNIT_SCALE) / GdxGame.WORLD_WIDTH;
+            float zoomY = (height * GdxGame.UNIT_SCALE) / GdxGame.WORLD_HEIGHT;
+            targetZoom = Math.max(zoomX, zoomY) + 0.1f;
+
+            // slower panning (it kind of adds a cinematic effect)
+            camSpeed = 3f;
+        }
+
+        // glide the camera toward those targets (using a method called Lerp so its smooth)
+        float dt = com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+
+        camera.position.x += (targetX - camera.position.x) * camSpeed * dt;
+        camera.position.y += (targetY - camera.position.y) * camSpeed * dt;
+        camZoom += (targetZoom - camZoom) * camSpeed * dt;
+
+        camera.zoom = camZoom;
     }
 
     /**

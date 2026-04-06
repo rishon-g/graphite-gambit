@@ -11,7 +11,7 @@
             "scaleInDock": 1
         },
         "bigobjects.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": false
         },
         "level1.tmx": {
             "expandedObjectLayers": [
@@ -19,22 +19,46 @@
                 7,
                 2
             ],
-            "scale": 0.1372,
+            "scale": 0.1229,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 2252.186588921283,
-                "y": 1585.2769679300293
+                "x": 2449.1456468673714,
+                "y": 1013.0187144019524
             }
         },
         "level1.tmx#maintiles": {
             "dynamicWrapping": true
         },
         "level2.tmx": {
-            "scale": 0.1659,
+            "expandedObjectLayers": [
+                5,
+                2
+            ],
+            "scale": 0.3744,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 3741.9871794871797,
+                "y": 2562.7670940170938
+            }
+        },
+        "level3.tmx": {
+            "expandedObjectLayers": [
+                6,
+                2
+            ],
+            "scale": 0.6028,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 2430.3251493032517,
+                "y": 2170.7033842070337
+            }
+        },
+        "level4.tmx": {
+            "scale": 0.16,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1500.9041591320076,
-                "y": 1473.7793851717906
+                "x": 1500,
+                "y": 1471.875
             }
         },
         "maintiles.tsx": {
@@ -48,10 +72,12 @@
     },
     "last.externalTilesetPath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/maps",
     "last.imagePath": "/Users/rishonghosh/Documents/CMPT276S26_Group17/src/main/resources/images",
+    "map.height": 25,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "1",
     "map.tileHeight": 128,
     "map.tileWidth": 128,
+    "map.width": 40,
     "openFiles": [
     ],
     "project": "level1.tiled-project",
