@@ -205,6 +205,13 @@ public class WorldLoader {
             }
 
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
+
+            // centers node, (AKA plot point)
+            if (newEntity instanceof Node) {
+                newEntity.transform.position.x += 48f;
+                newEntity.transform.position.y += 48f;
+            }
+
             world.addEntity(newEntity);
 
         }

@@ -3,8 +3,6 @@ package Entities;
 import Game.AudioManager;
 import Game.DrawWeight;
 import Game.GameWorld;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -26,11 +24,6 @@ public class Eraser extends MobileEnemy {
      * Movement speed in world units per second.
      */
     private static final float MOVE_SPEED = 400f;
-
-    /**
-     * Visual size of the eraser sprite in world units.
-     */
-    private static final float DRAW_SIZE = 120f;
 
     /**
      * Amount of damage dealt to the player on contact.

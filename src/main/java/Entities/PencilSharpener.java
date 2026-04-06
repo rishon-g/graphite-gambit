@@ -1,8 +1,6 @@
 package Entities;
 
 import Game.GameWorld;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -33,10 +31,9 @@ public class PencilSharpener extends MobileEnemy {
      */
     private static final int DOWN = 0;
     private static final int UP = 1;
-    private static final int LEFT = 2;
-    private static final int RIGHT = 3;
+    private static final int RIGHT = 2;
+    private static final int LEFT = 3;
     int facing = DOWN;
-    private float time = 0;
 
     static final int HITBOX = 64;
 
