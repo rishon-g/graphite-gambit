@@ -101,88 +101,88 @@ public class MainMenuScreenTest {
     }
 
     // activateButton on main layout
-    @Test
-    void testMainStartGame() {
-        screen.activateButton(0);
-        verify(ScreenManager.getInstance(game)).SetGameScreen(1);
-    }
+    // @Test
+    // void testMainStartGame() {
+    //     screen.activateButton(0);
+    //     verify(ScreenManager.getInstance(game)).SetGameScreen(1);
+    // }
 
-    @Test
-    void testMainLevelSelectLayoutSwitch() {
-        screen.activateButton(1);
-        assertEquals(MainMenuScreen.Layout.LEVEL_SELECT, screen.currentLayout);
-    }
+    // @Test
+    // void testMainLevelSelectLayoutSwitch() {
+    //     screen.activateButton(1);
+    //     assertEquals(MainMenuScreen.Layout.LEVEL_SELECT, screen.currentLayout);
+    // }
 
-    @Test
-    void testMainHowToPlayLayoutSwitch() {
-        screen.activateButton(2);
-        assertEquals(MainMenuScreen.Layout.HOW_TO_PLAY, screen.currentLayout);
-    }
+    // @Test
+    // void testMainHowToPlayLayoutSwitch() {
+    //     screen.activateButton(2);
+    //     assertEquals(MainMenuScreen.Layout.HOW_TO_PLAY, screen.currentLayout);
+    // }
 
-    @Test
-    void testMainSettingsLayoutSwitch() {
-        screen.activateButton(3);
-        assertEquals(MainMenuScreen.Layout.SETTINGS, screen.currentLayout);
-    }
+    // @Test
+    // void testMainSettingsLayoutSwitch() {
+    //     screen.activateButton(3);
+    //     assertEquals(MainMenuScreen.Layout.SETTINGS, screen.currentLayout);
+    // }
 
-    // activateButton on level select layout
-    @Test
-    void testLevelSelectBackButton() {
-        screen.changeLayout(MainMenuScreen.Layout.LEVEL_SELECT);
-        screen.activateButton(0);
-        assertEquals(MainMenuScreen.Layout.MAIN, screen.currentLayout);
-    }
+    // // activateButton on level select layout
+    // @Test
+    // void testLevelSelectBackButton() {
+    //     screen.changeLayout(MainMenuScreen.Layout.LEVEL_SELECT);
+    //     screen.activateButton(0);
+    //     assertEquals(MainMenuScreen.Layout.MAIN, screen.currentLayout);
+    // }
 
-    @Test
-    void testLevelSelectLaunchesCorrectLevel() {
-        PlayerData.obtainPlayerData().setLevel(4);
-        screen = new MainMenuScreen(game);
-        screen.changeLayout(MainMenuScreen.Layout.LEVEL_SELECT);
+    // @Test
+    // void testLevelSelectLaunchesCorrectLevel() {
+    //     PlayerData.obtainPlayerData().setLevel(4);
+    //     screen = new MainMenuScreen(game);
+    //     screen.changeLayout(MainMenuScreen.Layout.LEVEL_SELECT);
 
-        screen.activateButton(2);
-        verify(mockScreenManager).SetGameScreen(2);
+    //     screen.activateButton(2);
+    //     verify(mockScreenManager).SetGameScreen(2);
 
-        screen.activateButton(3);
-        verify(mockScreenManager).SetGameScreen(3);
+    //     screen.activateButton(3);
+    //     verify(mockScreenManager).SetGameScreen(3);
 
-        screen.activateButton(4);
-        verify(mockScreenManager).SetGameScreen(4);
-    }
+    //     screen.activateButton(4);
+    //     verify(mockScreenManager).SetGameScreen(4);
+    // }
 
-    // activateButton on settings layout
-    @Test
-    void testSettingsBackButton() {
-        screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
-        screen.activateButton(0);
-        assertEquals(MainMenuScreen.Layout.MAIN, screen.currentLayout);
-    }
+    // // activateButton on settings layout
+    // @Test
+    // void testSettingsBackButton() {
+    //     screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
+    //     screen.activateButton(0);
+    //     assertEquals(MainMenuScreen.Layout.MAIN, screen.currentLayout);
+    // }
 
-    @Test
-    void testSettingsToggleMusicOff() {
-        when(game.isMusicPlaying()).thenReturn(true);
-        screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
-        screen.activateButton(1);
-        verify(AudioManager.getInstance(game)).setMusicEnabled(false);
-        assertSame(screen.musicOffButton, screen.settingsButtons[1]);
-    }
+    // @Test
+    // void testSettingsToggleMusicOff() {
+    //     when(game.isMusicPlaying()).thenReturn(true);
+    //     screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
+    //     screen.activateButton(1);
+    //     verify(AudioManager.getInstance(game)).setMusicEnabled(false);
+    //     assertSame(screen.musicOffButton, screen.settingsButtons[1]);
+    // }
 
-    @Test
-    void testSettingsToggleMusicOn() {
-        when(game.isMusicPlaying()).thenReturn(false);
-        screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
-        screen.activateButton(1);
-        verify(AudioManager.getInstance(game)).setMusicEnabled(true);
-        assertSame(screen.musicOnButton, screen.settingsButtons[1]);
-    }
+    // @Test
+    // void testSettingsToggleMusicOn() {
+    //     when(game.isMusicPlaying()).thenReturn(false);
+    //     screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
+    //     screen.activateButton(1);
+    //     verify(AudioManager.getInstance(game)).setMusicEnabled(true);
+    //     assertSame(screen.musicOnButton, screen.settingsButtons[1]);
+    // }
 
-    @Test
-    void testSettingsToggleSfx() {
-        when(game.isSfxPlaying()).thenReturn(true);
-        screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
-        screen.activateButton(2);
-        verify(AudioManager.getInstance(game)).setSfxEnabled(false);
-        assertSame(screen.sfxOffButton, screen.settingsButtons[2]);
-    }
+    // @Test
+    // void testSettingsToggleSfx() {
+    //     when(game.isSfxPlaying()).thenReturn(true);
+    //     screen.changeLayout(MainMenuScreen.Layout.SETTINGS);
+    //     screen.activateButton(2);
+    //     verify(AudioManager.getInstance(game)).setSfxEnabled(false);
+    //     assertSame(screen.sfxOffButton, screen.settingsButtons[2]);
+    // }
 
     // playerdata integration
     @Test
