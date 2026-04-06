@@ -11,10 +11,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  * Enemy that moves toward the player, erases drawn floor tiles while moving,
  * and damages the player on contact.
  *
- * <p>The Eraser inherits shared pathfinding and movement behavior from
+ * <p>
+ * The Eraser inherits shared pathfinding and movement behavior from
  * {@link MobileEnemy}. In addition to movement, it stores its spawn position,
  * removes player-drawn floor tiles, and
- * respawns back at its starting location after a successful attack.</p>
+ * respawns back at its starting location after a successful attack.
+ * </p>
  */
 public class Eraser extends MobileEnemy {
 
@@ -33,7 +35,6 @@ public class Eraser extends MobileEnemy {
      */
     private static final float ATTACK_COOLDOWN = 1.0f;
 
-    private static final float ATTACK_RANGE = 45f;
     /**
      * Indicators for the direction the player is facing for sprite rendering.
      */
@@ -63,7 +64,6 @@ public class Eraser extends MobileEnemy {
      */
     private float attackCooldownTimer = 0f;
 
-
     private static final float DRAW_WIDTH = 128;
     private static final float DRAW_HEIGHT = 192;
 
@@ -89,53 +89,90 @@ public class Eraser extends MobileEnemy {
         Texture png = new Texture("src/main/resources/sprites/EraserSheet.png");
         TextureRegion[][] sheet = TextureRegion.split(png, 32, 64);
         sprites = new TextureRegion[4];
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             sprites[i] = sheet[0][i];
         }
+        ATTACK_RANGE = 50f;
     }
-    @Override
-    protected float getAttackRange() {
-        return ATTACK_RANGE;
-    }
+
     /**
      * Updates eraser-specific state before movement logic runs.
      *
-     * <p>This includes saving the original spawn position, updating the attack
-     * cooldown timer, and erasing drawn floor tiles.</p>
+     * <p>
+     * This includes saving the original spawn position, updating the attack
+     * cooldown timer, and erasing drawn floor tiles.
+     * </p>
      *
      * @param delta time since last update
      */
     @Override
     protected void beforeMovementUpdate(float delta) {
+        saveSpawnPositionIfNeeded();
+        updateAttackCooldown(delta);
+
+        if (!isMoving()) {
+            return;
+        }
+
+        updateFacingFromVelocity();
+        eraseFloorUnderEraser();
+    }
+
+    /**
+     * Saves the eraser's initial spawn position the first time it updates.
+     */
+    private void saveSpawnPositionIfNeeded() {
         if (startX == -1f) {
             startX = transform.position.x;
             startY = transform.position.y;
         }
+    }
 
+    /**
+     * Updates the remaining attack cooldown time.
+     *
+     * @param delta time since last update
+     */
+    private void updateAttackCooldown(float delta) {
         if (attackCooldownTimer > 0f) {
             attackCooldownTimer -= delta;
             if (attackCooldownTimer < 0f) {
                 attackCooldownTimer = 0f;
             }
         }
+    }
 
-        if(transform.velocity.x != 0 || transform.velocity.y != 0){
-            if(Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)){
-                if(transform.velocity.y > 0){
-                    facing = UP;
-                }else{
-                    facing = DOWN;
-                }
-            }else{
-                if(transform.velocity.x > 0){
-                    facing = RIGHT;
-                }else{
-                    facing = LEFT;
-                }
-            }
+    /**
+     * Checks whether the eraser is currently moving.
+     *
+     * @return true if the eraser has non-zero velocity
+     */
+    private boolean isMoving() {
+        return transform.velocity.x != 0 || transform.velocity.y != 0;
+    }
 
-            world.floorDraw(transform.position.x + transform.size.x/2, transform.position.y + transform.size.y/4, true, 10, weight);
+    /**
+     * Updates the facing direction based on the current velocity.
+     */
+    private void updateFacingFromVelocity() {
+        if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
+            facing = transform.velocity.y > 0 ? UP : DOWN;
+        } else {
+            facing = transform.velocity.x > 0 ? RIGHT : LEFT;
         }
+    }
+
+    /**
+     * Erases drawn floor tiles under the eraser.
+     */
+    private void eraseFloorUnderEraser() {
+        world.floorDraw(
+                transform.position.x + transform.size.x / 2,
+                transform.position.y + transform.size.y / 4,
+                true,
+                10,
+                weight
+        );
     }
 
     /**
@@ -169,16 +206,17 @@ public class Eraser extends MobileEnemy {
                 drawX * Game.GdxGame.UNIT_SCALE,
                 drawY * Game.GdxGame.UNIT_SCALE,
                 DRAW_WIDTH * Game.GdxGame.UNIT_SCALE,
-                DRAW_HEIGHT * Game.GdxGame.UNIT_SCALE
-        );
+                DRAW_HEIGHT * Game.GdxGame.UNIT_SCALE);
     }
 
     /**
      * Handles collision with the player.
      *
-     * <p>If the eraser is not on cooldown and the player is neither stunned nor
+     * <p>
+     * If the eraser is not on cooldown and the player is neither stunned nor
      * immune, it deals damage, plays a sound effect, teleports back to its spawn
-     * position, clears its current path, and starts its attack cooldown.</p>
+     * position, clears its current path, and starts its attack cooldown.
+     * </p>
      *
      * @param player the player that collided with this eraser
      */
@@ -203,7 +241,8 @@ public class Eraser extends MobileEnemy {
         this.pathIndex = 0;
         this.pathTimer = 0f;
 
-        // start the cooldown immediately so it doesn't double-attack if it respawns near the player
+        // start the cooldown immediately so it doesn't double-attack if it respawns
+        // near the player
         attackCooldownTimer = ATTACK_COOLDOWN;
     }
 }

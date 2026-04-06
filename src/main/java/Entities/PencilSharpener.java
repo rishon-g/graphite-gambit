@@ -8,8 +8,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 /**
  * Enemy that moves toward the player and traps them.
  *
- * <p>When the player collides with the pencil sharpener, the player is stunned.
- * While the player remains trapped, this enemy periodically deals damage over time.</p>
+ * <p>
+ * When the player collides with the pencil sharpener, the player is stunned.
+ * While the player remains trapped, this enemy periodically deals damage over
+ * time.
+ * </p>
  */
 public class PencilSharpener extends MobileEnemy {
 
@@ -34,11 +37,9 @@ public class PencilSharpener extends MobileEnemy {
 
     static final int HITBOX = 64;
 
-
     public static final float STUN_DURATION = 8f;
     public static final int DOT_DAMAGE = -5;
     public static final float DAMAGE_TICK_RATE = 0.5f;
-    private static final float ATTACK_RANGE = 50f;
     /**
      * sprites for the sharpener
      */
@@ -65,20 +66,20 @@ public class PencilSharpener extends MobileEnemy {
         TextureRegion[][] sheet2 = TextureRegion.split(png2, 48, 72);
         sprites = new TextureRegion[4];
         holdsprites = new TextureRegion[4];
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             sprites[i] = sheet[0][i];
             holdsprites[i] = sheet2[0][i];
         }
+        ATTACK_RANGE = 55f;
     }
-    @Override
-    protected float getAttackRange() {
-        return ATTACK_RANGE;
-    }
+
     /**
      * Updates sharpener-specific state before movement logic runs.
      *
-     * <p>This reduces the damage timer used for periodic damage while
-     * the player is trapped.</p>
+     * <p>
+     * This reduces the damage timer used for periodic damage while
+     * the player is trapped.
+     * </p>
      *
      * @param delta time since last update
      */
@@ -90,19 +91,11 @@ public class PencilSharpener extends MobileEnemy {
                 damageTimer = 0f;
             }
         }
-        if(transform.velocity.x != 0 || transform.velocity.y != 0){
-            if(Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)){
-                if(transform.velocity.y > 0){
-                    facing = UP;
-                }else{
-                    facing = DOWN;
-                }
-            }else{
-                if(transform.velocity.x > 0){
-                    facing = RIGHT;
-                }else{
-                    facing = LEFT;
-                }
+        if (transform.velocity.x != 0 || transform.velocity.y != 0) {
+            if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
+                facing = transform.velocity.y > 0 ? UP : DOWN;
+            } else {
+                facing = transform.velocity.x > 0 ? RIGHT : LEFT;
             }
         }
     }
@@ -125,28 +118,29 @@ public class PencilSharpener extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-            float offsetX = (DRAW_SIZE - transform.size.x) / 2f;
-            float offsetY = (DRAW_SIZE - transform.size.y) / 2f;
+        float offsetX = (DRAW_SIZE - transform.size.x) / 2f;
+        float offsetY = (DRAW_SIZE - transform.size.y) / 2f;
 
-            float drawX = transform.position.x - offsetX;
-            float drawY = transform.position.y - offsetY;
+        float drawX = transform.position.x - offsetX;
+        float drawY = transform.position.y - offsetY;
 
-            batch.draw(
-                    sprites[facing],
-                    drawX * Game.GdxGame.UNIT_SCALE,
-                    drawY * Game.GdxGame.UNIT_SCALE,
-                    DRAW_SIZE * Game.GdxGame.UNIT_SCALE,
-                    DRAW_SIZE * Game.GdxGame.UNIT_SCALE
-            );
+        batch.draw(
+                sprites[facing],
+                drawX * Game.GdxGame.UNIT_SCALE,
+                drawY * Game.GdxGame.UNIT_SCALE,
+                DRAW_SIZE * Game.GdxGame.UNIT_SCALE,
+                DRAW_SIZE * Game.GdxGame.UNIT_SCALE);
     }
 
     /**
      * Handles collision with the player.
      *
-     * <p>If the player is immune, nothing happens. If the player is not already
+     * <p>
+     * If the player is immune, nothing happens. If the player is not already
      * stunned, the sharpener traps them by applying a stun. If the player is
      * already stunned, the sharpener periodically drains health while the
-     * internal damage timer allows it.</p>
+     * internal damage timer allows it.
+     * </p>
      *
      * @param player the player that collided with this sharpener
      */
@@ -166,7 +160,7 @@ public class PencilSharpener extends MobileEnemy {
         else {
             if (damageTimer <= 0) {
                 player.modifyHealth(DOT_DAMAGE); // Drain graphite points
-                damageTimer = DAMAGE_TICK_RATE;      // Reset the timer to wait
+                damageTimer = DAMAGE_TICK_RATE; // Reset the timer to wait
             }
         }
     }
