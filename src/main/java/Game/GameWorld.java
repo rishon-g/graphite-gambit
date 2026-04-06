@@ -423,18 +423,6 @@ public class GameWorld {
                     }
                 }
             }
-        }
-
-        // Resolve entity to player collisions
-        if (this.player != null) {
-            for (Entity entity : entities) {
-                if (entity instanceof Nonplayer) {
-                    if (isTouchingPlayer(entity.transform)) {
-                        ((Nonplayer) entity).playerCollide(player);
-
-                    }
-                }
-            }
         } else {
             // cutscene logic
             animTimer += delta;
