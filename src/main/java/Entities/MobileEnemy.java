@@ -133,7 +133,12 @@ public abstract class MobileEnemy extends Nonplayer {
             return;
         }
 
-        beforeMovementUpdate(delta);
+        boolean move = beforeMovementUpdate(delta);
+        if(!move) {
+            transform.setVelocity(0, 0);
+            return;
+        }
+
         tryAttackPlayer(player);
 
         updateMovementState(player);
@@ -148,7 +153,7 @@ public abstract class MobileEnemy extends Nonplayer {
      *
      * @param delta time since last update
      */
-    protected abstract void beforeMovementUpdate(float delta);
+    protected abstract boolean beforeMovementUpdate(float delta);
 
     /**
      * Returns the movement speed of this enemy.

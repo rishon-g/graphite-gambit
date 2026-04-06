@@ -740,8 +740,9 @@ public class MobileEnemyTest extends GameTest {
         }
 
         @Override
-        protected void beforeMovementUpdate(float delta) {
+        protected boolean beforeMovementUpdate(float delta) {
             beforeMovementCalled = true;
+            return true;
         }
 
         @Override
@@ -785,7 +786,8 @@ public class MobileEnemyTest extends GameTest {
         }
 
         @Override
-        protected void beforeMovementUpdate(float delta) {
+        protected boolean beforeMovementUpdate(float delta) {
+            return true;
         }
 
         @Override

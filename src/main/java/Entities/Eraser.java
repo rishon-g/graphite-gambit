@@ -3,6 +3,8 @@ package Entities;
 import Game.AudioManager;
 import Game.DrawWeight;
 import Game.GameWorld;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -31,11 +33,6 @@ public class Eraser extends MobileEnemy {
     private static final int ATTACK_DAMAGE = 10;
 
     /**
-     * Cooldown in seconds between attacks.
-     */
-    private static final float ATTACK_COOLDOWN = 1.0f;
-
-    /**
      * Indicators for the direction the player is facing for sprite rendering.
      */
     private static final int DOWN = 0;
@@ -60,9 +57,10 @@ public class Eraser extends MobileEnemy {
     private float startY = -1;
 
     /**
-     * Remaining time until the eraser can attack again.
+     * Remaining time until the eraser can respawn.
      */
-    private float attackCooldownTimer = 0f;
+    private final float RESPAWN_TIME = 5.0f;
+    private float respawnTimer = 0f;
 
     private static final float DRAW_WIDTH = 128;
     private static final float DRAW_HEIGHT = 192;
@@ -106,16 +104,24 @@ public class Eraser extends MobileEnemy {
      * @param delta time since last update
      */
     @Override
-    protected void beforeMovementUpdate(float delta) {
+    protected boolean beforeMovementUpdate(float delta) {
         saveSpawnPositionIfNeeded();
-        updateAttackCooldown(delta);
+
+        if(respawnTimer > 0f) {
+            respawnTimer -= delta;
+            if(respawnTimer < 0f) {
+                respawnTimer = 0f;
+            }
+            return false;
+        }
 
         if (!isMoving()) {
-            return;
+            return true;
         }
 
         updateFacingFromVelocity();
         eraseFloorUnderEraser();
+        return true;
     }
 
     /**
@@ -125,20 +131,6 @@ public class Eraser extends MobileEnemy {
         if (startX == -1f) {
             startX = transform.position.x;
             startY = transform.position.y;
-        }
-    }
-
-    /**
-     * Updates the remaining attack cooldown time.
-     *
-     * @param delta time since last update
-     */
-    private void updateAttackCooldown(float delta) {
-        if (attackCooldownTimer > 0f) {
-            attackCooldownTimer -= delta;
-            if (attackCooldownTimer < 0f) {
-                attackCooldownTimer = 0f;
-            }
         }
     }
 
@@ -194,6 +186,10 @@ public class Eraser extends MobileEnemy {
     @Override
     public void render(SpriteBatch batch, float delta) {
 
+        if(respawnTimer > 0f) {
+            batch.setColor(1f, 1f, 1f, (RESPAWN_TIME - respawnTimer) / RESPAWN_TIME);
+        }
+
         float offsetX = (DRAW_WIDTH - transform.size.x) / 2f;
 
         float offsetY = (DRAW_HEIGHT - transform.size.y) / 2f;
@@ -207,6 +203,8 @@ public class Eraser extends MobileEnemy {
                 drawY * Game.GdxGame.UNIT_SCALE,
                 DRAW_WIDTH * Game.GdxGame.UNIT_SCALE,
                 DRAW_HEIGHT * Game.GdxGame.UNIT_SCALE);
+        
+        batch.setColor(1f, 1f, 1f, 1f);
     }
 
     /**
@@ -223,7 +221,7 @@ public class Eraser extends MobileEnemy {
     @Override
     public void playerCollide(Player player) {
         // Respect cooldown and immunity states
-        if (attackCooldownTimer > 0f || player.isStunned || player.isImmune) {
+        if (player.isStunned || player.isImmune || respawnTimer > 0f) {
             return;
         }
 
@@ -241,8 +239,6 @@ public class Eraser extends MobileEnemy {
         this.pathIndex = 0;
         this.pathTimer = 0f;
 
-        // start the cooldown immediately so it doesn't double-attack if it respawns
-        // near the player
-        attackCooldownTimer = ATTACK_COOLDOWN;
+        respawnTimer = RESPAWN_TIME; // add a short delay before the eraser can move again
     }
 }

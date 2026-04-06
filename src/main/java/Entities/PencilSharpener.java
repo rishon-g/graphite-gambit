@@ -85,7 +85,7 @@ public class PencilSharpener extends MobileEnemy {
      * @param delta time since last update
      */
     @Override
-    protected void beforeMovementUpdate(float delta) {
+    protected boolean beforeMovementUpdate(float delta) {
         if (damageTimer > 0f) {
             damageTimer -= delta;
             if (damageTimer < 0f) {
@@ -99,6 +99,7 @@ public class PencilSharpener extends MobileEnemy {
                 facing = transform.velocity.x > 0 ? RIGHT : LEFT;
             }
         }
+        return true;
     }
 
     /**
