@@ -272,14 +272,8 @@ public abstract class MobileEnemy extends Nonplayer {
         int startX = startTile[0];
         int startY = startTile[1];
 
-        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
-            clearCurrentPath();
-            transform.setVelocity(0, 0);
-            return;
-        }
-
         int[] targetTile = findBestTargetTile(player, map, startX, startY);
-        rebuildPathToTarget(map, startX, startY, targetTile);
+        rebuildPathToTarget(startX, startY, targetTile);
     }
 
     /**
@@ -295,14 +289,24 @@ public abstract class MobileEnemy extends Nonplayer {
         int startX = startTile[0];
         int startY = startTile[1];
 
-        if (!isInsideMap(map, startX, startY) || isBlocked(map, startX, startY)) {
-            clearCurrentPath();
-            transform.setVelocity(0, 0);
-            return;
+        for (int attempt = 0; attempt < 4; attempt++) {
+            int[] patrolTarget = RandomPatrol.choosePatrolTarget(map, startX, startY, PATROL_SEARCH_RADIUS);
+            if (patrolTarget == null) {
+                clearCurrentPath();
+                transform.setVelocity(0, 0);
+                return;
+            }
+
+            List<int[]> path = AStar.findPath(map, startX, startY, patrolTarget[0], patrolTarget[1]);
+            if (!path.isEmpty()) {
+                currentPath = path;
+                pathIndex = 0;
+                return;
+            }
         }
 
-        int[] patrolTarget = RandomPatrol.choosePatrolTarget(map, startX, startY, PATROL_SEARCH_RADIUS);
-        rebuildPathToTarget(map, startX, startY, patrolTarget);
+        clearCurrentPath();
+        transform.setVelocity(0, 0);
     }
 
     /**
@@ -311,12 +315,11 @@ public abstract class MobileEnemy extends Nonplayer {
      * <p>If the target is {@code null}, or if the start and target tiles are the
      * same, the current path is cleared.</p>
      *
-     * @param map the tile map
      * @param startX the starting tile x-coordinate
      * @param startY the starting tile y-coordinate
      * @param targetTile the destination tile as {@code {x, y}}, or {@code null}
      */
-    private void rebuildPathToTarget(int[][] map, int startX, int startY, int[] targetTile) {
+    private void rebuildPathToTarget(int startX, int startY, int[] targetTile) {
         if (targetTile == null) {
             clearCurrentPath();
             return;
@@ -330,7 +333,7 @@ public abstract class MobileEnemy extends Nonplayer {
             return;
         }
 
-        currentPath = AStar.findPath(map, startX, startY, endX, endY);
+        currentPath = AStar.findPath(getValidTileMap(), startX, startY, endX, endY);
         pathIndex = 0;
     }
 
@@ -357,14 +360,14 @@ public abstract class MobileEnemy extends Nonplayer {
         int playerMinTileY = playerBounds[2];
         int playerMaxTileY = playerBounds[3];
 
-        List<int[]> bestPath = Collections.emptyList();
-        int[] bestTile = null;
-
         for (int radius = 0; radius <= TARGET_SEARCH_RADIUS; radius++) {
             int searchMinX = playerMinTileX - radius;
             int searchMaxX = playerMaxTileX + radius;
             int searchMinY = playerMinTileY - radius;
             int searchMaxY = playerMaxTileY + radius;
+
+            int[] bestTile = null;
+            int bestHeuristic = Integer.MAX_VALUE;
 
             for (int targetX = searchMinX; targetX <= searchMaxX; targetX++) {
                 for (int targetY = searchMinY; targetY <= searchMaxY; targetY++) {
@@ -380,10 +383,10 @@ public abstract class MobileEnemy extends Nonplayer {
                         continue;
                     }
 
-                    List<int[]> path = AStar.findPath(map, startX, startY, targetX, targetY);
-                    if (isBetterTargetPath(path, bestTile, bestPath)) {
+                    int heuristic = Math.abs(targetX - startX) + Math.abs(targetY - startY);
+                    if (heuristic < bestHeuristic) {
+                        bestHeuristic = heuristic;
                         bestTile = new int[]{targetX, targetY};
-                        bestPath = path;
                     }
                 }
             }

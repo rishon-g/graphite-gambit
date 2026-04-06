@@ -73,7 +73,7 @@ public class PencilSharpener extends MobileEnemy {
             sprites[i] = sheet[0][i];
             holdsprites[i] = sheet2[0][i];
         }
-        ATTACK_RANGE = 50f;
+        ATTACK_RANGE = 55f;
     }
 
     /**

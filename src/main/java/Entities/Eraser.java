@@ -99,7 +99,7 @@ public class Eraser extends MobileEnemy {
         for (int i = 0; i < 4; i++) {
             sprites[i] = sheet[0][i];
         }
-        ATTACK_RANGE = 45f;
+        ATTACK_RANGE = 50f;
     }
 
     /**

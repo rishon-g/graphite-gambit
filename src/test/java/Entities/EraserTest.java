@@ -173,7 +173,7 @@ public class EraserTest extends GameTest {
 
     @Test
     void testGetAttackRange_Set() {
-        assertEquals(45f, eraser.ATTACK_RANGE, 0.0001f);
+        assertEquals(50f, eraser.ATTACK_RANGE, 0.0001f);
     }
 
     @Test
