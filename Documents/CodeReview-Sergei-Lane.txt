@@ -18,11 +18,15 @@ The GameWorld class ran way too much code, and was responsible for almost everyt
 To alleviate this, the physics was instead refactored into it's own singleton class
 responsible for handling solidObjects, and the requestMove logic.
 
-5:
+5: Duplicated Code
+In the MobileEnemy class, the logic of determining the enemy's attack range was duplicated in several ways in the isPlayerWithinAttackRange and tryAttackPlayer methods. A helper method getEdgeDistanceToPlayer was created that solved the problem of calculating the distance from the edges of the enemy's and player's hitboxes. This eliminated code duplication and made the logic clearer for future updates.
 
-6:
+6: Duplicated Code
+In the MobileEnemy class, the chase and patrol path rebuilding logic used the same setup code, which included checking the map for validity, getting the player's current position, and the general stage of rebuilding the path. This is a duplication of the complexity in maintaining the code, since it was necessary to change the code in two places. The getValidTileMap, getCurrentTilePosition, and rebuildPathToTarget methods were created to perform these tasks. This improved readability and reduced the amount of repeated code.
 
-7:
+7: Long Method
+In the MobileEnemy class, the updateInternal method performed too many functions independent of each other, in particular, updating the movement state, deciding whether to rebuild path, and following the path. This increased the time to understand the functions of the method. This problem was solved by extracting the helper methods handlePathRebuild and followCurrentPath. As a result, the state update method has become shorter and more readable.
 
-8:
+8: Long Method
+In the Eraser class, the beforeMovementUpdate method performed several unrelated tasks, such as adjusting the position when appearing, updating the cooldown, checking movement, updating the side of the surface to correctly draw the sprite, and erasing graphite from the floor. This made it more difficult to use the method. This method was divided into subtask methods that were each responsible for their own function. This made the structure more logical.
 
