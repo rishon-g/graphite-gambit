@@ -26,9 +26,7 @@ public class PhysicsHandler {
     }
 
     public static void CreateHandler(Vector<Entity> entities, int width, int height) {
-        if (instance == null) {
-            instance = new PhysicsHandler(entities, width, height);
-        }
+        instance = new PhysicsHandler(entities, width, height);
     }
 
     public static PhysicsHandler getInstance() {

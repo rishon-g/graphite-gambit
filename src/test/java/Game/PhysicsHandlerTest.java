@@ -23,7 +23,6 @@ public class PhysicsHandlerTest {
     }
 
     @BeforeEach void setup() {
-        PhysicsHandler.instance = null;
         entities = new Vector<>();
         PhysicsHandler.CreateHandler(entities, 800, 600);
         physics = PhysicsHandler.getInstance();
