@@ -2,6 +2,8 @@ package Entities;
 
 import Components.Transform;
 import Game.GameWorld;
+import Game.PhysicsHandler;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,6 +23,9 @@ abstract public class Entity {
     // reference to the game world the entity belongs to (used for interactions with other entities)
     protected GameWorld world;
 
+    // reference to the world physics handler (used for requesting movement and checking collisions)
+    protected PhysicsHandler physics;
+
     public boolean dead;
 
     /**
@@ -30,6 +35,7 @@ abstract public class Entity {
         this.transform = new Transform();
         this.world = world;
         dead = false;
+        physics = PhysicsHandler.getInstance();
     }
 
     /**
@@ -40,7 +46,7 @@ abstract public class Entity {
      */
     public void update(float delta){
         updateInternal(delta);
-        world.requestMove(transform, delta);
+        physics.requestMove(this, delta);
     }
 
     /**

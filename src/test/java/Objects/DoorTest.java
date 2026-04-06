@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DoorTest extends GameTest {
-
     @Test
     public void testConstructor_LeftDoor_InitializesCorrectly() {
         // hits the first 'if' statement

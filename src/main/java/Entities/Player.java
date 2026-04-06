@@ -153,7 +153,7 @@ public class Player extends Entity {
         float oldY = transform.position.y;
 
         updateInternal(delta);
-        world.requestMove(transform, delta);
+        physics.requestMove(this, delta);
 
         float movedX = transform.position.x - oldX;
         float movedY = transform.position.y - oldY;

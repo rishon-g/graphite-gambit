@@ -39,16 +39,17 @@ public class WorldLoader {
      */
     public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
-
+        
         // get the map dynamically using the id
         MapAsset currentLevel = MapAsset.getLevelAsset(id);
         TiledMap map = game.getAssetService().get(currentLevel);
-
+        
         // populate the 2D array
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
         world.setDimensions(layer.getWidth() * GameWorld.getTileSize(), layer.getHeight() * GameWorld.getTileSize());
         world.tilemap = new int[layer.getWidth()][layer.getHeight()];
-
+        PhysicsHandler.CreateHandler(world.entities, world.width, world.height); // temporary dimensions, will be set properly after loading the map
+        
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(x, y);
@@ -59,9 +60,10 @@ public class WorldLoader {
                 }
             }
         }
-
+        
         // get collisions object layer
         MapLayer collisionLayer = map.getLayers().get("collisions");
+        PhysicsHandler physics = PhysicsHandler.getInstance();
 
         if (collisionLayer != null) {
             // loop through all hitboxes
@@ -76,7 +78,7 @@ public class WorldLoader {
                     wall.setScale(rect.width, rect.height);
 
                     // add to solid object array, so we know not to collide with these elements
-                    world.solidObjects.add(wall);
+                    physics.solidObjects.add(wall);
 
                     // also mark blocked tiles for pathfinding
                     int tileSize = GameWorld.getTileSize();

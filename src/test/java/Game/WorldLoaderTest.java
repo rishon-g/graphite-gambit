@@ -129,7 +129,7 @@ public class WorldLoaderTest extends GameTest {
 
         GameWorld world = worldLoader.loadWorld(mockGame, mockScreen, 1);
 
-        assertEquals(1, world.solidObjects.size, "should have loaded one solid object from the collision layer");
+        assertEquals(1, PhysicsHandler.getInstance().solidObjects.size, "should have loaded one solid object from the collision layer");
         assertEquals(1, world.tilemap[0][0], "the tile intersecting the collision object should be marked as blocked");
     }
 
@@ -241,7 +241,7 @@ public class WorldLoaderTest extends GameTest {
 
         GameWorld world = worldLoader.loadWorld(mockGame, mockScreen, 1);
         // the bad shape was safely skipped
-        assertEquals(0, world.solidObjects.size, "non-rectangle objects should be ignored");
+        assertEquals(0, PhysicsHandler.getInstance().solidObjects.size, "non-rectangle objects should be ignored");
     }
 
     @Test
