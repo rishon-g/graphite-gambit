@@ -45,30 +45,30 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testBeforeMovementUpdate_CooldownDecreases() throws Exception {
-        setPrivateFloat(eraser, "attackCooldownTimer", 1.0f);
+    void testBeforeMovementUpdate_RespawnDecreases() throws Exception {
+        setPrivateFloat(eraser, "respawnTimer", 1.0f);
 
         eraser.beforeMovementUpdate(0.25f);
 
-        assertEquals(0.75f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+        assertEquals(0.75f, getPrivateFloat(eraser, "respawnTimer"), 0.0001f);
     }
 
     @Test
-    void testBeforeMovementUpdate_CooldownClampsToZero() throws Exception {
-        setPrivateFloat(eraser, "attackCooldownTimer", 0.2f);
+    void testBeforeMovementUpdate_RespawnClampsToZero() throws Exception {
+        setPrivateFloat(eraser, "respawnTimer", 0.2f);
 
         eraser.beforeMovementUpdate(0.5f);
 
-        assertEquals(0f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+        assertEquals(0f, getPrivateFloat(eraser, "respawnTimer"), 0.0001f);
     }
 
     @Test
-    void testBeforeMovementUpdate_ZeroDelta_DoesNotChangeCooldown() throws Exception {
-        setPrivateFloat(eraser, "attackCooldownTimer", 0.6f);
+    void testBeforeMovementUpdate_ZeroDelta_DoesNotChangeRespawn() throws Exception {
+        setPrivateFloat(eraser, "respawnTimer", 0.6f);
 
         eraser.beforeMovementUpdate(0.0f);
 
-        assertEquals(0.6f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+        assertEquals(0.6f, getPrivateFloat(eraser, "respawnTimer"), 0.0001f);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testPlayerCollide_DamagesPlayerRespawnsAndStartsCooldown() throws Exception {
+    void testPlayerCollide_DamagesPlayerRespawnsAndStartsRespawnTimer() throws Exception {
         eraser.transform.setPosition(300, 400);
         eraser.beforeMovementUpdate(0.1f);
 
@@ -200,7 +200,7 @@ public class EraserTest extends GameTest {
         assertTrue(eraser.currentPath.isEmpty());
         assertEquals(0, eraser.pathIndex);
         assertEquals(0f, eraser.pathTimer);
-        assertEquals(1.0f, getPrivateFloat(eraser, "attackCooldownTimer"), 0.0001f);
+        assertEquals(5.0f, getPrivateFloat(eraser, "respawnTimer"), 0.0001f);
 
         verify(mockAudio, times(1)).playDamage();
     }
@@ -232,11 +232,11 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testPlayerCollide_DuringCooldown_DoesNothing() throws Exception {
+    void testPlayerCollide_DuringRespawn_DoesNothing() throws Exception {
         eraser.transform.setPosition(100, 100);
         eraser.beforeMovementUpdate(0.1f);
 
-        setPrivateFloat(eraser, "attackCooldownTimer", 0.5f);
+        setPrivateFloat(eraser, "respawnTimer", 0.5f);
 
         int healthBefore = player.getHealth();
 
@@ -277,7 +277,7 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testPlayerCollide_CooldownPreventsSecondHit() {
+    void testPlayerCollide_RespawnPreventsSecondHit() {
         eraser.transform.setPosition(100, 100);
         eraser.beforeMovementUpdate(0.1f);
 
@@ -291,14 +291,14 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testPlayerCollide_AfterCooldownExpires_CanHitAgain() {
+    void testPlayerCollide_AfterRespawn_CanHitAgain() {
         eraser.transform.setPosition(100, 100);
         eraser.beforeMovementUpdate(0.1f);
 
         int healthBefore = player.getHealth();
 
         eraser.playerCollide(player);
-        eraser.beforeMovementUpdate(1.1f);
+        eraser.beforeMovementUpdate(5.1f);
         eraser.playerCollide(player);
 
         assertEquals(healthBefore - 20, player.getHealth());
