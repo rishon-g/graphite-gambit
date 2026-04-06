@@ -1,0 +1,28 @@
+1: Long Method
+Within Player.updateInternal, the method alone ran lots of code, including the stun handling, input handling, and movement.
+This was refactored to split off into an input handling method, which then calls to a move method.
+The stun may further be split into it's own method later.
+
+2: Primitive Obsession?
+Within MobileEntity, the parent abstracts a getAttackRange method which is continuously drawn from by the abstracted part.
+While needed, this method was just used as a holder for a primitive value which is only used in the parent.
+Instead, this was changed such that the abstracted counterpart sets the variable for the attack range upon creation such that
+no internal calls are needed to obtain this constant data.
+
+3: Long Method
+Within MobileEntity, the AStar path construction within updateInternal was a very long process.
+This was refactored into multiple methods outside of updateInternal.
+
+4: God Class
+The GameWorld class ran way too much code, and was responsible for almost everything.
+To alleviate this, the physics was instead refactored into it's own singleton class
+responsible for handling solidObjects, and the requestMove logic.
+
+5:
+
+6:
+
+7:
+
+8:
+
