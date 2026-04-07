@@ -22,6 +22,13 @@ import java.util.List;
  */
 public abstract class MobileEnemy extends Nonplayer {
 
+    // sprite movement directions
+    protected static final int DOWN = 0;
+    protected static final int UP = 1;
+    protected static final int LEFT = 2;
+    protected static final int RIGHT = 3;
+    protected int facing;
+
     /**
      * Time interval in seconds between path recalculations.
      */
