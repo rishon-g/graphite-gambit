@@ -36,15 +36,6 @@ public class Eraser extends MobileEnemy {
     private static final float ATTACK_COOLDOWN = 1.0f;
 
     /**
-     * Indicators for the direction the player is facing for sprite rendering.
-     */
-    private static final int DOWN = 0;
-    private static final int UP = 1;
-    private static final int RIGHT = 2;
-    private static final int LEFT = 3;
-    private int facing = DOWN;
-
-    /**
      * sprites for the eraser
      */
     private TextureRegion sprites[];
