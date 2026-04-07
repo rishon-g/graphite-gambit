@@ -1,12 +1,13 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Game.GameWorld;
 
-public class Node extends Nonplayer {
+public class Node extends Entity implements Nonplayer {
     Texture texture;
 
     public Node(GameWorld world){

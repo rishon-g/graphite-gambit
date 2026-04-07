@@ -24,7 +24,7 @@ import java.util.List;
  * reachable nearby tile within a small radius.
  * </p>
  */
-public abstract class MobileEnemy extends Nonplayer {
+public abstract class MobileEnemy extends Entity implements Nonplayer {
 
     // sprite movement directions
     protected static final int DOWN = 0;

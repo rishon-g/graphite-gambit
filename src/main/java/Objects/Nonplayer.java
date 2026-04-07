@@ -1,27 +1,34 @@
 package Objects;
 
-import Entities.Entity;
 import Entities.Player;
-import Game.GameWorld;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * The Enemy class represents an enemy entity in the game, extending the Entity abstract class.
- * Enemies have an attack method that defines their behavior when attacking the player.
- * 
- * @author Lane Jacobson
- * @version 1.0
- * @since 2026-2-26
- * @see Entity
+ * The Nonplayer interface represents an entity in the game that the player can interact or collide with.
+ * Classes implementing this interface must define their specific collision, logic, and rendering behaviors.
  */
-//TODO make interface
-public abstract class Nonplayer extends Entity {
-    public Nonplayer(GameWorld world) {
-        super(world);
-    }
+public interface Nonplayer {
 
     /**
-     * The playerCollide function handles the event that this nonplayer entity collides with the player.
-     * The specific behavior of the collision will depend on the type of enemy and should be implemented in the subclasses.
+     * Updates the internal state and logic of the nonplayer entity.
+     *
+     * @param delta time since last update
      */
-    public abstract void playerCollide(Player player);
+    void updateInternal(float delta);
+
+    /**
+     * Handles the event that this nonplayer entity collides with the player.
+     * The specific behavior of the collision will depend on the type of object.
+     * * @param player the player that collided with this entity
+     */
+    void playerCollide(Player player);
+
+    /**
+     * Renders the nonplayer entity on the screen.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
+     */
+    void render(SpriteBatch batch, float delta);
+
 }

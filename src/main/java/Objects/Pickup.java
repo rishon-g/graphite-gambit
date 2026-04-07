@@ -1,5 +1,6 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 
 import com.badlogic.gdx.Gdx;
@@ -7,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import Game.GameWorld;
 
-public class Pickup extends Nonplayer {
+public class Pickup extends Entity implements Nonplayer {
     private Texture graphiteTexture;
     private Texture glowTexture;
 

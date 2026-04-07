@@ -1,5 +1,6 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
@@ -12,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * <p>This entity is rendered as a static ink sprite in the world. When the
  * player collides with it, a slowdown effect is applied.</p>
  */
-public class Ink extends Nonplayer {
+public class Ink extends Entity implements Nonplayer {
 
     /**
      * Texture used to render the ink obstacle.
