@@ -98,6 +98,8 @@ public class Eraser extends MobileEnemy {
      */
     @Override
     protected void beforeMovementUpdate(float delta) {
+        super.beforeMovementUpdate(delta);
+
         saveSpawnPositionIfNeeded();
         updateAttackCooldown(delta);
 
@@ -105,7 +107,6 @@ public class Eraser extends MobileEnemy {
             return;
         }
 
-        updateFacingFromVelocity();
         eraseFloorUnderEraser();
     }
 
@@ -140,17 +141,6 @@ public class Eraser extends MobileEnemy {
      */
     private boolean isMoving() {
         return transform.velocity.x != 0 || transform.velocity.y != 0;
-    }
-
-    /**
-     * Updates the facing direction based on the current velocity.
-     */
-    private void updateFacingFromVelocity() {
-        if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
-            facing = transform.velocity.y > 0 ? UP : DOWN;
-        } else {
-            facing = transform.velocity.x > 0 ? RIGHT : LEFT;
-        }
     }
 
     /**

@@ -78,25 +78,12 @@ public class PencilSharpener extends MobileEnemy {
      */
     @Override
     protected void beforeMovementUpdate(float delta) {
+        super.beforeMovementUpdate(delta);
+
         if (damageTimer > 0f) {
             damageTimer -= delta;
             if (damageTimer < 0f) {
                 damageTimer = 0f;
-            }
-        }
-        if(transform.velocity.x != 0 || transform.velocity.y != 0){
-            if(Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)){
-                if(transform.velocity.y > 0){
-                    facing = UP;
-                }else{
-                    facing = DOWN;
-                }
-            }else{
-                if(transform.velocity.x > 0){
-                    facing = RIGHT;
-                }else{
-                    facing = LEFT;
-                }
             }
         }
     }

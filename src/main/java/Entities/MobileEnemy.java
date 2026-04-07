@@ -160,7 +160,24 @@ public abstract class MobileEnemy extends Nonplayer {
      *
      * @param delta time since last update
      */
-    protected abstract void beforeMovementUpdate(float delta);
+    protected void beforeMovementUpdate(float delta) {
+        if (transform.velocity.x != 0 || transform.velocity.y != 0) {
+            if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
+                if (transform.velocity.y > 0) {
+                    facing = UP;
+                } else {
+                    facing = DOWN;
+                }
+            } else {
+                if (transform.velocity.x > 0) {
+                    facing = RIGHT;
+                } else {
+                    facing = LEFT;
+                }
+            }
+        }
+    }
+
 
     /**
      * Returns the movement speed of this enemy.
@@ -672,4 +689,5 @@ public abstract class MobileEnemy extends Nonplayer {
     private float tileToWorldCenterY(int tileY, float height) {
         return tileY * GameWorld.getTileSize() + (GameWorld.getTileSize() - height) / 2f;
     }
+
 }
