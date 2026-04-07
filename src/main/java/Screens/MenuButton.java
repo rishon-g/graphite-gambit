@@ -32,7 +32,6 @@ public class MenuButton {
      * @param x x position on screen
      * @param y y position on screen
      */
-    // TODO long parameter list FIXED
 
     public MenuButton(String label, float x, float y, double scale, boolean disabled, Runnable action) {
         if (!GdxGame.isTestMode()) {
@@ -71,7 +70,6 @@ public class MenuButton {
      * @param text the text to display on the button
      * @return a new MenuButton object to add to the buttons array
      */
-    //TODO centered button make global FIXED
     public static MenuButton createCenteredButton(String text, int ID, double scale, boolean isDisabled, Runnable action) {
         // global parameters for buttons
         int startingY = 700;

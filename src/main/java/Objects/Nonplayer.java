@@ -13,7 +13,6 @@ import Game.GameWorld;
  * @since 2026-2-26
  * @see Entity
  */
-//TODO make interface
 public abstract class Nonplayer extends Entity {
     public Nonplayer(GameWorld world) {
         super(world);

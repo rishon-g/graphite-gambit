@@ -213,10 +213,6 @@ public class MainMenuScreen extends ScreenAdapter {
         // draw background
         batch.draw(background, 0, 0, screenWidth, screenHeight);
 
-        //TODO switch case or reduce somehow FIXED
-        // only difference is text
-        //TODO add test
-
         switch (currentLayout) {
             case MAIN:
                 setHeader("GRAPHITE GAMBIT");
@@ -236,7 +232,6 @@ public class MainMenuScreen extends ScreenAdapter {
             float currentY = 820f;
             float lineSpacing = 70f;
 
-            //TODO repeated code, make new mehod FIXED
             setHowToPlayText("Avoid ERASERS!  ", eraser, currentY);
             // Move down to the next line
             setHowToPlayText("Watch out for WHITE-OUT  ", whiteOut, currentY -= lineSpacing);

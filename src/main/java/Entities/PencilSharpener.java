@@ -29,7 +29,6 @@ public class PencilSharpener extends MobileEnemy {
     /**
      * Indicators for the direction the player is facing for sprite rendering.
      */
-    //TODO enum for global direcitons
     private static final int DOWN = 0;
     private static final int UP = 1;
     private static final int RIGHT = 2;

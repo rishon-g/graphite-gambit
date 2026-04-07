@@ -175,7 +175,7 @@ public class GameScreen implements Screen {
 
         // Buttons
         mainButtons = new MenuButton[] {
-                MenuButton.createCenteredButton("RESUME", 1, scale, false, () -> gameUnpause()),
+                MenuButton.createCenteredButton("RESUME", 1, scale, false, this::gameUnpause),
                 MenuButton.createCenteredButton("RESTART", 2, scale, false, () -> screenManager.SetGameScreen(world.getId())),
                 MenuButton.createCenteredButton("SETTINGS", 3, scale, false, () -> changeLayout(Layout.SETTINGS)),
                 MenuButton.createCenteredButton("SAVE & QUIT", 4, scale, false, () -> screenManager.SetMenuScreen()),
@@ -214,7 +214,6 @@ public class GameScreen implements Screen {
         textBox = null;
 
         // Buttons
-        //TODO remove test button creation with null textures FIXED BY MENUBUTTON
         this.game = game;
         this.playerData = PlayerData.obtainPlayerData();
         this.world = null;

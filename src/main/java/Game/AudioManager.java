@@ -203,7 +203,6 @@ public class AudioManager implements Disposable {
      * Call every frame from Player.updateInternal().
      * @param isStunned true while the player is stunned by a sharpener
      */
-    //TODO make one class for move and sharpener
     public void updateSharpenerSound(boolean isStunned) {
         if (!game.isSfxPlaying()) {
             stopSharpenerSound();
