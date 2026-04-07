@@ -444,7 +444,9 @@ public class GameWorld {
                     drawnLines++;
                     animTimer = 0f;
 
-                    Game.AudioManager.getInstance().playLineDrawSound();
+                    if (drawnLines < nodePositions.size + 1) {
+                        Game.AudioManager.getInstance().playLineDrawSound();
+                    }
 
                     if (drawnLines > nodePositions.size) {
                         currentState = GameState.HOLD_OUT;

@@ -19,22 +19,26 @@
                 7,
                 2
             ],
-            "scale": 0.2069,
+            "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1822.136297728371,
-                "y": 1317.0613823102944
+                "x": 2733.333333333333,
+                "y": 1113.6363636363635
             }
         },
         "level1.tmx#maintiles": {
             "dynamicWrapping": true
         },
         "level2.tmx": {
-            "scale": 0.1313,
-            "selectedLayer": 2,
+            "expandedObjectLayers": [
+                5,
+                2
+            ],
+            "scale": 0.1293,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 2726.580350342727,
-                "y": 2105.864432597106
+                "x": 3062.6450116009282,
+                "y": 2037.8963650425364
             }
         },
         "level3.tmx": {
