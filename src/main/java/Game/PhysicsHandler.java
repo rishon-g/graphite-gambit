@@ -2,6 +2,7 @@ package Game;
 
 import java.util.Vector;
 
+import Entities.PencilSharpener;
 import com.badlogic.gdx.utils.Array;
 
 import Components.Transform;
@@ -203,6 +204,11 @@ public class PhysicsHandler {
         // Erasers block each other
         if (mover instanceof Nonplayer && other instanceof Nonplayer) {
             return true;
+        }
+
+        // Pencil sharpener does not block eraser
+        if (other instanceof PencilSharpener) {
+            return false;
         }
         return false;
     }

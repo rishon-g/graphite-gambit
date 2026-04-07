@@ -25,7 +25,7 @@ public class Player extends Entity {
     // health (graphite) of the player
     private int health;
     private int maxHealth;
-    public final static int STARTING_HEALTH = 100; // pixels per second
+    public final static int STARTING_HEALTH = 100;
 
     private float drainTimer = 0f;
     private float acceleration = 3200f;
@@ -50,7 +50,7 @@ public class Player extends Entity {
     private final float INK_SLOW_FACTOR = 0.4f;
 
     // how much does the graphite drain everytime there is movement?
-    public static final int MOVEMENT_HEALTH_LOSS = -2;
+    public static int MOVEMENT_HEALTH_LOSS = -2;
 
     // movement sound state
     private boolean moveSoundSlowed = false;

@@ -45,18 +45,22 @@ public class WorldLoader {
             case 1:
                 world.maxPickups = 5;
                 world.spawnInterval = 5.0f;
+                Player.MOVEMENT_HEALTH_LOSS = -2;
                 break;
             case 2:
                 world.maxPickups = 7;
                 world.spawnInterval = 4.0f;
+                Player.MOVEMENT_HEALTH_LOSS = -3;
                 break;
             case 3:
                 world.maxPickups = 12;
-                world.spawnInterval = 3.0f;
+                world.spawnInterval = 2.0f;
+                Player.MOVEMENT_HEALTH_LOSS = -4;
                 break;
             default:
                 world.maxPickups = 5 + id;
                 world.spawnInterval = Math.max(1.0f, 6.0f - id);
+                Player.MOVEMENT_HEALTH_LOSS = -id -1;
                 break;
         }
 
