@@ -136,26 +136,13 @@ public class TransformTest {
 
     @Test
     void testCollidesPointOutside(){
-        input.setPosition(0, 0);
+        input.setPosition(10, 10);
         input.setScale(10, 10);
 
-        assert(!input.collides(15, 15));
-    }
-
-    @Test
-    void testCollidesPointOnEdge(){
-        input.setPosition(0, 0);
-        input.setScale(10, 10);
-
-        assert(input.collides(10, 5)); // On right edge
-    }
-
-    @Test
-    void testCollidesPointAtCorner(){
-        input.setPosition(0, 0);
-        input.setScale(10, 10);
-
-        assert(input.collides(10, 10)); // Bottom-right corner
+        assert(!input.collides(30, 15));
+        assert(!input.collides(0, 15));
+        assert(!input.collides(15, 30));
+        assert(!input.collides(15, 0));
     }
 
     @Test

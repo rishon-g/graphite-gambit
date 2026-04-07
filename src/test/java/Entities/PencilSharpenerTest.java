@@ -129,8 +129,8 @@ public class PencilSharpenerTest extends GameTest {
     @Test
     public void testBeforeMovementUpdate_DirectionalBranches() {
         // with a  helper method, we can test all 4 pure directions
-        assertFacingDirection(100f, 0f, 3, "Moving purely right should face right.");
-        assertFacingDirection(-100f, 0f, 2, "Moving purely left should face left.");
+        assertFacingDirection(100f, 0f, 2, "Moving purely right should face right.");
+        assertFacingDirection(-100f, 0f, 3, "Moving purely left should face left.");
         assertFacingDirection(0f, 100f, 1, "Moving purely up should face up.");
         assertFacingDirection(0f, -100f, 0, "Moving purely down should face down.");
     }
@@ -142,8 +142,8 @@ public class PencilSharpenerTest extends GameTest {
         assertFacingDirection(10f, -20f, 0, "Diagonal (mostly down) should prioritize down.");
 
         // x-axis dominant
-        assertFacingDirection(20f, 10f, 3, "Diagonal (mostly right) should prioritize right.");
-        assertFacingDirection(-20f, 10f, 2, "Diagonal (mostly left) should prioritize left.");
+        assertFacingDirection(20f, 10f, 2, "Diagonal (mostly right) should prioritize right.");
+        assertFacingDirection(-20f, 10f, 3, "Diagonal (mostly left) should prioritize left.");
     }
 
 

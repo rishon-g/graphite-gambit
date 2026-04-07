@@ -54,6 +54,7 @@ public class GameScreen implements Screen {
     OrthographicCamera uiCamera;
     Viewport uiViewport;
     int selectedIndex = -1;
+    double scale = 0.875;
 
     // sprite batch used for rendering entities
     SpriteBatch batch;
@@ -70,9 +71,7 @@ public class GameScreen implements Screen {
     }
 
     // menu textures
-    private Texture normalButton;
-    private Texture highlightedButton;
-    private Texture textBox;
+    private final Texture textBox;
 
     // menu buttons
     private MenuButton[] mainButtons;
@@ -172,36 +171,29 @@ public class GameScreen implements Screen {
         this.uiViewport = new FitViewport(1920, 1080, uiCamera);
 
         // Menu Textures
-        normalButton = new Texture(Gdx.files.internal("images/menu-button.png"));
-        highlightedButton = new Texture(Gdx.files.internal("images/menu-button-highlighted.png"));
         textBox = new Texture(Gdx.files.internal("images/menu-text-box.png"));
 
         // Buttons
         mainButtons = new MenuButton[] {
-                new MenuButton("RESUME", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
-                new MenuButton("RESTART", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),
-                new MenuButton("SETTINGS", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("SAVE & QUIT", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+                MenuButton.createCenteredButton("RESUME", 1, scale, false, () -> gameUnpause()),
+                MenuButton.createCenteredButton("RESTART", 2, scale, false, () -> screenManager.SetGameScreen(world.getId())),
+                MenuButton.createCenteredButton("SETTINGS", 3, scale, false, () -> changeLayout(Layout.SETTINGS)),
+                MenuButton.createCenteredButton("SAVE & QUIT", 4, scale, false, () -> screenManager.SetMenuScreen()),
         };
 
-        musicOnButton = new MenuButton("MUSIC: ON", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-                510, 700, 70, false);
-        musicOffButton = new MenuButton("MUSIC: OFF", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1),
-                510, 700, 70, false);
-        sfxOnButton = new MenuButton("SOUND EFFECTS: ON", normalButton, highlightedButton,
-                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
-        sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", normalButton, highlightedButton,
-                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
-        backButton = new MenuButton("BACK", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 600, 700,
-                70, false);
+        backButton = MenuButton.createCenteredButton("BACK", 1, scale, false, () -> changeLayout(Layout.MAIN));
+        musicOnButton = MenuButton.createCenteredButton("MUSIC: ON", 2, scale, false, this::toggleMusic);
+        musicOffButton = MenuButton.createCenteredButton("MUSIC: OFF", 2, scale, false, this::toggleMusic);
+        sfxOnButton = MenuButton.createCenteredButton("SOUND EFFECTS: ON", 3, scale, false, this::toggleSfx);
+        sfxOffButton = MenuButton.createCenteredButton("SOUND EFFECTS: OFF", 3, scale, false, this::toggleSfx);
 
         gameOverButtons = new MenuButton[] {
-                new MenuButton("RESTART LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+            MenuButton.createCenteredButton("RESTART LEVEL", 3, scale, false, () -> screenManager.SetGameScreen(world.getId())),
+            MenuButton.createCenteredButton("QUIT TO MENU", 4, scale, false, () -> screenManager.SetMenuScreen()),
         };
         gameWonButtons = new MenuButton[] {
-                new MenuButton("NEXT LEVEL", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("QUIT TO MENU", normalButton, highlightedButton, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
+                MenuButton.createCenteredButton("NEXT LEVEL", 3, scale, false, () -> screenManager.SetGameScreen(world.getId() + 1)),
+                MenuButton.createCenteredButton("QUIT TO MENU", 4, scale, false, () -> screenManager.SetMenuScreen()),
         };
 
         // generate a 1x1 white pixel texture for drawing the health bar shapes
@@ -219,38 +211,10 @@ public class GameScreen implements Screen {
      */
     private GameScreen(GdxGame game) {
         // Construct without textures
-        normalButton = null;
-        highlightedButton = null;
         textBox = null;
 
         // Buttons
-        //TODO function with texture parameters
-        MenuButton[] mainButtons = new MenuButton[] {
-                new MenuButton("RESUME", null, null, (1920 >> 1) - (700 >> 1), 600, 700, 70, false),
-                new MenuButton("RESTART", null, null, (1920 >> 1) - (700 >> 1), 510, 700, 70, false),
-                new MenuButton("SETTINGS", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("SAVE & QUIT", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
-        };
-
-        musicOnButton = new MenuButton("MUSIC: ON", null, null, (1920 >> 1) - (700 >> 1),
-                510, 700, 70, false);
-        musicOffButton = new MenuButton("MUSIC: OFF", null, null, (1920 >> 1) - (700 >> 1),
-                510, 700, 70, false);
-        sfxOnButton = new MenuButton("SOUND EFFECTS: ON", null, null,
-                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
-        sfxOffButton = new MenuButton("SOUND EFFECTS: OFF", null, null,
-                (1920 >> 1) - (700 >> 1), 420, 700, 70, false);
-        backButton = new MenuButton("BACK", null, null, (1920 >> 1) - (700 >> 1), 600, 700,
-                70, false);
-
-        gameOverButtons = new MenuButton[] {
-                new MenuButton("RESTART LEVEL", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("QUIT TO MENU", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
-        };
-        gameWonButtons = new MenuButton[] {
-                new MenuButton("NEXT LEVEL", null, null, (1920 >> 1) - (700 >> 1), 420, 700, 70, false),
-                new MenuButton("QUIT TO MENU", null, null, (1920 >> 1) - (700 >> 1), 330, 700, 70, false),
-        };
+        //TODO remove test button creation with null textures FIXED BY MENUBUTTON
         this.game = game;
         this.playerData = PlayerData.obtainPlayerData();
         this.world = null;
@@ -265,6 +229,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         AudioManager.getInstance().setMusicFullVolume();
+        AudioManager.getInstance().startMusic();
     }
 
     /**
@@ -308,11 +273,11 @@ public class GameScreen implements Screen {
 
         // expand the camera's "culling box" by 5 world units such that big objects do
         // not despawn
-        float bleed = 5f;
-        float startX = this.camera.position.x - (this.camera.viewportWidth / 2f) - bleed;
-        float startY = this.camera.position.y - (this.camera.viewportHeight / 2f) - bleed;
-        float boxWidth = this.camera.viewportWidth + (bleed * 2);
-        float boxHeight = this.camera.viewportHeight + (bleed * 2);
+        float bleed = 10f;
+        float startX = this.camera.position.x - ((this.camera.viewportWidth * this.camera.zoom) / 2f) - bleed;
+        float startY = this.camera.position.y - ((this.camera.viewportHeight * this.camera.zoom) / 2f) - bleed;
+        float boxWidth = (this.camera.viewportWidth * this.camera.zoom) + (bleed * 2);
+        float boxHeight = (this.camera.viewportHeight * this.camera.zoom) + (bleed * 2);
 
         this.mapRenderer.setView(this.camera.combined, startX, startY, boxWidth, boxHeight);
         this.mapRenderer.render();
@@ -420,7 +385,7 @@ public class GameScreen implements Screen {
                 }
                 if (menuButtons[i].isClicked(uiViewport)) {
                     AudioManager.getInstance().playClick();
-                    activateButton(i);
+                    menuButtons[i].click();
                     break;
                 }
             }
@@ -440,10 +405,10 @@ public class GameScreen implements Screen {
 
             layout.setText(font, "MASH SPACE!");
 
-            // 3. Draw it dead center
+            // draw it dead center
             font.draw(batch, layout, (1920f - layout.width) / 2f, 700f);
 
-            // 4. Clean the brush! (Crucial so your Score and Time don't turn red)
+            // clean the brush
             font.getData().setScale(1.0f);
             font.setColor(Color.WHITE);
         }
@@ -452,62 +417,6 @@ public class GameScreen implements Screen {
 
         // return the viewport to the world camera for the next frame
         viewport.apply();
-    }
-
-    /**
-     * Trigger code given the clicked button based on the selected layout and position of the button
-     *
-     * @param index index of the clicked button in its button array
-     */
-    void activateButton(int index) {
-        if (currentLayout == Layout.MAIN) {
-            if (index == 0) {
-                gameUnpause();
-            }
-            if (index == 1) {
-                screenManager.SetGameScreen(world.getId());
-            }
-            if (index == 2) {
-                changeLayout(Layout.SETTINGS);
-            }
-            if (index == 3) {
-                screenManager.SetMenuScreen();
-            }
-        } else if (currentLayout == Layout.SETTINGS) {
-            if (index == 0) {
-                changeLayout(Layout.MAIN);
-            }
-            if (index == 1) {
-                // toggle music
-                boolean nowOn = !game.isMusicPlaying();
-                AudioManager.getInstance(game).setMusicEnabled(nowOn);
-                settingsButtons[1] = nowOn ? musicOnButton : musicOffButton;
-            }
-            if (index == 2) {
-                // toggle sfx
-                boolean nowOn = !game.isSfxPlaying();
-                AudioManager.getInstance(game).setSfxEnabled(nowOn);
-                settingsButtons[2] = nowOn ? sfxOnButton : sfxOffButton;
-            }
-        } else if (currentLayout == Layout.LOST) {
-            if (index == 0) {
-                screenManager.SetGameScreen(world.getId());
-            }
-            if (index == 1) {
-                screenManager.SetMenuScreen();
-            }
-        } else if (currentLayout == Layout.WON) {
-            if (index == 0) {
-                if (playerData.getLevelUnlocked() >= world.getId() + 1) {
-                    screenManager.SetGameScreen(world.getId() + 1);
-                } else {
-                    screenManager.SetMenuScreen();
-                }
-            }
-            if (index == 1) {
-                screenManager.SetMenuScreen();
-            }
-        }
     }
 
     /**
@@ -524,6 +433,24 @@ public class GameScreen implements Screen {
     void gameUnpause() {
         paused = false;
         AudioManager.getInstance(game).setMusicFullVolume();
+    }
+
+    /**
+     * Helper function to toggle music on/off
+     */
+    public void toggleMusic() {
+        boolean musicNowOn = !game.isMusicPlaying();
+        AudioManager.getInstance(game).setMusicEnabled(musicNowOn);
+        changeLayout(currentLayout); // Refresh layout to pick up new button
+    }
+
+    /**
+     * Helper function to toggle sfx on/off
+     */
+    public void toggleSfx() {
+        boolean sfxNowOn = !game.isSfxPlaying();
+        AudioManager.getInstance(game).setSfxEnabled(sfxNowOn);
+        changeLayout(currentLayout);
     }
 
     /**
@@ -576,12 +503,13 @@ public class GameScreen implements Screen {
         gameWon = false;
         gameOver = false;
         AudioManager.getInstance(game).setMusicHalfVolume();
-        int currentScore = world.getScore();
 
         // Updates the player save if won level
         if (won) {
             changeLayout(Layout.WON);
             gameWon = true;
+            AudioManager.getInstance().stopMusic();
+            AudioManager.getInstance().playWinSound();
 
             int timeBonus = (int) world.time;
             world.score(timeBonus);

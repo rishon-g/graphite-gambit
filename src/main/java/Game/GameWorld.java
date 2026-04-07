@@ -37,8 +37,8 @@ public class GameWorld {
     // spawner variables
     public Array<Vec2> spawnPoints = new Array<>();
     private float spawnTimer = 0f;
-    private final float SPAWN_INTERVAL = 5.0f;
-    private final int MAX_PICKUPS = 5;
+    public float spawnInterval = 5.0f;
+    public int maxPickups = 5;
 
     int points;
     public float time;
@@ -46,9 +46,6 @@ public class GameWorld {
 
     // list of all entities in the game world
     Vector<Entity> entities;
-
-    // list of all solid objects
-    public Array<Transform> solidObjects = new Array<>();
 
     // separate reference to the player entity
     Player player;
@@ -70,6 +67,18 @@ public class GameWorld {
 
     // reference to the managing screen
     GameScreen screen;
+
+    // state machine for the cutscene
+    public enum GameState { PLAYING, PAN_OUT, DRAWING, HOLD_OUT, PAN_IN }
+    public GameState currentState = GameState.PLAYING;
+
+    // cutscene variables
+    public Array<Vec2> nodePositions = new Array<>();
+    private float animTimer = 0f;
+    private int drawnLines = 0;
+
+    // camera variables for smooth panning
+    private float camZoom = 1f;
 
     /**
      * Constructor for the GameWorld class, initializes the entities vector and
@@ -118,12 +127,17 @@ public class GameWorld {
         screen.collectPlotPoint();
         score(100);
         this.plotpoints--;
-        if (plotpoints <= 0) {
-            for (Entity e : entities) {
-                if (e instanceof Door) {
-                    e.dead = true; // This removes it from the world instantly
-                }
+        if (plotpoints <= 0 && currentState == GameState.PLAYING) {
+            // trigger the end cutscene
+            currentState = GameState.PAN_OUT;
+            animTimer = 0f;
+            drawnLines = 0;
+
+            // halt player movement and kill the audio loop
+            if (player != null) {
+                player.transform.velocity.set(0, 0);
             }
+            Game.AudioManager.getInstance().updateMoveSound(false, false);
         }
     }
 
@@ -239,9 +253,9 @@ public class GameWorld {
 
                 // get and clamp weight from function
                 short weight = (short) w.getWeight(x, y, brushsize);
-                if(weight < 0){
+                if (weight < 0) {
                     weight = 0;
-                }else if (weight > 10){
+                } else if (weight > 10) {
                     weight = 10;
                 }
 
@@ -291,16 +305,19 @@ public class GameWorld {
         // Set global player reference if this is a player entity
         if (e instanceof Player) {
             // If we already have a player, remove it before adding the new one
-            if(this.player != null){
+            if (this.player != null) {
                 entities.remove(this.player);
             }
             this.player = (Player) e;
+        } else if (e instanceof Node) {
+            plotpoints++;
         }
         entities.add(e);
     }
 
     /**
      * Getter for the entities vector, used for testing purposes.
+     * 
      * @return the vector of entities in the world
      */
     public Vector<Entity> getEntities() {
@@ -313,98 +330,195 @@ public class GameWorld {
      * @param delta time since last update (used for movement and animations)
      */
     public void update(float delta) {
-        // subtract delta to count down
-        time -= delta;
+        if (currentState == GameState.PLAYING) {
+            // subtract delta to count down
+            time -= delta;
 
-        // check for font.getData().setScale(1.0f);time over
-        if (time <= 0) {
-            time = 0;
-            loseGame();
-        }
+            // check for font.getData().setScale(1.0f);time over
+            if (time <= 0) {
+                time = 0;
+                loseGame();
+            }
 
-        // random spawner logic (meant for graphite shards for now)
-        if (spawnPoints.size > 0) {
-            spawnTimer += delta;
+            // random spawner logic (meant for graphite shards for now)
+            if (spawnPoints.size > 0) {
+                spawnTimer += delta;
 
-            if (spawnTimer >= SPAWN_INTERVAL) {
+                if (spawnTimer >= spawnInterval) {
 
-                // count how many pickups concurrently are on the map
-                int currentPickups = 0;
-                for (Entity e : entities) {
-                    if (e instanceof Pickup) {
-                        currentPickups++;
-                    }
-                }
-
-                // do we have room to spawn more?
-                if (currentPickups < MAX_PICKUPS) {
-
-                    int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
-                    Vec2 chosenLoc = spawnPoints.get(randomIndex);
-
-                    // occupancy check (making sure they don't spawn in the same location)
-                    boolean spotTaken = false;
+                    // count how many pickups concurrently are on the map
+                    int currentPickups = 0;
                     for (Entity e : entities) {
                         if (e instanceof Pickup) {
-                            // if an existing pickup is extremely close to our chosen location
-                            if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
-                                    Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
-                                spotTaken = true;
-                                break;
-                            }
+                            currentPickups++;
                         }
                     }
 
-                    // we only spawn if the spot is completely empty
-                    if (!spotTaken) {
-                        Pickup newPickup = new Pickup(this);
-                        newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
-                        this.entities.add(newPickup);
+                    // do we have room to spawn more?
+                    if (currentPickups < maxPickups) {
 
-                        // successfully spawned, so we reset the time
-                        // if the spot was taken, this time is not reset because it will instantly try
-                        // again until it finds an empty spot
+                        int randomIndex = com.badlogic.gdx.math.MathUtils.random(0, spawnPoints.size - 1);
+                        Vec2 chosenLoc = spawnPoints.get(randomIndex);
+
+                        // occupancy check (making sure they don't spawn in the same location)
+                        boolean spotTaken = false;
+                        for (Entity e : entities) {
+                            if (e instanceof Pickup) {
+                                // if an existing pickup is extremely close to our chosen location
+                                if (Math.abs(e.transform.position.x - chosenLoc.x) < 10f &&
+                                        Math.abs(e.transform.position.y - chosenLoc.y) < 10f) {
+                                    spotTaken = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // we only spawn if the spot is completely empty
+                        if (!spotTaken) {
+                            Pickup newPickup = new Pickup(this);
+                            newPickup.transform.setPosition(chosenLoc.x, chosenLoc.y);
+                            this.entities.add(newPickup);
+
+                            // successfully spawned, so we reset the time
+                            // if the spot was taken, this time is not reset because it will instantly try
+                            // again until it finds an empty spot
+                            spawnTimer = 0f;
+                        }
+
+                    } else {
+                        // we are at max limit but we try to spawn more
                         spawnTimer = 0f;
                     }
+                }
+            }
+            // Entity updates
+            for (Entity entity : entities) {
+                entity.update(delta);
+            }
 
-                } else {
-                    // we are at max limit but we try to spawn more
-                    spawnTimer = 0f;
+            // Resolve entity to player collisions
+            if (this.player != null) {
+                for (Entity entity : entities) {
+                    if (entity instanceof Nonplayer) {
+                        if (isTouchingPlayer(entity.transform)) {
+                            ((Nonplayer) entity).playerCollide(player);
+                        }
+                    }
+                }
+            }
+
+
+            // Resolve deaths
+            for (int i = entities.size() - 1; i >= 0; i--) {
+                if (entities.get(i).dead()) {
+
+                    // Handle game over
+                    if (entities.get(i) instanceof Player) {
+                        loseGame();
+                    }
+
+                    // Remove entity from list
+                    else {
+                        entities.remove(i);
+                    }
                 }
             }
         }
-        // Entity updates
-        for (Entity entity : entities) {
-            entity.update(delta);
-        }
 
         // Resolve entity to player collisions
-        if(this.player != null){
+        if (this.player != null) {
             for (Entity entity : entities) {
                 if (entity instanceof Nonplayer) {
                     if (isTouchingPlayer(entity.transform)) {
                         ((Nonplayer) entity).playerCollide(player);
+
                     }
                 }
             }
-        }
+        } else {
+            // cutscene logic
+            animTimer += delta;
 
-        // Resolve deaths
-        for (int i = entities.size() - 1; i >= 0; i--) {
-            if (entities.get(i).dead()) {
-
-                // Handle game over
-                if (entities.get(i) instanceof Player) {
-                    loseGame();
+            if (currentState == GameState.PAN_OUT) {
+                // wait some time for camera to pan out, then start drawing
+                if (animTimer > 1.5f) {
+                    currentState = GameState.DRAWING;
+                    animTimer = 0f;
                 }
 
-                // Remove entity from list
-                else {
-                    entities.remove(i);
+            } else if (currentState == GameState.DRAWING) {
+                // failsafe if the array didn't populate properly
+                if (nodePositions.size < 2) {
+                    currentState = GameState.HOLD_OUT;
+                    animTimer = 0f;
+                }
+                // normal drawing logic
+                else if (animTimer > 0.3f) {
+                    drawnLines++;
+                    animTimer = 0f;
+
+                    Game.AudioManager.getInstance().playLineDrawSound();
+
+                    if (drawnLines > nodePositions.size) {
+                        currentState = GameState.HOLD_OUT;
+                        animTimer = 0f;
+                    }
+                }
+
+            } else if (currentState == GameState.HOLD_OUT) {
+                // we add some extra time after the drawing is done so the player can admire the canvas
+                if (animTimer > 1.0f) {
+                    boolean doorOpened = false;
+                    for (int f = entities.size() - 1; f >= 0; f--) {
+                        if (entities.get(f) instanceof Door) {
+                            entities.remove(f);
+                            doorOpened = true;
+                        }
+                    }
+
+                    // sfx
+                    if (doorOpened) {
+                        Game.AudioManager.getInstance().playDoorOpenSound();
+                    }
+                }
+
+                // wait some more time to admire the open doors, then pan in
+                if (animTimer > 2.0f) {
+                    currentState = GameState.PAN_IN;
+                    animTimer = 0f;
+                }
+
+            } else if (currentState == GameState.PAN_IN) {
+                // wait some time to zoom back to player, then resume game
+                if (animTimer > 1.5f) {
+                    currentState = GameState.PLAYING;
+                    animTimer = 0f;
                 }
             }
         }
     }
+
+    // helper method to draw lines
+    private void drawLine(SpriteBatch batch, Vec2 p1, Vec2 p2) {
+        if (p1 == null || p2 == null || pixel == null) return;
+
+
+        float x1 = p1.x * GdxGame.UNIT_SCALE;
+        float y1 = p1.y * GdxGame.UNIT_SCALE;
+        float x2 = p2.x * GdxGame.UNIT_SCALE;
+        float y2 = p2.y * GdxGame.UNIT_SCALE;
+
+
+        float distance = (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        float angle = (float) Math.toDegrees(Math.atan2(y2 - y1, x2 - x1));
+
+        // thickness of the line
+        float thickness = 0.15f;
+
+        batch.draw(pixel, x1, y1, 0f, thickness / 2f, distance, thickness, 1f, 1f, angle);
+    }
+
+
     /**
      * Renders all entities in the game world. This method is called every frame
      * after update.
@@ -413,7 +527,23 @@ public class GameWorld {
      * @param delta the time since the last update
      */
     public void render(SpriteBatch batch, float delta) {
+        // draw the floor
         renderFloor(batch);
+
+        // draw the connecting lines on the floor
+        if (drawnLines > 0) {
+            batch.setColor(Color.GRAY);
+
+            for (int i = 1; i <= Math.min(drawnLines, nodePositions.size); i++) {
+                Vec2 current = nodePositions.get(i % nodePositions.size);
+                Vec2 previous = nodePositions.get(i - 1);
+                drawLine(batch, previous, current);
+            }
+
+            batch.setColor(Color.WHITE);
+        }
+
+        // we draw all entities including the player last so they sit on top of the lines
         for (Entity entity : entities) {
             entity.render(batch, delta);
         }
@@ -428,16 +558,44 @@ public class GameWorld {
     }
 
     /**
-     * updates the position of the camera to follow the player.
-     * called by the screen before rendering the spritebatch.
-     * 
-     * @param camera the camera following the player.
+     * Updates the position of the camera depending on the current GameState
+     * @param camera the camera.
      */
     public void updateCamera(OrthographicCamera camera) {
-        camera.position.set(
-                player.transform.position.x * GdxGame.UNIT_SCALE,
-                player.transform.position.y * GdxGame.UNIT_SCALE,
-                0);
+        float targetX, targetY, targetZoom;
+        float camSpeed;
+
+        // UPDATED CAMERA MOVEMENT
+        // determine where the camera should be at
+        if (currentState == GameState.PLAYING || currentState == GameState.PAN_IN) {
+            // target the player
+            targetX = player.transform.position.x * GdxGame.UNIT_SCALE;
+            targetY = player.transform.position.y * GdxGame.UNIT_SCALE;
+            targetZoom = 1f;
+
+            // we add faster tracking during gameplay so it doesn't feel too laggy
+            camSpeed = 6f;
+        } else {
+            // target the center of the map (this applies to PAN_OUT, DRAWING and HOLD_OUT)
+            targetX = (width / 2f) * GdxGame.UNIT_SCALE;
+            targetY = (height / 2f) * GdxGame.UNIT_SCALE;
+
+            float zoomX = (width * GdxGame.UNIT_SCALE) / GdxGame.WORLD_WIDTH;
+            float zoomY = (height * GdxGame.UNIT_SCALE) / GdxGame.WORLD_HEIGHT;
+            targetZoom = Math.max(zoomX, zoomY) + 0.1f;
+
+            // slower panning (it kind of adds a cinematic effect)
+            camSpeed = 3f;
+        }
+
+        // glide the camera toward those targets (using a method called Lerp so its smooth)
+        float dt = com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+
+        camera.position.x += (targetX - camera.position.x) * camSpeed * dt;
+        camera.position.y += (targetY - camera.position.y) * camSpeed * dt;
+        camZoom += (targetZoom - camZoom) * camSpeed * dt;
+
+        camera.zoom = camZoom;
     }
 
     /**
@@ -477,45 +635,6 @@ public class GameWorld {
     }
 
     /**
-     * returns whether or not a given entity should block the movement of a moving
-     * entity.
-     * 
-     * @param mover the transform of the moving entity
-     * @param other the entity that is coliding
-     * @return true if the movement should be blocked, otherwise false.
-     */
-    public boolean shouldBlockEntityMovement(Transform mover, Entity other) {
-        Entity moverEntity = getEntityByTransform(mover);
-
-        //TODO switch case
-        if (moverEntity == null || other == null) {
-            return false;
-        }
-
-        if (other instanceof Door) {
-            return true;
-        }
-
-        if (other instanceof Ink) {
-            return false;
-        }
-
-        if (other instanceof WhiteOut) {
-            return false;
-        }
-
-        if (other.transform == mover) {
-            return false;
-        }
-
-        // Erasers block each other
-        if (moverEntity instanceof Nonplayer && other instanceof Nonplayer) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Returns true if a non-player entity is touching or very close to the player.
      *
      * @param other transform of the other entity
@@ -544,160 +663,22 @@ public class GameWorld {
      * Triggers the win condition for the game. Called when the player reaches the
      * exit point.
      */
-    public void winGame(){
+    public void winGame() {
         endGame(true);
     }
 
     /**
      * Triggers the lose condition for the game. Called when the player dies or time
      */
-    public void loseGame(){
+    public void loseGame() {
         endGame(false);
     }
 
     /**
-     * Ends the game and triggers the end screen. Called when the player wins or loses.
+     * Ends the game and triggers the end screen. Called when the player wins or
+     * loses.
      */
     public void endGame(boolean won) {
         screen.gameEnd(won);
-    }
-
-    /**
-     * Called by and entity of the world in order to request to move.
-     * Handles any collisions between the entity and the map, then moves it in an
-     * allowed way.
-     *
-     * @param t the transform of the entity
-     */
-    public void requestMove(Transform t, float delta) {
-        float dx = t.velocity.x * delta;
-        float dy = t.velocity.y * delta;
-
-        // grid boundary check, so we cant traverse outside of the map
-        //TODO make into helper function
-        if (t.position.x + dx < 0)
-            dx = -t.position.x;
-        if (t.position.x + t.size.x + dx > width)
-            dx = (width) - (t.position.x + t.size.x);
-        if (t.position.y + dy < 0)
-            dy = -t.position.y;
-        if (t.position.y + t.size.y + dy > height)
-            dy = (height) - (t.position.y + t.size.y);
-
-        // phantom box to test movements before actually moving the player
-        Transform testBox = new Transform();
-        testBox.setScale(t.size.x, t.size.y);
-
-        // horizontal movement
-        if (dx != 0) {
-            testBox.setPosition(t.position.x + dx, t.position.y); // lets see if this collides
-
-            // collide with walls
-            for (Transform wall : solidObjects) {
-                if (testBox.collides(wall)) {
-                    // snap exactly to the edge of the custom rectangle
-                    if (dx > 0) { // move right
-                        dx = wall.position.x - (t.position.x + t.size.x) - 0.01f;
-                        if (dx < 0f) {
-                            dx = 0f;
-                        }
-                    } else { // move left
-                        dx = (wall.position.x + wall.size.x) - t.position.x + 0.01f;
-                        if (dx > 0f) {
-                            dx = 0f;
-                        }
-                    }
-                    testBox.setPosition(t.position.x + dx, t.position.y); // update phantom box
-                }
-            }
-
-            // collide with blocking entities
-            for (Entity entity : entities) {
-                if (!shouldBlockEntityMovement(t, entity)) {
-                    continue;
-                }
-
-                if (testBox.collides(entity.transform)) {
-                    if (dx > 0) {
-                        dx = entity.transform.position.x - (t.position.x + t.size.x) - 0.01f;
-                        if (dx < 0f) {
-                            dx = 0f;
-                        }
-                    } else {
-                        dx = (entity.transform.position.x + entity.transform.size.x) - t.position.x + 0.01f;
-                        if (dx > 0f) {
-                            dx = 0f;
-                        }
-                    }
-                    testBox.setPosition(t.position.x + dx, t.position.y);
-                }
-            }
-
-            t.move(new Vec2(dx, 0)); // if there is a collision, the testBox provides
-            // us with a dx value that is flush with the collision rectangle, otherwise we
-            // move as normal
-        }
-
-        // vertical movement
-        if (dy != 0) {
-            testBox.setPosition(t.position.x, t.position.y + dy); // test y move
-
-            // collide with walls
-            //TODO Refactor into collision method with direction as parameter
-            for (Transform wall : solidObjects) {
-                if (testBox.collides(wall)) {
-                    // snap exactly to the edge of the custom rectangle
-                    if (dy > 0) { // move up
-                        dy = wall.position.y - (t.position.y + t.size.y) - 0.01f;
-                        if (dy < 0f) {
-                            dy = 0f;
-                        }
-                    } else { // move down
-                        dy = (wall.position.y + wall.size.y) - t.position.y + 0.01f;
-                        if (dy < 0f) {
-                            dy = 0f;
-                        }
-                    }
-                    testBox.setPosition(t.position.x, t.position.y + dy); // update phantom box
-                }
-            }
-
-            // collide with blocking entities
-            for (Entity entity : entities) {
-                if (!shouldBlockEntityMovement(t, entity)) {
-                    continue;
-                }
-
-                if (testBox.collides(entity.transform)) {
-                    if (dy > 0) {
-                        dy = entity.transform.position.y - (t.position.y + t.size.y) - 0.01f;
-                        if (dy < 0f) {
-                            dy = 0f;
-                        }
-                    } else {
-                        dy = (entity.transform.position.y + entity.transform.size.y) - t.position.y + 0.01f;
-                        if (dy < 0f) {
-                            dy = 0f;
-                        }
-                    }
-                    testBox.setPosition(t.position.x, t.position.y + dy);
-                }
-            }
-
-            t.move(new Vec2(0, dy)); // same thing as before but now for y
-        }
-
-        // never allow the object to end up outside the map
-        if (t.position.x < 0f) {
-            t.position.x = 0f;
-        } else if (t.position.x + t.size.x > width) {
-            t.position.x = width - t.size.x;
-        }
-
-        if (t.position.y < 0f) {
-            t.position.y = 0f;
-        } else if (t.position.y + t.size.y > height) {
-            t.position.y = height - t.size.y;
-        }
     }
 }

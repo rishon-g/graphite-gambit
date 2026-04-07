@@ -1,0 +1,85 @@
+{
+  "entities": [
+    {
+      "type": "Player",
+      "x": 3,
+      "y": 17
+    },
+    {
+      "type": "Node",
+      "x": 11,
+      "y": 0
+    },
+    {
+      "type": "Node",
+      "x": 23,
+      "y": 29
+    },
+    {
+      "type": "Node",
+      "x": 34,
+      "y": 0
+    },
+    {
+      "type": "Node",
+      "x": 0,
+      "y": 18
+    },
+    {
+      "type": "Node",
+      "x": 49,
+      "y": 18
+    },
+    {
+      "type": "Eraser",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "type": "Eraser",
+      "x": 41,
+      "y": 3
+    },
+    {
+      "type": "Eraser",
+      "x": 27,
+      "y": 2
+    },
+
+    {
+      "type": "Eraser",
+      "x": 35,
+      "y": 27
+    },
+    {
+      "type": "Eraser",
+      "x": 6,
+      "y": 10
+    },
+    {
+      "type": "Eraser",
+      "x": 24,
+      "y": 20
+    },
+    {
+      "type": "Eraser",
+      "x": 26,
+      "y": 12
+    },
+    {
+      "type": "PencilSharpener",
+      "x": 47,
+      "y": 28
+    },
+    {
+      "type": "PencilSharpener",
+      "x": 13,
+      "y": 29
+    },
+    {
+      "type": "PencilSharpener",
+      "x": 18,
+      "y": 9
+    }
+  ]
+}

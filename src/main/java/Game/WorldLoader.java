@@ -40,15 +40,36 @@ public class WorldLoader {
     public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
 
+        // #pickups depends on the level
+        switch (id) {
+            case 1:
+                world.maxPickups = 5;
+                world.spawnInterval = 5.0f;
+                break;
+            case 2:
+                world.maxPickups = 7;
+                world.spawnInterval = 4.0f;
+                break;
+            case 3:
+                world.maxPickups = 12;
+                world.spawnInterval = 3.0f;
+                break;
+            default:
+                world.maxPickups = 5 + id;
+                world.spawnInterval = Math.max(1.0f, 6.0f - id);
+                break;
+        }
+
         // get the map dynamically using the id
         MapAsset currentLevel = MapAsset.getLevelAsset(id);
         TiledMap map = game.getAssetService().get(currentLevel);
-
+        
         // populate the 2D array
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
         world.setDimensions(layer.getWidth() * GameWorld.getTileSize(), layer.getHeight() * GameWorld.getTileSize());
         world.tilemap = new int[layer.getWidth()][layer.getHeight()];
-
+        PhysicsHandler.CreateHandler(world.entities, world.width, world.height); // temporary dimensions, will be set properly after loading the map
+        
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(x, y);
@@ -59,9 +80,10 @@ public class WorldLoader {
                 }
             }
         }
-
+        
         // get collisions object layer
         MapLayer collisionLayer = map.getLayers().get("collisions");
+        PhysicsHandler physics = PhysicsHandler.getInstance();
 
         if (collisionLayer != null) {
             // loop through all hitboxes
@@ -76,7 +98,7 @@ public class WorldLoader {
                     wall.setScale(rect.width, rect.height);
 
                     // add to solid object array, so we know not to collide with these elements
-                    world.solidObjects.add(wall);
+                    physics.solidObjects.add(wall);
 
                     // also mark blocked tiles for pathfinding
                     int tileSize = GameWorld.getTileSize();
@@ -135,7 +157,7 @@ public class WorldLoader {
                             float spawnY = tileObject.getY();
 
                             puddle.transform.setPosition(spawnX, spawnY);
-                            world.entities.add(puddle);
+                            world.addEntity(puddle);
                         }
                     }
                     // door
@@ -146,7 +168,7 @@ public class WorldLoader {
 
                             Door doorPart = new Door(world, partWord);
                             doorPart.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(doorPart);
+                            world.addEntity(doorPart);
                         }
                     }
 
@@ -157,7 +179,7 @@ public class WorldLoader {
 
                             ExitPoint exit = new ExitPoint(world);
                             exit.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(exit);
+                            world.addEntity(exit);
                         }
                     }
 
@@ -168,7 +190,7 @@ public class WorldLoader {
 
                             Ink inkArea = new Ink(world);
                             inkArea.transform.setPosition(tileObject.getX(), tileObject.getY());
-                            world.entities.add(inkArea);
+                            world.addEntity(inkArea);
                         }
                     }
                 }
@@ -188,7 +210,6 @@ public class WorldLoader {
             switch (entity.type) {
                 case "Player":
                     newEntity = new Player(world);
-                    world.player = (Player) newEntity;
                     break;
                 case "Eraser":
                     newEntity = new Eraser(world);
@@ -196,6 +217,16 @@ public class WorldLoader {
                 case "Node":
                     newEntity = new Node(world);
                     world.plotpoints++;
+
+                    newEntity.transform.setTilePosition(entity.x, entity.y, 128);
+                    newEntity.transform.position.x += 48f;
+                    newEntity.transform.position.y += 48f;
+
+                    // save the precise visual center (node is 32x32, so we add 16)
+                    world.nodePositions.add(new Vec2(
+                            newEntity.transform.position.x + 16f,
+                            newEntity.transform.position.y + 16f
+                    ));
                     break;
                 case "PencilSharpener":
                     newEntity = new PencilSharpener(world);
@@ -205,7 +236,14 @@ public class WorldLoader {
             }
 
             newEntity.transform.setTilePosition(entity.x, entity.y, 128);
-            world.entities.add(newEntity);
+
+            // centers node, (AKA plot point)
+            if (newEntity instanceof Node) {
+                newEntity.transform.position.x += 48f;
+                newEntity.transform.position.y += 48f;
+            }
+
+            world.addEntity(newEntity);
 
         }
 

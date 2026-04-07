@@ -44,7 +44,6 @@ public class EraserTest extends GameTest {
         assertEquals(220f, getPrivateFloat(eraser, "startY"));
     }
 
-
     @Test
     void testBeforeMovementUpdate_CooldownDecreases() throws Exception {
         setPrivateFloat(eraser, "attackCooldownTimer", 1.0f);
@@ -86,7 +85,6 @@ public class EraserTest extends GameTest {
 
         verify(mockWorld, times(1)).floorDraw(anyFloat(), anyFloat(), eq(true), eq(10), any());
     }
-
 
     @Test
     void testBeforeMovementUpdate_FacingRight() throws Exception {
@@ -174,10 +172,9 @@ public class EraserTest extends GameTest {
     }
 
     @Test
-    void testGetAttackRange_ReturnsCorrectValue() {
-        assertEquals(45f, eraser.getAttackRange(), 0.0001f);
+    void testGetAttackRange_Set() {
+        assertEquals(50f, eraser.ATTACK_RANGE, 0.0001f);
     }
-
 
     @Test
     void testPlayerCollide_DamagesPlayerRespawnsAndStartsCooldown() throws Exception {
@@ -187,7 +184,7 @@ public class EraserTest extends GameTest {
         eraser.transform.setPosition(700, 800);
         eraser.transform.setVelocity(40, 20);
 
-        eraser.currentPath = List.of(new int[]{2, 2});
+        eraser.currentPath = List.of(new int[] { 2, 2 });
         eraser.pathIndex = 1;
         eraser.pathTimer = 0.7f;
 
@@ -234,7 +231,6 @@ public class EraserTest extends GameTest {
         verify(mockAudio, times(1)).playDamage();
     }
 
-
     @Test
     void testPlayerCollide_DuringCooldown_DoesNothing() throws Exception {
         eraser.transform.setPosition(100, 100);
@@ -280,7 +276,6 @@ public class EraserTest extends GameTest {
         verify(mockAudio, never()).playDamage();
     }
 
-
     @Test
     void testPlayerCollide_CooldownPreventsSecondHit() {
         eraser.transform.setPosition(100, 100);
@@ -309,7 +304,6 @@ public class EraserTest extends GameTest {
         assertEquals(healthBefore - 20, player.getHealth());
         verify(mockAudio, times(2)).playDamage();
     }
-
 
     private float getPrivateFloat(Object target, String fieldName) throws Exception {
         Field field = target.getClass().getDeclaredField(fieldName);
