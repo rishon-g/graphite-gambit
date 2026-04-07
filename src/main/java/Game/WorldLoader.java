@@ -40,27 +40,19 @@ public class WorldLoader {
     public GameWorld loadWorld(GdxGame game, GameScreen screen, int id) {
         GameWorld world = new GameWorld(id, screen);
 
-        // #pickups depends on the level
+        // we add variability to each world
         switch (id) {
             case 1:
-                world.maxPickups = 5;
-                world.spawnInterval = 5.0f;
-                Player.MOVEMENT_HEALTH_LOSS = -2;
+                setWorldConditions(world, 5, 5.0f, -2);
                 break;
             case 2:
-                world.maxPickups = 7;
-                world.spawnInterval = 4.0f;
-                Player.MOVEMENT_HEALTH_LOSS = -3;
+                setWorldConditions(world, 7, 3.5f, -3);
                 break;
             case 3:
-                world.maxPickups = 12;
-                world.spawnInterval = 2.0f;
-                Player.MOVEMENT_HEALTH_LOSS = -4;
+                setWorldConditions(world, 14, 1.0f, -4);
                 break;
             default:
-                world.maxPickups = 5 + id;
-                world.spawnInterval = Math.max(1.0f, 6.0f - id);
-                Player.MOVEMENT_HEALTH_LOSS = -id -1;
+                setWorldConditions(world, 5 + id, Math.max(1.0f, 6.0f - id), -id - 1);
                 break;
         }
 
@@ -251,4 +243,11 @@ public class WorldLoader {
 
         return world;
     }
+
+    public void setWorldConditions(GameWorld world, int pickupCount, float spawnInterval, int movementHealthLoss) {
+        world.maxPickups = pickupCount;
+        world.spawnInterval = spawnInterval;
+        Player.MOVEMENT_HEALTH_LOSS = movementHealthLoss;
+    }
 }
+
