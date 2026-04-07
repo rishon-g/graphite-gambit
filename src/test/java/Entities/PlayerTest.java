@@ -1,5 +1,6 @@
 package Entities;
 
+import Game.PhysicsHandler;
 import utils.GameTest;
 import Game.GameWorld;
 import Screens.GameScreen;
@@ -19,6 +20,7 @@ public class PlayerTest extends GameTest {
 
         mockWorld = spy(new GameWorld(-1, mockScreen));
         mockWorld.setDimensions(2000, 2000);
+        PhysicsHandler.CreateHandler(mockWorld.getEntities(), 2000, 2000);
 
         player = new Player(mockWorld);
     }
