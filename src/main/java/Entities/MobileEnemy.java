@@ -67,6 +67,7 @@ public abstract class MobileEnemy extends Nonplayer {
     private static final float VISION_RADIUS = 700f;
     private static final float CHASE_LOSE_RADIUS = 1000f;
 
+
     /**
      * Enemy movement state.
      */
@@ -148,6 +149,10 @@ public abstract class MobileEnemy extends Nonplayer {
 
         handlePathRebuild(player);
         followCurrentPath(player);
+    }
+
+    protected float getAttackRange() {
+        return ATTACK_RANGE;
     }
 
     /**
