@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Main Menu, displays on game load and switches to game screen on input
- * 
+ *
  * @author Luke McRae
  * @version 2.1
  * @since 2026-03-16
@@ -62,17 +62,19 @@ public class MainMenuScreen extends ScreenAdapter {
     MenuButton sfxOffButton;
     private final MenuButton backButton;
     private MenuButton[] howToPlayButtons;
+    private MenuButton[] controlsButtons;
+    private MenuButton[] scoringButtons;
 
     // Different sets of menu buttons that can be displayed
     enum Layout {
-        MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY
+        MAIN, LEVEL_SELECT, SETTINGS, HOW_TO_PLAY, CONTROLS, SCORING
     }
     Layout currentLayout = Layout.MAIN;
 
     /**
      * Constructor for the main menu. retrieves rendering resources, save data, and
      * audio.
-     * 
+     *
      * @param game the game object of this main menu
      */
     public MainMenuScreen(GdxGame game) {
@@ -93,9 +95,20 @@ public class MainMenuScreen extends ScreenAdapter {
             eraser = new Texture(Gdx.files.internal("sprites/eraser.png"));
             background = new Texture(Gdx.files.internal("images/menu-background.png"));
 
-            // Back button in how to play screen
+            // buttons for the how to play  screen
             howToPlayButtons = new MenuButton[] {
+                    new MenuButton("CONTROLS", (screenWidth >> 1) - 700, 200, 0.75, false, () -> changeLayout(Layout.CONTROLS)),
+                    new MenuButton("SCORING", (screenWidth >> 1) + 100, 200, 0.75, false, () -> changeLayout(Layout.SCORING)),
                     new MenuButton("BACK", (screenWidth >> 1) - (800 >> 1), 100, scale, false, () -> changeLayout(Layout.MAIN)),
+            };
+            // back button for controls screen (goes back to how to play)
+            controlsButtons = new MenuButton[] {
+                    new MenuButton("BACK", (screenWidth >> 1) - (800 >> 1), 100, scale, false, () -> changeLayout(Layout.HOW_TO_PLAY)),
+            };
+
+            // back button for scoring screen
+            scoringButtons = new MenuButton[] {
+                    new MenuButton("BACK", (screenWidth >> 1) - (800 >> 1), 100, scale, false, () -> changeLayout(Layout.HOW_TO_PLAY)),
             };
         }
 
@@ -152,7 +165,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
     /**
      * Changes the current layout of the ui to the specified layout.
-     * 
+     *
      * @param layout the layout to swap to
      */
     void changeLayout(Layout layout) {
@@ -181,6 +194,8 @@ public class MainMenuScreen extends ScreenAdapter {
             case LEVEL_SELECT -> levelSelectButtons;
             case SETTINGS -> settingsButtons;
             case HOW_TO_PLAY -> howToPlayButtons;
+            case CONTROLS -> controlsButtons;
+            case SCORING -> scoringButtons;
         };
     }
 
@@ -200,7 +215,7 @@ public class MainMenuScreen extends ScreenAdapter {
     /**
      * Renders the ui and background of the main menu.
      * Varies what buttons are rendered based on the current layout.
-     * 
+     *
      * @param delta the time since the last update
      */
     @Override
@@ -228,27 +243,58 @@ public class MainMenuScreen extends ScreenAdapter {
 
             case HOW_TO_PLAY:
                 setHeader("HOW TO PLAY");
-            // layout
-            float currentY = 820f;
-            float lineSpacing = 70f;
+                // layout
+                float currentY = 820f;
+                float lineSpacing = 70f;
 
-            setHowToPlayText("Avoid ERASERS!  ", eraser, currentY);
-            // Move down to the next line
-            setHowToPlayText("Watch out for WHITE-OUT  ", whiteOut, currentY -= lineSpacing);
-            setHowToPlayText("and INK SPILLS!  ", ink, currentY -= 45);
-            setHowToPlayText("Don't get caught by PENCIL SHARPENERS!  ", pencilsharpener, currentY -= lineSpacing);
-            setHowToPlayText("Collect GRAPHITE!  ", graphite, currentY -= lineSpacing);
-            setHowToPlayText("Collect PLOT POINTS  ", plot, currentY -= lineSpacing);
-            String line4 = "to create a connect-the-dots shape!";
-            layout.setText(font, line4);
-            font.draw(batch, layout, howToPlayStartX, currentY -= 45);
+                setHowToPlayText("Avoid ERASERS!  ", eraser, currentY);
+                // Move down to the next line
+                setHowToPlayText("Watch out for WHITE-OUT  ", whiteOut, currentY -= lineSpacing);
+                setHowToPlayText("and INK SPILLS!  ", ink, currentY -= 45);
+                setHowToPlayText("Don't get caught by PENCIL SHARPENERS!  ", pencilsharpener, currentY -= lineSpacing);
+                setHowToPlayText("Collect GRAPHITE!  ", graphite, currentY -= lineSpacing);
+                setHowToPlayText("Collect PLOT POINTS  ", plot, currentY -= lineSpacing);
+                String line4 = "to create a connect-the-dots shape!";
+                layout.setText(font, line4);
+                font.draw(batch, layout, howToPlayStartX, currentY -= 45);
 
-            String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
-            layout.setText(font, line5);
-            font.draw(batch, layout, howToPlayStartX, currentY -= lineSpacing);
-            setHowToPlayText("are collected to WIN!  ", trophy, currentY - 45);
-            break;
+                String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
+                layout.setText(font, line5);
+                font.draw(batch, layout, howToPlayStartX, currentY -= lineSpacing);
+                setHowToPlayText("are collected to WIN!  ", trophy, currentY - 45);
+                break;
+
+            case CONTROLS:
+                setHeader("CONTROLS");
+                float cy = 820f;
+
+                layout.setText(font, "Move: WASD or Arrow Keys");
+                font.draw(batch, layout, howToPlayStartX, cy);
+
+                layout.setText(font, "Pause: ESC");
+                font.draw(batch, layout, howToPlayStartX, cy -= 50f);
+
+                layout.setText(font, "Escape Sharpener: SPACE button");
+                font.draw(batch, layout, howToPlayStartX, cy -= 100f);
+
+                break;
+
+            case SCORING:
+                setHeader("SCORING");
+                float sy = 820f;
+
+                layout.setText(font, "PLOT POINTS: +100 score");
+                font.draw(batch, layout, howToPlayStartX, sy);
+
+                layout.setText(font, "OVER-HEAL GRAPHITE: +Excess amount score");
+                font.draw(batch, layout, howToPlayStartX, sy -= 50f);
+
+                layout.setText(font, "LEVEL COMPLETE: +Time score");
+                font.draw(batch, layout, howToPlayStartX, sy -= 50f);
+                break;
         }
+
+
 
         // render buttons
         for (int i = 0; i < buttons.length; i++) {
