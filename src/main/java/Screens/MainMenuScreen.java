@@ -238,7 +238,11 @@ public class MainMenuScreen extends ScreenAdapter {
             setHowToPlayText("and INK SPILLS!  ", ink, currentY -= 45);
             setHowToPlayText("Don't get caught by PENCIL SHARPENERS!  ", pencilsharpener, currentY -= lineSpacing);
             setHowToPlayText("Collect GRAPHITE!  ", graphite, currentY -= lineSpacing);
-            setHowToPlayText("Collect PLOT POINTS!  ", plot, currentY -= lineSpacing);
+            setHowToPlayText("Collect PLOT POINTS  ", plot, currentY -= lineSpacing);
+            String line4 = "to create a connect-the-dots shape!";
+            layout.setText(font, line4);
+            font.draw(batch, layout, howToPlayStartX, currentY -= 45);
+
             String line5 = "Navigate to the END CELL after all PLOT POINTS  ";
             layout.setText(font, line5);
             font.draw(batch, layout, howToPlayStartX, currentY -= lineSpacing);
