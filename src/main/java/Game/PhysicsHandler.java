@@ -193,6 +193,11 @@ public class PhysicsHandler {
             return false;
         }
 
+        // Pencil sharpener does not block eraser
+        if (other instanceof PencilSharpener) {
+            return false;
+        }
+
         if (other instanceof WhiteOut) {
             return false;
         }
@@ -206,10 +211,6 @@ public class PhysicsHandler {
             return true;
         }
 
-        // Pencil sharpener does not block eraser
-        if (other instanceof PencilSharpener) {
-            return false;
-        }
         return false;
     }
 }
