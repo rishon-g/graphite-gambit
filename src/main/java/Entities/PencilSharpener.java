@@ -106,11 +106,8 @@ public class PencilSharpener extends MobileEnemy {
      */
     @Override
     public void render(SpriteBatch batch, float delta) {
-        float offsetX = (DRAW_SIZE - transform.size.x) / 2f;
-        float offsetY = (DRAW_SIZE - transform.size.y) / 2f;
-
-        float drawX = transform.position.x - offsetX;
-        float drawY = transform.position.y - offsetY;
+        float drawX = getdrawX(DRAW_SIZE);
+        float drawY = getdrawY(DRAW_SIZE);
 
         batch.draw(
                 sprites[facing],

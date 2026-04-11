@@ -170,12 +170,8 @@ public class Eraser extends MobileEnemy {
             batch.setColor(1f, 1f, 1f, (RESPAWN_TIME - respawnTimer) / RESPAWN_TIME);
         }
 
-        float offsetX = (DRAW_WIDTH - transform.size.x) / 2f;
-
-        float offsetY = (DRAW_HEIGHT - transform.size.y) / 2f;
-
-        float drawX = transform.position.x - offsetX;
-        float drawY = transform.position.y - offsetY;
+        float drawX = getdrawX(DRAW_WIDTH);
+        float drawY = getdrawY(DRAW_HEIGHT);
 
         batch.draw(
                 sprites[facing],

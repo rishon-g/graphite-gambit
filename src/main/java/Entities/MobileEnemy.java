@@ -173,6 +173,26 @@ public abstract class MobileEnemy extends Entity implements Nonplayer {
     protected abstract float getMoveSpeed();
 
     /**
+     * Retrieve the X draw position of an enemy
+     * @param X width of drawing
+     * @return position of X to draw enemy
+     */
+    public float getdrawX(float X) {
+        float offsetX = (X - transform.size.x) / 2f;
+        return transform.position.x - offsetX;
+    }
+
+    /**
+     * Retrieve the Y draw position of an enemy
+     * @param Y width of drawing
+     * @return position of Y to draw enemy
+     */
+    public float getdrawY(float Y) {
+        float offsetY = (Y - transform.size.y) / 2f;
+        return transform.position.y - offsetY;
+    }
+
+    /**
      * Updates the current movement state based on player distance.
      *
      * @param player the current player
