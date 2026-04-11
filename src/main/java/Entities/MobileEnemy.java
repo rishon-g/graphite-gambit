@@ -24,7 +24,17 @@ import java.util.List;
  * reachable nearby tile within a small radius.
  * </p>
  */
-public abstract class MobileEnemy extends Nonplayer {
+public abstract class MobileEnemy extends Entity implements Nonplayer {
+
+    /**
+     * Indicators for the direction the player is facing for sprite rendering.
+     */
+    static final int DOWN = 0;
+    static final int UP = 1;
+    static final int RIGHT = 2;
+    static final int LEFT = 3;
+    int facing = DOWN;
+
 
     /**
      * Time interval in seconds between path recalculations.

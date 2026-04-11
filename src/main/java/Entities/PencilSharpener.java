@@ -26,15 +26,6 @@ public class PencilSharpener extends MobileEnemy {
      */
     private static final float DRAW_SIZE = 256f;
 
-    /**
-     * Indicators for the direction the player is facing for sprite rendering.
-     */
-    private static final int DOWN = 0;
-    private static final int UP = 1;
-    private static final int RIGHT = 2;
-    private static final int LEFT = 3;
-    int facing = DOWN;
-
     static final int HITBOX = 64;
 
     public static final float STUN_DURATION = 8f;

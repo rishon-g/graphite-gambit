@@ -206,7 +206,7 @@ public class Player extends Entity {
 
             // did we escape
             if (stunTimer <= 0) {
-                stunTimer = 0f; // Bug fix: PREVENT NEGATIVE TIMER TODO mention in report!
+                stunTimer = 0f;
                 isStunned = false;
                 isImmune = true;
                 immunityTimer = 1.0f;
