@@ -1,6 +1,8 @@
 package Objects;
 
+import Components.Transform;
 import Entities.Entity;
+import Entities.Player;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  *
  * <p>A door is created as either the left or right part.</p>
  */
-public class Door extends Entity {
+public class Door extends Entity implements Nonplayer {
 
     /**
      * Texture used to render this door half.
@@ -64,5 +66,10 @@ public class Door extends Entity {
     @Override
     public void render(SpriteBatch batch, float delta) {
         renderTexture(batch, texture);
+    }
+
+    @Override
+    public void playerCollide(Player player) {
+
     }
 }

@@ -1,19 +1,14 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import Game.GameWorld;
-/**
- * Non-player entity representing a healing object.
- *
- * <p>This entity spawns frequently (according to level conditions) and is placed in several locations
- * around the map. When the player collides with it, they gain some health (graphite), and if the health
- * gain exceeds the max health, they gain score.</p>
- */
-public class Pickup extends Nonplayer {
+
+public class Pickup extends Entity implements Nonplayer {
     private Texture graphiteTexture;
     private Texture glowTexture;
 
@@ -24,11 +19,6 @@ public class Pickup extends Nonplayer {
     public static final float DEFAULT_HEIGHT = 64f;
     public static final int HEAL_AMOUNT = 20;
 
-    /**
-     * Creates a graphite texture with the requested size.
-     *
-     * @param world the game world
-     */
     public Pickup(GameWorld world) {
         super(world);
 
@@ -40,11 +30,6 @@ public class Pickup extends Nonplayer {
         this.transform.setScale(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
-    /**
-     * Updates the position so that it oscillates.
-     *
-     * @param delta time since last update
-     */
     @Override
     public void updateInternal(float delta) {
         // lock in the spawn floor height (placed in correct spot)
@@ -59,23 +44,12 @@ public class Pickup extends Nonplayer {
         this.transform.position.y = newY;
     }
 
-    /**
-     * Gives the player health if they collide with it, and the graphite disappears at this location.
-     *
-     * @param player the player colliding with this entity
-     */
     @Override
     public void playerCollide(Player player) {
         world.getPlayer().modifyHealth(HEAL_AMOUNT);
         this.dead = true;
     }
 
-    /**
-     * Renders the glow behind the graphite, and the graphite.
-     *
-     * @param batch sprite batch used for drawing
-     * @param delta time since last update
-     */
     @Override
     public void render(SpriteBatch batch, float delta) {
 

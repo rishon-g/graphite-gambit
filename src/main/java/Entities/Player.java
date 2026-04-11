@@ -3,6 +3,7 @@ package Entities;
 import Game.AudioManager;
 import Game.DrawWeight;
 
+import Objects.Nonplayer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;

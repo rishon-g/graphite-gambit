@@ -1,5 +1,6 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,7 +14,7 @@ import Game.GameWorld;
  * determines its sprite, hitbox dimensions, and damage amount. When the player
  * collides with it.</p>
  */
-public class WhiteOut extends Nonplayer {
+public class WhiteOut extends Entity implements Nonplayer {
 
     /**
      * Texture used to render this white-out hazard.

@@ -1,5 +1,6 @@
 package Objects;
 
+import Entities.Entity;
 import Entities.Player;
 import Game.GameWorld;
 import com.badlogic.gdx.Gdx;
@@ -12,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * <p>This entity is rendered as a static trophy sprite in the world. When the
  * player collides with it, the game win condition is triggered.</p>
  */
-public class ExitPoint extends Nonplayer {
+public class ExitPoint extends Entity implements Nonplayer {
 
     public final static int DEFAULT_WIDTH = 128;
     public final static int DEFAULT_HEIGHT = 128;
