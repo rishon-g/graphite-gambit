@@ -82,13 +82,9 @@ public class PencilSharpener extends MobileEnemy {
                 damageTimer = 0f;
             }
         }
-        if (transform.velocity.x != 0 || transform.velocity.y != 0) {
-            if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
-                facing = transform.velocity.y > 0 ? UP : DOWN;
-            } else {
-                facing = transform.velocity.x > 0 ? RIGHT : LEFT;
-            }
-        }
+
+        updateFacingFromVelocity();
+
         return true;
     }
 

@@ -135,17 +135,6 @@ public class Eraser extends MobileEnemy {
     }
 
     /**
-     * Updates the facing direction based on the current velocity.
-     */
-    private void updateFacingFromVelocity() {
-        if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
-            facing = transform.velocity.y > 0 ? UP : DOWN;
-        } else {
-            facing = transform.velocity.x > 0 ? RIGHT : LEFT;
-        }
-    }
-
-    /**
      * Erases drawn floor tiles under the eraser.
      */
     private void eraseFloorUnderEraser() {

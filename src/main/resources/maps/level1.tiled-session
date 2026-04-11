@@ -34,19 +34,19 @@
                 5,
                 2
             ],
-            "scale": 0.3834,
-            "selectedLayer": 1,
+            "scale": 1.4473,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 3142.9316640584248,
-                "y": 2150.4955659885236
+                "x": 3305.4653492710563,
+                "y": 2440.0608028743177
             }
         },
         "level3.tmx": {
-            "scale": 0.1146,
+            "scale": 0.11,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 3376.9633507853405,
-                "y": 1531.413612565445
+                "x": 3372.727272727273,
+                "y": 1531.8181818181824
             }
         },
         "level4.tmx": {
@@ -58,7 +58,7 @@
             }
         },
         "maintiles.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": true
         },
         "updatedtiles.tsx": {
             "dynamicWrapping": false,

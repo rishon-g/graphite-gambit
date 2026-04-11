@@ -197,6 +197,17 @@ public abstract class MobileEnemy extends Entity implements Nonplayer {
     }
 
     /**
+     * Updates the facing direction based on the current velocity.
+     */
+    void updateFacingFromVelocity() {
+        if (Math.abs(transform.velocity.y) > Math.abs(transform.velocity.x)) {
+            facing = transform.velocity.y > 0 ? UP : DOWN;
+        } else {
+            facing = transform.velocity.x > 0 ? RIGHT : LEFT;
+        }
+    }
+
+    /**
      * Returns true if the path should be rebuilt for the current movement state.
      *
      * @return true if a rebuild is needed
