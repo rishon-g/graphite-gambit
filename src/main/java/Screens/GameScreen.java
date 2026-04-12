@@ -354,7 +354,7 @@ public class GameScreen implements Screen {
                 layout.setText(menuFont, "TIME REMAINING: " + seconds);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 620);
 
-                layout.setText(menuFont, "PLOT POINTS: " + plotPoints);
+                layout.setText(menuFont, "PLOT POINTS: " + plotPoints + "/" + world.nodePositions.size);
                 menuFont.draw(batch, layout, 1920 / 2 - 300, 570);
             } else if (gameWon) {
                 layout.setText(smallHeaderFont, "LEVEL COMPLETE!");

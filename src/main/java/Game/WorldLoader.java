@@ -221,6 +221,7 @@ public class WorldLoader {
                             newEntity.transform.position.x + 16f,
                             newEntity.transform.position.y + 16f
                     ));
+
                     break;
                 case "PencilSharpener":
                     newEntity = new PencilSharpener(world);

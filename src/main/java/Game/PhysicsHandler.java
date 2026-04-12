@@ -39,7 +39,8 @@ public class PhysicsHandler {
      * Handles any collisions between the entity and the map, then moves it in an
      * allowed way.
      *
-     * @param t the transform of the entity
+     * @param e the transform of the entity
+     * @param delta time since last update
      */
     public void requestMove(Entity e, float delta) {
         Transform t = e.transform;
