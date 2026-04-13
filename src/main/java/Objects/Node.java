@@ -7,9 +7,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Game.GameWorld;
 
+/**
+ * Non-player entity representing a node in the map, which the player must collect all to win.
+ *
+ * <p>This entity is rendered as a static node sprite in the world. When the
+ * player collides with it, it gives them score and if all nodes are collected, the win
+ * condition is activated.</p>
+ */
 public class Node extends Entity implements Nonplayer {
     Texture texture;
 
+    /**
+     * Creates a node with the requested size.
+     *
+     * @param world the game world
+     */
     public Node(GameWorld world){
         super(world);
         texture = new Texture("src/main/resources/sprites/Plot.png");
@@ -21,6 +33,12 @@ public class Node extends Entity implements Nonplayer {
         // No Internal Updates
     }
 
+    /**
+     * Renders the node.
+     *
+     * @param batch sprite batch used for drawing
+     * @param delta time since last update
+     */
     @Override
     public void render(SpriteBatch batch, float delta) {
         batch.draw(
