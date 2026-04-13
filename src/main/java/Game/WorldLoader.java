@@ -245,6 +245,13 @@ public class WorldLoader {
         return world;
     }
 
+    /**
+     * Helper class to set conditions for each level
+     * @param world the current world we are in
+     * @param pickupCount max pickups for the level
+     * @param spawnInterval how often pickups spawn in the level
+     * @param movementHealthLoss how much graphite you lose per second
+     */
     public void setWorldConditions(GameWorld world, int pickupCount, float spawnInterval, int movementHealthLoss) {
         world.maxPickups = pickupCount;
         world.spawnInterval = spawnInterval;
