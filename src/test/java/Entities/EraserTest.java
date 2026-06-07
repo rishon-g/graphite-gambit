@@ -8,8 +8,10 @@ import utils.GameTest;
 import java.lang.reflect.Field;
 import java.util.List;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 
 public class EraserTest extends GameTest {
 
@@ -318,7 +320,8 @@ public class EraserTest extends GameTest {
     }
 
     private int getFacingValue(Object target) throws Exception {
-        Field field = target.getClass().getDeclaredField("facing");
+        // Explicitly tell Java to look inside the parent MobileEnemy class
+        Field field = MobileEnemy.class.getDeclaredField("facing");
         field.setAccessible(true);
         return field.getInt(target);
     }

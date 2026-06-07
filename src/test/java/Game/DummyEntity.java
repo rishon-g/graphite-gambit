@@ -1,11 +1,11 @@
 package Game;
 
+import Entities.Entity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Entities.Player;
-import Objects.Nonplayer;
 
-public class DummyEntity extends Nonplayer {
+public class DummyEntity extends Entity {
     public DummyEntity(GameWorld world) {
         super(world);
     }
