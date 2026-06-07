@@ -1,4 +1,4 @@
-# Graphite Gambit ✏️
+# Graphite Gambit 
 - Avoid ***erasers***! Watch out for ***white-out*** and ***ink spills***!
 - Don't get caught by ***pencil sharpeners***!
 - Collect ***graphite***!
@@ -8,16 +8,22 @@
 ### Build
 1. Clone the repository with:
 ```bash
-git clone https://github.sfu.ca/saba/CMPT276S26_Group17.git
+git clone https://github.com/rishon-g/graphite-gambit.git
 ```
 2. To package, run:
 ```bash
 mvn clean package
 ```
-3. Run the game using the launcher with:
+3. Run the game using the launcher with
+Windows:
 ```bash
 java -jar target/graphite-gambit-1.0.jar
 ```
+MacOS:
+```bash
+java -XstartOnFirstThread -jar target/graphite-gambit-1.0.jar
+```
+
 ### Testing
 To run all tests, use:
 ```bash
