@@ -1,5 +1,7 @@
 # Graphite Gambit 
 <div align="center">
+  <h1> Trailer
+<div align="center">
   <a href="https://www.youtube.com/watch?v=x5MVc6XfxyI">
     <img src="https://img.youtube.com/vi/x5MVc6XfxyI/maxresdefault.jpg" alt="Graphite Gambit Trailer" width="800">
   </a>
