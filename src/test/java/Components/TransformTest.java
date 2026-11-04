@@ -178,4 +178,21 @@ public class TransformTest {
         vec2Equals(new Vec2(-50, -20), input.getCorner(Corner.BL));
         vec2Equals(new Vec2(-40, -20), input.getCorner(Corner.BR));
     }
+
+    @Test
+    void testSetTilePositionMultipliesByTileSize(){
+        input.setTilePosition(3, 5, 32);
+
+        vec2Equals(new Vec2(96, 160), input.position);
+    }
+
+    @Test
+    void testSetScaleAndVelocityOnlyChangeTheirOwnVector(){
+        input.setScale(8, 9);
+        input.setVelocity(1.5f, -2f);
+
+        vec2Equals(new Vec2(8, 9), input.size);
+        vec2Equals(new Vec2(1.5f, -2f), input.velocity);
+        vec2Equals(new Vec2(0, 0), input.position);
+    }
 }
