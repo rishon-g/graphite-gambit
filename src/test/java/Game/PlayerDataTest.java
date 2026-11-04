@@ -60,4 +60,11 @@ public class PlayerDataTest {
         assertEquals(2, data.getLevelUnlocked());
         assertEquals(400, data.getScore(1));
     }
+
+    @Test
+    void testSetHighScorePadsEarlierLevelsWithZero() {
+        data.setHighScore(3, 750);
+        assertEquals(0, data.getScore(1));
+        assertEquals(0, data.getScore(2));
+    }
 }
