@@ -54,7 +54,7 @@ There are three playable levels, plus a fourth "coming soon" teaser.
 - **Data-driven levels.** Levels are designed visually in **Tiled** (`.tmx`). `WorldLoader` reads the tile layers into a collision grid and reads **JSON level files** for entity placement, pickups and spawn rates, so new levels need no code changes.
 - **Custom physics.** Velocity, collision against the tile grid and hitbox resolution are done by hand in `PhysicsHandler` and `Transform`, with per-entity collision rules (for example, erasers don't collide with sharpeners).
 - **Clean architecture.** Screens go through a singleton `ScreenManager`. Assets are loaded and tracked by an `AssetService`, and sound by an `AudioManager`. Non-player objects share a `Nonplayer` interface instead of a deep class hierarchy, after a deliberate refactor.
-- **Tested.** **296 JUnit 5 tests**, using **Mockito** and a headless test mode so game logic runs without opening a window. Several classes (`Door`, `ExitPoint`, `PencilSharpener`) have 100% branch coverage.
+- **Tested.** **301 JUnit 5 tests**, using **Mockito** and a headless test mode so game logic runs without opening a window. Several classes (`Door`, `ExitPoint`, `PencilSharpener`) have 100% branch coverage.
 - **Designed before it was built.** The project went through use cases, UI mockups, UML and peer code reviews ([`Design/`](Design) and [`Documents/`](Documents)).
 
 ## My role
@@ -93,7 +93,7 @@ java -XstartOnFirstThread -jar target/graphite-gambit-1.0.jar
 ### Tests
 
 ```bash
-mvn test                      # all 296 tests
+mvn test                      # all 301 tests
 mvn test -Dtest=AStarTest     # a single test class
 ```
 
