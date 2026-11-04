@@ -6,7 +6,7 @@
 
 Dodge erasers, escape pencil sharpeners, collect plot points, then reach the end cell before the clock or your graphite runs out.
 
-![Java](https://img.shields.io/badge/Java-22-ED8B00?logo=openjdk&logoColor=white) ![libGDX](https://img.shields.io/badge/libGDX-1.12.1-E74C3C) ![Tiled](https://img.shields.io/badge/maps-Tiled-4A90D9) ![Tests](https://img.shields.io/badge/tests-296%20passing-brightgreen?logo=junit5&logoColor=white) ![Maven](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)
+![Java](https://img.shields.io/badge/Java-22-ED8B00?logo=openjdk&logoColor=white) ![libGDX](https://img.shields.io/badge/libGDX-1.12.1-E74C3C) ![Tiled](https://img.shields.io/badge/maps-Tiled-4A90D9) ![Tests](https://img.shields.io/badge/tests-301%20passing-brightgreen?logo=junit5&logoColor=white) ![Maven](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)
 
 <img src="docs/media/gameplay.gif" alt="Gameplay: the pencil moves through a graph-paper maze, leaving a graphite trail while an eraser chases it" width="720">
 
