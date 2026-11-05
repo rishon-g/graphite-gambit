@@ -124,7 +124,7 @@ public class PlayerData {
     public void completeLevel(int level, int score) {
         // newly beat level
 		if(level == levelUnlocked){
-			if(highScores.size() < level){
+			while(highScores.size() < level){
 				highScores.add(0);
 			}
 			highScores.set(level-1, score);

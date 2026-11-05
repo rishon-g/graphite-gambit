@@ -67,4 +67,16 @@ public class PlayerDataTest {
         assertEquals(0, data.getScore(1));
         assertEquals(0, data.getScore(2));
     }
+
+    @Test
+    void testCompleteNewLevelPadsSkippedScoresAndUnlocksNext() {
+        data.setLevel(3);
+
+        data.completeLevel(3, 900);
+
+        assertEquals(4, data.getLevelUnlocked());
+        assertEquals(900, data.getScore(3));
+        assertEquals(0, data.getScore(1));
+        assertEquals(0, data.getScore(2));
+    }
 }
