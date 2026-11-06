@@ -140,4 +140,16 @@ public class RandomPatrolTest {
 
         assertNull(result);
     }
+
+    @Test
+    void testChoosePatrolTarget_DiagonalBetweenTwoBlockedCorners_ReturnsNull() {
+        int[][] map = {
+                {0, 1},
+                {1, 0}
+        };
+
+        int[] result = RandomPatrol.choosePatrolTarget(map, 0, 0, 1);
+
+        assertNull(result);
+    }
 }
