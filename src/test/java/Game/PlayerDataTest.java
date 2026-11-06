@@ -79,4 +79,15 @@ public class PlayerDataTest {
         assertEquals(0, data.getScore(1));
         assertEquals(0, data.getScore(2));
     }
+
+    @Test
+    void testReplayLevelWithNoRecordedScoreDoesNotThrow() {
+        data.setLevel(3); // levels 1 and 2 unlocked but no scores stored
+
+        data.completeLevel(2, 500);
+
+        assertEquals(3, data.getLevelUnlocked());
+        assertEquals(500, data.getScore(2));
+        assertEquals(0, data.getScore(1));
+    }
 }

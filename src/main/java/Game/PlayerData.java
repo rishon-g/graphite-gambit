@@ -133,7 +133,10 @@ public class PlayerData {
 		}
 
         // beat old level again
-		else if(score > highScores.get(level-1)){
+		else if(score > (level <= highScores.size() ? highScores.get(level-1) : 0)){
+            while(highScores.size() < level){
+                highScores.add(0);
+            }
             highScores.set(level-1, score);
             saveToFile();
         }
