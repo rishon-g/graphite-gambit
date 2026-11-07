@@ -107,4 +107,13 @@ public class WhiteOutTest extends GameTest {
         // verify the player took exactly 1 hit of damage
         verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
     }
+
+    @Test
+    public void testPlayerCollide_SmallHazardDealsSmallDamage() {
+        WhiteOut smallHazard = new WhiteOut(mockWorld, "Small");
+
+        smallHazard.playerCollide(mockPlayer);
+
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
+    }
 }
