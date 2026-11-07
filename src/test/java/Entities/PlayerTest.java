@@ -272,5 +272,11 @@ public class PlayerTest extends GameTest {
         assertEquals(Player.STARTING_HEALTH + Player.MOVEMENT_HEALTH_LOSS, player.getHealth(), "Moving on the Y axis should drain health.");
     }
 
+    @Test
+    public void testModifyHealth_OverkillDamageClampsToZero() {
+        player.modifyHealth(-150);
 
+        assertEquals(0, player.getHealth(), "health should never go negative.");
+        assertTrue(player.dead(), "player should be dead after lethal damage.");
+    }
 }
