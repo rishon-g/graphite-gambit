@@ -1,6 +1,7 @@
 package Game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,5 +90,11 @@ public class PlayerDataTest {
         assertEquals(3, data.getLevelUnlocked());
         assertEquals(500, data.getScore(2));
         assertEquals(0, data.getScore(1));
+    }
+
+    @Test
+    void testGetScoreForUnrecordedLevelThrows() {
+        // MainMenuScreen relies on this exception to show a score of 0 for unplayed levels
+        assertThrows(IndexOutOfBoundsException.class, () -> data.getScore(1));
     }
 }
