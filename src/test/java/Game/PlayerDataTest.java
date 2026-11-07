@@ -97,4 +97,15 @@ public class PlayerDataTest {
         // MainMenuScreen relies on this exception to show a score of 0 for unplayed levels
         assertThrows(IndexOutOfBoundsException.class, () -> data.getScore(1));
     }
+
+    @Test
+    void testCompleteWithEqualScoreKeepsExistingHighscore() {
+        data.setLevel(2);
+        data.setHighScore(1, 400);
+
+        data.completeLevel(1, 400);
+
+        assertEquals(2, data.getLevelUnlocked());
+        assertEquals(400, data.getScore(1));
+    }
 }
