@@ -279,4 +279,13 @@ public class PlayerTest extends GameTest {
         assertEquals(0, player.getHealth(), "health should never go negative.");
         assertTrue(player.dead(), "player should be dead after lethal damage.");
     }
+
+    @Test
+    public void testModifyHealth_PartialHealBelowMaxDoesNotScore() {
+        player.modifyHealth(-30);
+        player.modifyHealth(20);
+
+        assertEquals(90, player.getHealth(), "a heal below max should be applied in full.");
+        verify(mockWorld, never()).score(anyInt());
+    }
 }
