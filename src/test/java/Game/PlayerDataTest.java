@@ -108,4 +108,16 @@ public class PlayerDataTest {
         assertEquals(2, data.getLevelUnlocked());
         assertEquals(400, data.getScore(1));
     }
+
+    @Test
+    void testResetClearsProgress() {
+        data.setLevel(3);
+        data.setHighScore(2, 600);
+
+        PlayerData.reset(false);
+        data = PlayerData.obtainPlayerData();
+
+        assertEquals(1, data.getLevelUnlocked());
+        assertThrows(IndexOutOfBoundsException.class, () -> data.getScore(2));
+    }
 }
