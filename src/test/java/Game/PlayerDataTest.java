@@ -120,4 +120,15 @@ public class PlayerDataTest {
         assertEquals(1, data.getLevelUnlocked());
         assertThrows(IndexOutOfBoundsException.class, () -> data.getScore(2));
     }
+
+    @Test
+    void testSetHighScoreOverwritesExistingScoreWithoutTouchingOthers() {
+        data.setHighScore(1, 100);
+        data.setHighScore(2, 200);
+
+        data.setHighScore(1, 50);
+
+        assertEquals(50, data.getScore(1));
+        assertEquals(200, data.getScore(2));
+    }
 }
