@@ -1,6 +1,8 @@
 package Game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -130,5 +132,14 @@ public class PlayerDataTest {
 
         assertEquals(50, data.getScore(1));
         assertEquals(200, data.getScore(2));
+    }
+
+    @Test
+    void testObtainPlayerDataReturnsSameInstanceUntilReset() {
+        assertSame(data, PlayerData.obtainPlayerData());
+
+        PlayerData.reset(false);
+
+        assertNotSame(data, PlayerData.obtainPlayerData());
     }
 }
