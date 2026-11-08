@@ -35,4 +35,12 @@ public class MapAssetTest {
         // assert it targets the correct libGDX class
         assertEquals(TiledMap.class, descriptor1.type, "descriptor should target TiledMap class.");
     }
+
+    @Test
+    public void testGetLevelAsset_Levels3And4_ReturnCorrectLevelWithMatchingPath() {
+        assertEquals(MapAsset.LEVEL3, MapAsset.getLevelAsset(3));
+        assertEquals(MapAsset.LEVEL4, MapAsset.getLevelAsset(4));
+        assertEquals("maps/level3.tmx", MapAsset.LEVEL3.getDescriptor().fileName);
+        assertEquals("maps/level4.tmx", MapAsset.LEVEL4.getDescriptor().fileName);
+    }
 }
