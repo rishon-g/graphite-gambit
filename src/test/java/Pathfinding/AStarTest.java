@@ -176,4 +176,23 @@ public class AStarTest {
         assertNotNull(path);
         assertTrue(path.isEmpty(), "Completely trapped start should return an empty path");
     }
+
+    @Test
+    void testFindPath_DetoursThroughTheGapInAWall() {
+        int[][] map = new int[5][5];
+        // wall along x = 2 with its only gap at y = 4
+        for (int y = 0; y < 4; y++) map[2][y] = 1;
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 4, 0);
+
+        assertEquals(10, path.size(), "Shortest route without corner cutting is 10 steps");
+        assertTrue(path.stream().anyMatch(p -> p[0] == 2 && p[1] == 4), "Path should pass through the gap");
+        int px = 0, py = 0;
+        for (int[] step : path) {
+            assertEquals(0, map[step[0]][step[1]], "Path should never enter a blocked tile");
+            assertTrue(Math.abs(step[0] - px) <= 1 && Math.abs(step[1] - py) <= 1, "Each step should move to a neighbouring tile");
+            px = step[0];
+            py = step[1];
+        }
+    }
 }
