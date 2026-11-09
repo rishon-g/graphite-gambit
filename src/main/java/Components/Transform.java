@@ -46,6 +46,13 @@ public class Transform {
         position.set(x, y);
     }
 
+    /**
+     * Sets the position from tile coordinates by scaling them by the tile size.
+     *
+     * @param x x position in tiles
+     * @param y y position in tiles
+     * @param tileSize width and height of one tile in pixels
+     */
     public void setTilePosition(float x, float y, int tileSize){
         position.set(x*tileSize, y*tileSize);
     }
