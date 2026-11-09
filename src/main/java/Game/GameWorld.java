@@ -243,7 +243,6 @@ public class GameWorld {
                 // pixel draw position
                 int xindex = tilex + x, yindex = tiley + y;
 
-                // System.out.println("at: (" + xindex + ", " + yindex + ")");
 
                 // out of bounds checking
                 if (xindex < 0 || xindex >= width / DRAW_SIZE || yindex < 0 || yindex >= height / DRAW_SIZE) {

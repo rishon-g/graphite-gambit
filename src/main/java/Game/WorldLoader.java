@@ -202,7 +202,6 @@ public class WorldLoader {
 
             // dynamically create entity of any type
             Entity newEntity;
-            System.out.println("New entity: " + entity.type);
             switch (entity.type) {
                 case "Player":
                     newEntity = new Player(world);
