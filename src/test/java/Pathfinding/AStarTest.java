@@ -94,6 +94,22 @@ public class AStarTest {
     }
 
     @Test
+    void testFindPath_OnNonSquareMap_TakesAShortestRouteOfSingleTileSteps() {
+        int[][] map = new int[5][2]; // 5 wide, 2 tall
+
+        List<int[]> path = AStar.findPath(map, 0, 0, 4, 1);
+
+        assertEquals(4, path.size(), "Diagonal moves make the shortest route 4 steps");
+        int[] previous = {0, 0};
+        for (int[] step : path) {
+            assertEquals(1, Math.max(Math.abs(step[0] - previous[0]), Math.abs(step[1] - previous[1])),
+                    "Each step should move to an adjacent tile");
+            previous = step;
+        }
+        assertArrayEquals(new int[]{4, 1}, previous);
+    }
+
+    @Test
     void testFindPath_NullMap_ReturnsEmptyList() {
         List<int[]> path = AStar.findPath(null, 0, 0, 1, 1);
 
