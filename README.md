@@ -6,7 +6,7 @@
 
 Dodge erasers, escape pencil sharpeners, collect plot points, then reach the end cell before the clock or your graphite runs out.
 
-![Java](https://img.shields.io/badge/Java-22-ED8B00?logo=openjdk&logoColor=white) ![libGDX](https://img.shields.io/badge/libGDX-1.12.1-E74C3C) ![Tiled](https://img.shields.io/badge/maps-Tiled-4A90D9) ![Tests](https://img.shields.io/badge/tests-301%20passing-brightgreen?logo=junit5&logoColor=white) ![Maven](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)
+![Java](https://img.shields.io/badge/Java-22-ED8B00?logo=openjdk&logoColor=white) ![libGDX](https://img.shields.io/badge/libGDX-1.12.1-E74C3C) ![Tiled](https://img.shields.io/badge/maps-Tiled-4A90D9) ![Tests](https://img.shields.io/badge/tests-315%20passing-brightgreen?logo=junit5&logoColor=white) ![Maven](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)
 
 <img src="docs/media/gameplay.gif" alt="Gameplay: the pencil moves through a graph-paper maze, leaving a graphite trail while an eraser chases it" width="720">
 
@@ -54,7 +54,7 @@ There are three playable levels, plus a fourth "coming soon" teaser.
 - **Data-driven levels.** Levels are designed visually in **Tiled** (`.tmx`). `WorldLoader` reads the tile layers into a collision grid and reads **JSON level files** for entity placement, pickups and spawn rates, so new levels need no code changes.
 - **Custom physics.** Velocity, collision against the tile grid and hitbox resolution are done by hand in `PhysicsHandler` and `Transform`, with per-entity collision rules (for example, erasers don't collide with sharpeners).
 - **Clean architecture.** Screens go through a singleton `ScreenManager`. Assets are loaded and tracked by an `AssetService`, and sound by an `AudioManager`. Non-player objects share a `Nonplayer` interface instead of a deep class hierarchy, after a deliberate refactor.
-- **Tested.** **301 JUnit 5 tests**, using **Mockito** and a headless test mode so game logic runs without opening a window. Several classes (`Door`, `ExitPoint`, `PencilSharpener`) have 100% branch coverage.
+- **Tested.** **315 JUnit 5 tests**, using **Mockito** and a headless test mode so game logic runs without opening a window. Several classes (`Door`, `ExitPoint`, `PencilSharpener`) have 100% branch coverage.
 - **Designed before it was built.** The project went through use cases, UI mockups, UML and peer code reviews ([`Design/`](Design) and [`Documents/`](Documents)).
 
 ## My role
@@ -93,7 +93,7 @@ java -XstartOnFirstThread -jar target/graphite-gambit-1.0.jar
 ### Tests
 
 ```bash
-mvn test                      # all 301 tests
+mvn test                      # all 315 tests
 mvn test -Dtest=AStarTest     # a single test class
 ```
 
