@@ -60,14 +60,6 @@ public class PlayerData {
     }
 
     /**
-     * Resets the global save data
-     */
-    public static void resetData(){
-        instance = new PlayerData();
-        saveToFile();
-    }
-
-    /**
      * singleton method to initialize/obtain shared player save data.
      * @return the save data of the player
      */
