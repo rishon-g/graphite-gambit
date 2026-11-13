@@ -68,7 +68,7 @@ public class Pickup extends Entity implements Nonplayer {
      */
     @Override
     public void playerCollide(Player player) {
-        world.getPlayer().modifyHealth(HEAL_AMOUNT);
+        player.modifyHealth(HEAL_AMOUNT);
         this.dead = true;
     }
 
