@@ -1,6 +1,8 @@
 package Components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -143,6 +145,17 @@ public class TransformTest {
         assert(!input.collides(0, 15));
         assert(!input.collides(15, 30));
         assert(!input.collides(15, 0));
+    }
+
+    @Test
+    void testCollidesPointOnEdgeIsInclusive(){
+        input.setPosition(10, 10);
+        input.setScale(10, 10);
+
+        assertTrue(input.collides(10, 10));
+        assertTrue(input.collides(20, 20));
+        assertTrue(input.collides(20, 15));
+        assertFalse(input.collides(20.01f, 15));
     }
 
     @Test
