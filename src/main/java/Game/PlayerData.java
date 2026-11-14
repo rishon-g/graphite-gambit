@@ -116,20 +116,14 @@ public class PlayerData {
     public void completeLevel(int level, int score) {
         // newly beat level
 		if(level == levelUnlocked){
-			while(highScores.size() < level){
-				highScores.add(0);
-			}
-			highScores.set(level-1, score);
+			setHighScore(level, score);
 			levelUnlocked++;
             saveToFile();
 		}
 
         // beat old level again
 		else if(score > (level <= highScores.size() ? highScores.get(level-1) : 0)){
-            while(highScores.size() < level){
-                highScores.add(0);
-            }
-            highScores.set(level-1, score);
+            setHighScore(level, score);
             saveToFile();
         }
     }
