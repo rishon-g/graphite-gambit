@@ -43,4 +43,13 @@ public class MapAssetTest {
         assertEquals("maps/level3.tmx", MapAsset.LEVEL3.getDescriptor().fileName);
         assertEquals("maps/level4.tmx", MapAsset.LEVEL4.getDescriptor().fileName);
     }
+
+    @Test
+    public void testEveryLevelDescriptorPointsToABundledMapFile() {
+        // a typo in a map name would otherwise only show up when that level is loaded
+        for (MapAsset level : MapAsset.values()) {
+            String path = level.getDescriptor().fileName;
+            assertNotNull(getClass().getClassLoader().getResource(path), path + " should be on the classpath");
+        }
+    }
 }
