@@ -64,7 +64,7 @@ public class WorldLoader {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("background");
         world.setDimensions(layer.getWidth() * GameWorld.getTileSize(), layer.getHeight() * GameWorld.getTileSize());
         world.tilemap = new int[layer.getWidth()][layer.getHeight()];
-        PhysicsHandler.CreateHandler(world.entities, world.width, world.height); // temporary dimensions, will be set properly after loading the map
+        PhysicsHandler.CreateHandler(world.entities, world.width, world.height); // bounds use the map size set by setDimensions above
         
         for (int x = 0; x < layer.getWidth(); x++) {
             for (int y = 0; y < layer.getHeight(); y++) {
