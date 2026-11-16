@@ -324,10 +324,13 @@ public class PhysicsHandlerTest {
         assert(mover.transform.position.y >= startY);
     }
 
-    // @Test
+    @Test
     void requestMoveWithBlockingEntity(){
-        // Create a solid entity
-        Entity solidEntity = createDummyMover(200, 100, 100, 100, 0, 0);
+        // Create a solid entity (doors block everything; the mock skips texture loading)
+        Door solidEntity = mock(Door.class);
+        solidEntity.transform = new Transform();
+        solidEntity.transform.setPosition(200, 100);
+        solidEntity.transform.setScale(100, 100);
         entities.add(solidEntity);
 
         // Create a moving object
