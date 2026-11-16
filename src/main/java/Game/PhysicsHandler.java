@@ -126,7 +126,7 @@ public class PhysicsHandler {
                         }
                     } else { // move down
                         dy = (wall.position.y + wall.size.y) - t.position.y + 0.01f;
-                        if (dy < 0f) {
+                        if (dy > 0f) {
                             dy = 0f;
                         }
                     }
@@ -148,7 +148,7 @@ public class PhysicsHandler {
                         }
                     } else {
                         dy = (entity.transform.position.y + entity.transform.size.y) - t.position.y + 0.01f;
-                        if (dy < 0f) {
+                        if (dy > 0f) {
                             dy = 0f;
                         }
                     }

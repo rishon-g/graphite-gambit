@@ -160,6 +160,21 @@ public class PhysicsHandlerTest {
         assert(mover.transform.position.y <= startY);
     }
 
+    @Test void requestMoveDownSnapsFlushOntoWallTop(){
+        Transform wall = new Transform();
+        wall.setPosition(100, 100);
+        wall.setScale(100, 100);
+        physics.solidObjects.add(wall);
+
+        // 50 units above the wall, moving down 200 units this frame
+        Entity mover = createDummyMover(100, 250, 50, 50, 0, -200);
+
+        physics.requestMove(mover, 1.0f);
+
+        // Mover should land on the wall's top edge, not stop where it started
+        assert(equalsWithEpsilon(200.01f, mover.transform.position.y, 0.001f));
+    }
+
     @Test void requestMoveCollideFromBottom(){
         // Create a solid wall
         Transform wall = new Transform();
