@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Vector;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
 import Objects.Ink;
 
 public class PhysicsHandlerTest {
@@ -343,18 +346,20 @@ public class PhysicsHandlerTest {
         assert(mover.transform.position.x >= startX);
     }
 
-    // @Test
+    @Test
     public void shouldBlockEntity(){
-        Door door = new Door(null, "left");
-        Ink ink = new Ink(null);
-        DummyEntity dummy = new DummyEntity(null);
-        DummyEntity dummy2 = new DummyEntity(null);
-        Player player = new Player(null);
+        // mocks skip the constructors, so no textures are loaded
+        Player player = mock(Player.class);
+        Eraser eraser = mock(Eraser.class);
+        Eraser eraser2 = mock(Eraser.class);
 
-        assert(physics.shouldBlockEntityMovement(player, door) == true);
-        assert(physics.shouldBlockEntityMovement(player, ink) == false);
-        assert(physics.shouldBlockEntityMovement(player, dummy) == false);
-        assert(physics.shouldBlockEntityMovement(player, player) == false);
-        assert(physics.shouldBlockEntityMovement(dummy, dummy2) == true);
+        assertTrue(physics.shouldBlockEntityMovement(player, mock(Door.class)));
+        assertFalse(physics.shouldBlockEntityMovement(player, mock(Ink.class)));
+        assertFalse(physics.shouldBlockEntityMovement(player, mock(WhiteOut.class)));
+        assertFalse(physics.shouldBlockEntityMovement(eraser, mock(PencilSharpener.class)));
+        assertFalse(physics.shouldBlockEntityMovement(player, eraser));
+        assertFalse(physics.shouldBlockEntityMovement(eraser, eraser));
+        assertTrue(physics.shouldBlockEntityMovement(eraser, eraser2));
+        assertFalse(physics.shouldBlockEntityMovement(null, eraser));
     }
 }
