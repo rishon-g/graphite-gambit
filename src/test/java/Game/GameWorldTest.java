@@ -238,6 +238,21 @@ public class GameWorldTest extends GameTest {
         assert(world.currentState == GameState.PAN_OUT); // Should trigger pan-out when all plot points collected
     }
 
+    @Test void holdOutRemovesDoorsAndPlaysDoorSound(){
+        Door door = new Door(world, "Left");
+        Node node = new Node(world);
+        world.addEntity(door);
+        world.addEntity(node);
+        world.currentState = GameState.HOLD_OUT;
+
+        world.update(1.1f); // past the 1 second hold, before the 2 second pan-in
+
+        assert(!world.getEntities().contains(door));
+        assert(world.getEntities().contains(node));
+        assert(world.currentState == GameState.HOLD_OUT);
+        verify(super.mockAudio, times(1)).playDoorOpenSound();
+    }
+
     // ==================== requestMove Tests ====================
     
 
