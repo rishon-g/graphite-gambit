@@ -30,8 +30,6 @@ import com.badlogic.gdx.graphics.Texture;
 public class GameWorld {
     // measurements for physics
     static final int TILE_SIZE = 128;
-    static final int X_ORIGIN = 0;
-    static final int Y_ORIGIN = 0;
     static final int DRAW_SIZE = 3;
 
     // spawner variables
@@ -584,20 +582,6 @@ public class GameWorld {
         camZoom += (targetZoom - camZoom) * camSpeed * dt;
 
         camera.zoom = camZoom;
-    }
-
-    /**
-     * from a coordinate, calculates the indices of the tile that the coordinate
-     * resides within.
-     * 
-     * @param coordinate the coordinate to query
-     * @return the tile that the coordinate is in
-     */
-    public Vec2 coordToIndex(Vec2 coordinate) {
-        Vec2 index = new Vec2();
-        index.x = coordinate.x / TILE_SIZE - X_ORIGIN / TILE_SIZE;
-        index.y = coordinate.y / TILE_SIZE - Y_ORIGIN / TILE_SIZE;
-        return index;
     }
 
     /**
