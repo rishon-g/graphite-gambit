@@ -93,7 +93,7 @@ java -XstartOnFirstThread -jar target/graphite-gambit-1.0.jar
 ### Tests
 
 ```bash
-mvn test                      # all 316 tests
+mvn test                      # all 321 tests
 mvn test -Dtest=AStarTest     # a single test class
 ```
 
