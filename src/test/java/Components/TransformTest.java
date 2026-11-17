@@ -96,6 +96,18 @@ public class TransformTest {
     }
 
     @Test
+    void testCollidesOverlapOnOneAxisOnly(){
+        input.setPosition(0, 0);
+        input.setScale(10, 10);
+
+        result.setScale(10, 10);
+        result.setPosition(5, 20); // x ranges overlap, y ranges don't
+        assertFalse(input.collides(result));
+        result.setPosition(20, 5); // y ranges overlap, x ranges don't
+        assertFalse(input.collides(result));
+    }
+
+    @Test
     void testCollidesSideTouching(){
         input.setPosition(0, 0);
         input.setScale(10, 10);
