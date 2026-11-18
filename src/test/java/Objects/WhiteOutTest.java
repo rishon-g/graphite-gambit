@@ -116,4 +116,15 @@ public class WhiteOutTest extends GameTest {
 
         verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
     }
+
+    @Test
+    public void testConstructor_SizeMatchIsCaseSensitive() {
+        // only the exact string "Large" selects the large hazard; anything else is small
+        WhiteOut hazard = new WhiteOut(mockWorld, "large");
+
+        assertEquals(WhiteOut.SMALL_DEFAULT_WIDTH, hazard.transform.size.x);
+        assertEquals(WhiteOut.SMALL_DEFAULT_HEIGHT, hazard.transform.size.y);
+        hazard.playerCollide(mockPlayer);
+        verify(mockPlayer, times(1)).modifyHealth(WhiteOut.SMALL_DEFAULT_DAMAGE);
+    }
 }
