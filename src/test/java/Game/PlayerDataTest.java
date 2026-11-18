@@ -142,4 +142,14 @@ public class PlayerDataTest {
 
         assertNotSame(data, PlayerData.obtainPlayerData());
     }
+
+    @Test
+    void testCompleteLockedLevelRecordsScoreWithoutUnlocking() {
+        // only level 1 is unlocked, so completing level 3 is treated as a replay
+        data.completeLevel(3, 500);
+
+        assertEquals(1, data.getLevelUnlocked());
+        assertEquals(500, data.getScore(3));
+        assertEquals(0, data.getScore(1));
+    }
 }
