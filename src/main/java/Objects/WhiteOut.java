@@ -12,7 +12,7 @@ import Game.GameWorld;
  *
  * <p>A white-out object can be created in different sizes. The selected size
  * determines its sprite, hitbox dimensions, and damage amount. When the player
- * collides with it.</p>
+ * collides with it, it deals that damage at most once per second.</p>
  */
 public class WhiteOut extends Entity implements Nonplayer {
 
