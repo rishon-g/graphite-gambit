@@ -75,8 +75,11 @@ public class PlayerData {
      * called internally upon first request of the save data.
      */
     private static void loadFromFile(){
-        if(testMode)
+        if(testMode){
+            // no save file in test mode, so start from fresh data instead of returning null
+            instance = new PlayerData();
             return;
+        }
         Json json = new Json();
         String path = "./Save/save.json";
 
