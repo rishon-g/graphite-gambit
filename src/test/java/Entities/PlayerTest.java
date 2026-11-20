@@ -109,6 +109,20 @@ public class PlayerTest extends GameTest {
     }
 
     @Test
+    public void testUpdate_EscapingStunGrantsOneSecondOfImmunity() {
+        player.stun(0.5f);
+        player.update(0.6f);
+
+        assertFalse(player.isStunned, "the stun should have worn off.");
+        assertTrue(player.isImmune, "escaping a stun should make the player immune.");
+        assertEquals(1.0f, player.immunityTimer, 0.001f, "immunity should last one second.");
+
+        // an immediate re-stun is ignored while immune
+        player.stun(2f);
+        assertFalse(player.isStunned, "a stun right after escaping should be ignored.");
+    }
+
+    @Test
     public void testUpdate_KeyboardInputMovesPlayer() {
         //velocity starts at 0
         player.transform.velocity.set(0, 0);
