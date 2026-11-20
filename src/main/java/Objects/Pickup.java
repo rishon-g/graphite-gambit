@@ -27,7 +27,7 @@ public class Pickup extends Entity implements Nonplayer {
     public static final int HEAL_AMOUNT = 20;
 
     /**
-     * Creates a graphite pickup with the requested size.
+     * Creates a graphite pickup with a fixed 64x64 hitbox.
      *
      * @param world the game world
      */

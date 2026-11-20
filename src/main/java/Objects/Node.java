@@ -18,7 +18,7 @@ public class Node extends Entity implements Nonplayer {
     Texture texture;
 
     /**
-     * Creates a node with the requested size.
+     * Creates a node with a fixed 32x32 hitbox.
      *
      * @param world the game world
      */
