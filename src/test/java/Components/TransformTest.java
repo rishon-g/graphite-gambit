@@ -220,4 +220,16 @@ public class TransformTest {
         vec2Equals(new Vec2(1.5f, -2f), input.velocity);
         vec2Equals(new Vec2(0, 0), input.position);
     }
+
+    @Test
+    void testGetCornerReturnsCopyThatDoesNotMoveTransform(){
+        input.setPosition(10, 20);
+        input.setScale(5, 5);
+
+        Vec2 corner = input.getCorner(Corner.BL);
+        corner.set(99, 99);
+
+        vec2Equals(new Vec2(10, 20), input.position);
+        vec2Equals(new Vec2(10, 20), input.getCorner(Corner.BL));
+    }
 }
