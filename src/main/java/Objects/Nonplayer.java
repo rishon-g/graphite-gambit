@@ -19,7 +19,7 @@ public interface Nonplayer {
     /**
      * Handles the event that this nonplayer entity collides with the player.
      * The specific behavior of the collision will depend on the type of object.
-     * * @param player the player that collided with this entity
+     * @param player the player that collided with this entity
      */
     void playerCollide(Player player);
 
