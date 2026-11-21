@@ -1,6 +1,10 @@
 package Objects;
 
 import Entities.Player;
+import Game.GdxGame;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import utils.GameTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,5 +52,18 @@ public class InkTest extends GameTest {
         // verify the object is truly static and hasn't moved
         assertEquals(initialX, ink.transform.position.x, "ink should not move in X during update.");
         assertEquals(initialY, ink.transform.position.y, "ink should not move in Y during update.");
+    }
+
+    @Test
+    public void testRender_DrawsWhiteTintedAtWorldUnitScale() {
+        Ink ink = new Ink(mockWorld);
+        ink.transform.setPosition(256, 384);
+        SpriteBatch batch = mock(SpriteBatch.class);
+
+        ink.render(batch, 0.1f);
+
+        verify(batch).setColor(Color.WHITE);
+        verify(batch).draw(any(Texture.class), eq(256 * GdxGame.UNIT_SCALE), eq(384 * GdxGame.UNIT_SCALE),
+                eq(Ink.DEFAULT_WIDTH * GdxGame.UNIT_SCALE), eq(Ink.DEFAULT_HEIGHT * GdxGame.UNIT_SCALE));
     }
 }
