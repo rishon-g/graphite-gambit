@@ -330,7 +330,7 @@ public class GameWorld {
             // subtract delta to count down
             time -= delta;
 
-            // check for font.getData().setScale(1.0f);time over
+            // check for time over
             if (time <= 0) {
                 time = 0;
                 loseGame();
