@@ -229,6 +229,12 @@ public class GameWorldTest extends GameTest {
         verify(mockScreen, times(1)).collectPlotPoint();
     }
 
+    @Test void plotPointCollectedAwardsOneHundredPoints(){
+        world.plotpoints = 2;
+        world.plotPointCollected();
+        assert(world.getScore() == 100);
+    }
+
     @Test void allPlotPointsCollected(){
         world.plotpoints = 1; // No plot points to collect
         world.addEntity(new Door(world, "left"));
