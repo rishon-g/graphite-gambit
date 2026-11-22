@@ -403,6 +403,14 @@ public class GameWorldTest extends GameTest {
     }
 
     @Test
+    public void testUpdateTimeUpClampsTimeToZero(){
+        world.setDimensions(800, 600);
+        world.time = 10;
+        world.update(20); // overshoot the time limit
+        assert(world.time == 0); // the HUD should show 0, not a negative time
+    }
+
+    @Test
     public void testUpdateTimeNotUp(){
         world.setDimensions(800, 600);
         world.time = 10; // Set time limit to 10 seconds
