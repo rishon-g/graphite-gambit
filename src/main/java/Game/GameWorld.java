@@ -641,6 +641,7 @@ public class GameWorld {
 
     /**
      * Triggers the lose condition for the game. Called when the player dies or time
+     * runs out.
      */
     public void loseGame() {
         endGame(false);
