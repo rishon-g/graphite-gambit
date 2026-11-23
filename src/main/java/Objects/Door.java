@@ -1,6 +1,5 @@
 package Objects;
 
-import Components.Transform;
 import Entities.Entity;
 import Entities.Player;
 import Game.GameWorld;

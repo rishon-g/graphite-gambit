@@ -4,7 +4,6 @@ import Game.AudioManager;
 import Game.DrawWeight;
 import Game.GameWorld;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
