@@ -302,4 +302,13 @@ public class PlayerTest extends GameTest {
         assertEquals(90, player.getHealth(), "a heal below max should be applied in full.");
         verify(mockWorld, never()).score(anyInt());
     }
+
+    @Test
+    public void testModifyHealth_HealPastMaxScoresOnlyTheExcess() {
+        player.modifyHealth(-10);
+        player.modifyHealth(25);
+
+        assertEquals(100, player.getHealth(), "health should be capped at max.");
+        verify(mockWorld, times(1)).score(15);
+    }
 }
