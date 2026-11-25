@@ -30,6 +30,8 @@ abstract public class Entity {
 
     /**
      * Constructor for the Entity class.
+     *
+     * @param world the game world this entity belongs to
      */
     public Entity(GameWorld world) {
         this.transform = new Transform();
@@ -74,6 +76,12 @@ abstract public class Entity {
      */
     abstract public void render(SpriteBatch batch, float delta);
 
+    /**
+     * Draws a texture untinted over this entity's position and size, converted to world units.
+     *
+     * @param batch spritebatch to draw into
+     * @param texture texture to draw
+     */
     protected void renderTexture(SpriteBatch batch, Texture texture) {
         batch.setColor(Color.WHITE);
         batch.draw(
