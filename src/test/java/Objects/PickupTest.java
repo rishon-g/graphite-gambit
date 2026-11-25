@@ -1,6 +1,9 @@
 package Objects;
 
 import Entities.Player;
+import Game.GdxGame;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import utils.GameTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -107,5 +110,20 @@ public class PickupTest extends GameTest {
         // Math: 100 + sin(0.2 * 5) * 10
         float expectedY = 100f + (float) Math.sin(0.2f * 5f) * 10f;
         assertEquals(expectedY, pickup.transform.position.y, 0.001f, "pickup oscillating incorrectly");
+    }
+
+    @Test
+    public void testRender_GlowStaysAtBaseYWhileGraphiteBobs() {
+        Pickup pickup = new Pickup(mockWorld);
+        pickup.transform.position.set(100f, 100f);
+        pickup.updateInternal(0.1f);
+        float bobbedY = pickup.transform.position.y;
+        SpriteBatch batch = mock(SpriteBatch.class);
+
+        pickup.render(batch, 0.1f);
+
+        float size = Pickup.DEFAULT_WIDTH * GdxGame.UNIT_SCALE;
+        verify(batch).draw(any(Texture.class), eq(100f * GdxGame.UNIT_SCALE), eq(100f * GdxGame.UNIT_SCALE), eq(size), eq(size));
+        verify(batch).draw(any(Texture.class), eq(100f * GdxGame.UNIT_SCALE), eq(bobbedY * GdxGame.UNIT_SCALE), eq(size), eq(size));
     }
 }
