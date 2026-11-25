@@ -1,6 +1,9 @@
 package Objects;
 
 import Entities.Player;
+import Game.GdxGame;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import utils.GameTest;
 
 import org.junit.jupiter.api.Test;
@@ -27,5 +30,17 @@ public class NodeTest extends GameTest {
 
         verify(mockWorld, times(1)).plotPointCollected();
         assertTrue(node.dead, "a collected node should be removed.");
+    }
+
+    @Test
+    public void testRender_DrawsAtPositionAndSizeInWorldUnits() {
+        Node node = new Node(mockWorld);
+        node.transform.setPosition(64, 96);
+        SpriteBatch batch = mock(SpriteBatch.class);
+
+        node.render(batch, 0.1f);
+
+        verify(batch).draw(any(Texture.class), eq(64 * GdxGame.UNIT_SCALE), eq(96 * GdxGame.UNIT_SCALE),
+                eq(32 * GdxGame.UNIT_SCALE), eq(32 * GdxGame.UNIT_SCALE));
     }
 }
