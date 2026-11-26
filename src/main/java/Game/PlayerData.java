@@ -143,6 +143,7 @@ public class PlayerData {
      * returns the highscore for a level
      * @param level the level of the game
      * @return the highscore as an integer
+     * @throws IndexOutOfBoundsException if neither this level nor a later one has a recorded score (MainMenuScreen shows 0 then)
     */
     public int getScore(int level) {
         return highScores.get(level-1);
