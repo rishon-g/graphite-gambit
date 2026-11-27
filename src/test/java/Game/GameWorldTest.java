@@ -438,6 +438,23 @@ public class GameWorldTest extends GameTest {
     }
 
     @Test
+    public void testPickupSpawnerSkipsAnOccupiedSpawnPoint(){
+        world.spawnPoints.add(new Vec2(100, 100));
+        world.setDimensions(800, 600);
+
+        world.update(6); // spawns a pickup on the only spawn point
+        world.update(6); // that spot is still taken, so nothing new spawns
+
+        int pickupCount = 0;
+        for(Entity e : world.getEntities()){
+            if(e instanceof Pickup){
+                pickupCount++;
+            }
+        }
+        assert(pickupCount == 1);
+    }
+
+    @Test
     public void testFullPickups(){
         int maxPickups = 5;
         for(int i = 0; i < 10; i++){
