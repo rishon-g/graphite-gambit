@@ -152,4 +152,14 @@ public class RandomPatrolTest {
 
         assertNull(result);
     }
+
+    @Test
+    void testChoosePatrolTarget_ZeroRadius_ReturnsNullEvenOnAnOpenMap() {
+        int[][] map = new int[5][5];
+
+        // a radius of 0 only covers the start tile, which is never a patrol target
+        int[] result = RandomPatrol.choosePatrolTarget(map, 2, 2, 0);
+
+        assertNull(result);
+    }
 }
