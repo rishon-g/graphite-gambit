@@ -78,8 +78,8 @@ public class GameWorld {
     private float camZoom = 1f;
 
     /**
-     * Constructor for the GameWorld class, initializes the entities vector and
-     * creates the player entity.
+     * Constructor for the GameWorld class, initializes the entities vector, score
+     * and 300-second timer. The player is added later through addEntity.
      * 
      * @param id     The id of this world
      * @param screen a reference to the creating screen
