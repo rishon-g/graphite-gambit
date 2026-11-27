@@ -184,9 +184,9 @@ public class GameWorld {
     }
 
     /**
-     * getter for the drawmap
+     * getter for the draw size
      * 
-     * @return drawmap
+     * @return DRAW_SIZE, the width and height in pixels of one drawmap cell
      */
     public int getDrawSize() {
         return DRAW_SIZE;
