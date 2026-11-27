@@ -219,6 +219,7 @@ public class GameWorld {
      * @param position  Position to draw at
      * @param erase     true if it should instead erase
      * @param brushsize width of drawing
+     * @param w         brush giving the weight at each offset, clamped to 0-10
      */
     public void floorDraw(Vec2 position, boolean erase, int brushsize, DrawWeight w) {
         floorDraw(position.x, position.y, erase, brushsize, w);
@@ -231,6 +232,7 @@ public class GameWorld {
      * @param posy      y position to draw at
      * @param erase     true if it should instead erase
      * @param brushsize width of the brush to be used
+     * @param w         brush giving the weight at each offset, clamped to 0-10
      */
     public void floorDraw(float posx, float posy, boolean erase, int brushsize, DrawWeight w) {
         int tilex = (int) posx / DRAW_SIZE, tiley = (int) posy / DRAW_SIZE;
@@ -650,6 +652,8 @@ public class GameWorld {
     /**
      * Ends the game and triggers the end screen. Called when the player wins or
      * loses.
+     *
+     * @param won true if the player won, false if they lost
      */
     public void endGame(boolean won) {
         screen.gameEnd(won);
