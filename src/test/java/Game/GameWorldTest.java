@@ -394,6 +394,13 @@ public class GameWorldTest extends GameTest {
         assert(result == null);
     }
 
+    @Test void getEntityByTransformNull(){
+        world.setDimensions(800, 600);
+        world.addEntity(new Player(world));
+
+        assert(world.getEntityByTransform(null) == null);
+    }
+
     @Test
     public void testUpdateTimeUp(){
         world.setDimensions(800, 600);
