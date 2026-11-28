@@ -93,7 +93,8 @@ public class AStar {
      * @param startY y-coordinate of the starting cell
      * @param endX x-coordinate of the destination cell
      * @param endY y-coordinate of the destination cell
-     * @return a list of cells representing the path, excluding the starting cell;
+     * @return the cells from start to end as {x, y} pairs, excluding the starting cell,
+     *         or an empty list if the map or either cell is invalid or no path exists
      */
     public static List<int[]> findPath(int[][] map, int startX, int startY, int endX, int endY) {
         // If we are already on the goal, the path is empty
